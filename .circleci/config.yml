@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: diehlpk/teaching
+    steps:
+      - checkout
+      - run: find -name "*.cpp" -exec g++ "{}" -o "{}".exec ";"
+      - run: find -name "*.cpp" -exec cppcheck --enable=warning,performance "{}" ";"
+      - run: mkdir final 
+      - run: 
+          command: | 
+            latexmk -pdflatex="lualatex --shell-escape %O %S" -pdf book.tex
+      - store_artifacts:
+          path: final
+          destination: lectures
