@@ -1,5 +1,5 @@
 
 
 all: book.tex
-	git submodule update --remote ParallelComputationMathExamples/
+	git submodule update --init --remote ParallelComputationMathExamples/
 	latexmk -pdflatex="lualatex --shell-escape %O %S" -pdf book.tex
