@@ -10,7 +10,7 @@ jobs:
       - run: mkdir final 
       - run: 
           command: | 
-            Make
+            make
             cp book.pdf final
       - store_artifacts:
           path: final
