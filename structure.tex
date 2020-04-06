@@ -18,6 +18,10 @@
 %----------------------------------------------------------------------------------------
 %	VARIOUS REQUIRED PACKAGES AND CONFIGURATIONS
 %----------------------------------------------------------------------------------------
+\usepackage{fontspec}
+\setmainfont{Raleway}
+
+
 \usepackage[
     type={CC},
     modifier={by-nc-nd},
@@ -39,8 +43,27 @@
 \usepackage{booktabs} % Required for nicer horizontal rules in tables
 
 \usepackage{xcolor} % Required for specifying colors by name
-\definecolor{azure}{RGB}{243,102,25} % Define the orange color used for highlighting throughout the book
- \definecolor{azure}{rgb}{0.0, 0.5, 1.0}
+\definecolor{azure}{rgb}{0.0, 0.5, 1.0}
+\definecolor{darkgreen}{rgb}{0.0, 0.5, 0.0}
+\definecolor{amaranth}{rgb}{0.9, 0.17, 0.31}
+
+\usepackage{listings}
+
+\usepackage{listings}
+
+\lstset{
+    basicstyle=\ttfamily,
+    keywordstyle=\color{azure}\ttfamily,
+    stringstyle=\color{amaranth}\ttfamily,
+    commentstyle=\color{darkgreen}\ttfamily,
+    morecomment=[l][\color{magenta}]{\#},
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny,
+    frame = single,
+}
+
+\newcommand{\orcid}[1]{\href{https://orcid.org/#1}{\includegraphics[height=10pt]{orcid}}}
 
 %----------------------------------------------------------------------------------------
 %	MARGINS

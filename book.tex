@@ -59,7 +59,7 @@
 \begingroup
 \thispagestyle{empty} % Suppress headers and footers on the title page
 \begin{tikzpicture}[remember picture,overlay]
-\node[inner sep=0pt] (background) at (current page.center) {\includegraphics[width=\paperwidth]{background.pdf}};
+%\node[inner sep=0pt] (background) at (current page.center) {\includegraphics[width=\paperwidth]{background.pdf}};
 \draw (current page.center) node [fill=azure!30!white,fill opacity=0.6,text opacity=1,inner sep=1cm]{\Huge\centering\bfseries\sffamily\parbox[c][][t]{\paperwidth}{\centering M4997: Parallel Computaitonal Mathematics\\[15pt] % Book title
 {\Large Fall 2020}\\[20pt] % Subtitle
 {\huge Dr. Patrick Diehl}}}; % Author name
@@ -75,11 +75,11 @@
 ~\vfill
 \thispagestyle{empty}
 
-\noindent Copyright \copyright\ 2020 Patrick Diehl\\ % Copyright notice
+\noindent Copyright \copyright\ 2020 Patrick Diehl\orcid{0000-0003-3922-8419}\\ % Copyright notice
 
 %\noindent \textsc{Published by Publisher}\\ % Publisher
 
-\noindent \textsc{https://www.cct.lsu.edu/~pdiehl/teaching/2020/4997/}\\ % URL
+\noindent \url{https://www.cct.lsu.edu/~pdiehl/teaching/2020/4997/}\\ % URL
 
 \noindent \doclicenseThis  
 
@@ -120,6 +120,9 @@
 \section{Getting started with C++}
 
 \subsection{A simple C++ program}
+
+
+\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example, which most languages start with.}]{ParallelComputationMathExamples/chapter2/lecture1-1.cpp}
 
 \subsection{Simple data types}
 
@@ -170,7 +173,7 @@
 
 \section{Distributed memory}
 
-\chaper{HPX}
+\chapter{HPX}
 
 \section{Introduction to HPX}
 

@@ -10,7 +10,8 @@ jobs:
       - run: mkdir final 
       - run: 
           command: | 
-            latexmk -pdflatex="lualatex --shell-escape %O %S" -pdf book.tex
+            Make
+            cp book.pdf final
       - store_artifacts:
           path: final
-          destination: lectures
+          destination: book
