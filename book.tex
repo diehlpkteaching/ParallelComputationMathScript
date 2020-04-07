@@ -1,42 +1,27 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The Legrand Orange Book
+%Book
+%Copyright (C) 2019  Patrick Diehl
+%
+%This program is free software: you can redistribute it and/or modify
+%it under the terms of the GNU General Public License as published by
+%the Free Software Foundation, either version 3 of the License, or
+%(at your option) any later version.
+
+%This program is distributed in the hope that it will be useful,
+%but WITHOUT ANY WARRANTY; without even the implied warranty of
+%MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%GNU General Public License for more details.
+
+%You should have received a copy of the GNU General Public License
+%along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+% The template of the book is based on the The Legrand Orange Book
 % LaTeX Template
 % Version 2.4 (26/09/2018)
-%
-% This template was downloaded from:
-% http://www.LaTeXTemplates.com
-%
 % Original author:
 % Mathias Legrand (legrand.mathias@gmail.com) with modifications by:
 % Vel (vel@latextemplates.com)
-%
 % License:
 % CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%
-% Compiling this template:
-% This template uses biber for its bibliography and makeindex for its index.
-% When you first open the template, compile it from the command line with the 
-% commands below to make sure your LaTeX distribution is configured correctly:
-%
-% 1) pdflatex main
-% 2) makeindex main.idx -s StyleInd.ist
-% 3) biber main
-% 4) pdflatex main x 2
-%
-% After this, when you wish to update the bibliography/index use the appropriate
-% command above and make sure to compile with pdflatex several times 
-% afterwards to propagate your changes to the document.
-%
-% This template also uses a number of packages which may need to be
-% updated to the newest versions for the template to compile. It is strongly
-% recommended you update your LaTeX distribution if you have any
-% compilation errors.
-%
-% Important note:
-% Chapter heading images should have a 2:1 width:height ratio,
-% e.g. 920px width and 460px height.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------------------------------------------------------------------------------------
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
@@ -105,7 +90,7 @@
 %	PART
 %----------------------------------------------------------------------------------------
 
-\part{Introduction to the C++ standard library}
+\part{Introduction: C++ and the C++ standard template library}
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 1
@@ -113,36 +98,92 @@
 
 \chapterimage{chapter_head_2.pdf} % Chapter heading image
 
+%----------------------------------------------------------------------------------------
 \chapter{Introduction C++}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \section{History of C and C++}\index{Paragraphs of Text}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \section{Getting started with C++}
+%----------------------------------------------------------------------------------------
+To begin with C++ programming, we look at a simple C++ program, the so-called ``Hello World'' example which most programming language start with. Listing~\ref{code:hello:world} shows this program and the first line in green a comment is shown. A  single-line comments always starts with \lstinline[language=C++]|//| and is used to explain the functionality of the program or the next lines of codes. It is also possible to use multi-line comments\endnote{\url{https://en.cppreference.com/w/cpp/comment}} by using \lstinline[language=C++]{/* */}. Comments are important to understand the program, especially if the code is shared with other collaborators. Fore more details we refer to~\cite{kernighan1974elements}.
 
-\subsection{A simple C++ program}
+The second line starts with a so-called include directive\endnote{\url{https://en.cppreference.com/w/cpp/preprocessor/include}} \lstinline[language=C++]{#include <iostream>}. This include directive is needed to include functionality of the C++ standard library, see Chpater~\ref{chapter:stl}, in our case we include the \lstinline|iostream| header to print the Hello World to the terminal, see Line 6.
+
+The fourth line \lstinline[language=C++]{int main()} starts with the so-called Main function\endnote{\url{https://en.cppreference.com/w/cpp/language/main_function}} which is the entry point of the program and all code lines within are executed sequentially one by one. Every C++ which will be compiled to an executable needs exact one function called \lstinline[language=C++]|main| which have a integer \lstinline[language=C++]{int} as its return type. On most operation systems a return value of zero means that the program executed successfully and any other value indicates an failure. The second last line \lstinline[]|return| is the so--called return statement\endnote{\url{https://en.cppreference.com/w/cpp/language/return}} which has to match the return type in front of the \lstinline[language=C++]{int main()}.
 
 
-\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example, which most languages start with.}]{ParallelComputationMathExamples/chapter2/lecture1-1.cpp}
+\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example, which most languages start with.\label{code:hello:world}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-1.cpp}
 
-\subsection{Simple data types}
+Once we have written the program, we have to compile the C++ code into an executable to run the code and print ``Hello world'' to the terminal. Note that there are plenty of C++ compilers\endnote{\url{https://en.wikipedia.org/wiki/List_of_compilers\#C++_compilers}} available, however this book will use the GNU Compiler Collection (GCC) for all examples. Line 1 in Listing~\ref{code:hello:world:compile} shows how to compile the file \lstinline[language=bash]|lecture1-1.cpp|, which contains the C++ code in Listing~\ref{code:hello:world}, to an executable. The GCC provides the \lstinline[language=bash]{g++} compiler to compile C++ code and the \lstinline[language=bash]{gcc} compiler to compile C code. As the first argument to the \lstinline[language=bash]{g++} compiler the file name of the C++ is provided and with the \lstinline[language=bash]|-o| option the name of the executable is specified. To run the generated executable, we type \lstinline[language=bash]|./lecture-1-1| in the terminal. Note for the basic usage of the Linux terminal we refer to~\cite{newham2005learning,robbins2016bash}.
 
+\lstinputlisting[language=bash,caption={Compilation and execution of the C++ program.\label{code:hello:world:compile}},float,floatplacement=h,firstline=2, lastline=3]{ParallelComputationMathExamples/chapter2/lecture1-1.sh}
+
+%----------------------------------------------------------------------------------------
+\subsection{Fundamental data types}
+%----------------------------------------------------------------------------------------
+In this section the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language are introduced. First, the numeric data types are introduced. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For all these data types following options: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long| are available. For more details about the binary numeral system we refer to~\cite{gilli1965binary}. To represent real numbers $\mathbb{R}$ the \lstinline[language=C++]|float| data type and \lstinline[language=C++]|double| data type are available. Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. Table~\ref{chapter2:table:datatypes} summarizes all the available numeric data types. 
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Data type & Size (Bytes) & Min & Max \\\midrule
+\multicolumn{4}{c}{Natural numbers $\mathbb{N}$ }\\\midrule
+\lstinline[language=C++]|unsigned short int| & 2 & 0 & 65,535  \\ 
+\lstinline[language=C++]|unsigned int| & 4 & 0 & 4,294,967,295 \\ 
+\lstinline[language=C++]|unsigned long int| & 4 & 0 & 4,294,967,295 \\ 
+\lstinline[language=C++]|unsigned long long int| & 8 & 0 & 8,446,744,073,709,551,615 \\ \midrule
+\multicolumn{4}{c}{Integer numbers $\mathbb{Z}$ }\\\midrule
+\lstinline[language=C++]|short int| & 2 & -32,768 & 32,768 \\
+\lstinline[language=C++]|int| & 4 & -2,147,483,648 & 2,147,483,648 \\
+\lstinline[language=C++]|long long int| & 8 & $-2^{63}$ & $2^{63}-1$ \\\midrule
+\multicolumn{4}{c}{Teal numbers $\mathbb{R}$ }\\\midrule
+\lstinline[language=C++]|float| & 4 &  &  \\
+\lstinline[language=C++]|double| & 8 &  &  \\
+\bottomrule
+\end{tabular} 
+\caption{Overview of the fundamental numeric data types.}
+\label{chapter2:table:datatypes}
+\end{table}
+
+To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|bool| data type which has either one of the two values \lstinline[language=C++]|true| or \lstinline[language=C++]|false|.
+
+%----------------------------------------------------------------------------------------
 \subsection{Statements and flow control}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \subsubsection{Iteration statements}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \subsubsection{Selection statements}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \subsection{Functions}
+%----------------------------------------------------------------------------------------
 
-
+%----------------------------------------------------------------------------------------
 \subsection{Structuring source code}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \subsubsection{Structs}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \subsection{Classes}
+%----------------------------------------------------------------------------------------
 
+\theendnotes
 
 \chapter{The C++ Standard Template Library (STL)}
+\label{chapter:stl}
 
 \section{Overview of the STL}
 
@@ -151,11 +192,16 @@
 \section{Random numbers}
 
 
+\part{Linear algebra and solvers}
+
 \chapter{Linear algebra}
 
 \section{Blaze library}
 
-\section{Solvers}
+\chapter{Solvers}
+
+
+\part{Numerical examples}
 
 \chapter{Numerical examples}
 
@@ -167,11 +213,15 @@
 
 \section{Peridynamics}
 
+\part{Parallel and distributes computing}
+
 \chapter{Parallel computing}
 
 \section{Shared memory}
 
 \section{Distributed memory}
+
+\part{Introduction: HPX}
 
 \chapter{HPX}
 
