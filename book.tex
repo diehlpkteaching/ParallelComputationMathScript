@@ -103,7 +103,7 @@
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
-\section{History of C and C++}\index{Paragraphs of Text}
+\section{History of C and C++}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
@@ -125,6 +125,7 @@ Once we have written the program, we have to compile the C++ code into an execut
 %----------------------------------------------------------------------------------------
 \subsection{Fundamental data types}
 %----------------------------------------------------------------------------------------
+\index{data types!fundamental}
 In this section the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language are introduced. First, the numeric data types are introduced. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For all these data types following options: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long| are available. For more details about the binary numeral system we refer to~\cite{gilli1965binary}. To represent real numbers $\mathbb{R}$ the \lstinline[language=C++]|float| data type and \lstinline[language=C++]|double| data type are available. Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. Table~\ref{chapter2:table:datatypes} summarizes all the available numeric data types. 
 
 \begin{table}[h]
@@ -159,10 +160,39 @@ To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|b
 %----------------------------------------------------------------------------------------
 \subsubsection{Iteration statements}
 %----------------------------------------------------------------------------------------
+\index{statements!iteration} For some applications, we have to repeat some operations multiple times. The C++ language provides the so-called iteration statements. There are two iteration statements, the \lstinline[language=C++]|for| loop and the \lstinline[language=C++]|while| loop, respectively. Let us look how to compute the sum of the numbers from one up ton $n$
+\begin{align}
+r = \sum\limits_{i=1}^n i\text{.}
+\end{align}
+The first option is using a \lstinline[language=C++]|for| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/for}}\index{loop!for statement} which shown in Listing~\ref{code:for:loop}. Line 9 shows the \lstinline[language=C++]|for| loop statement with its three arguments. First, the so--called loop variable \lstinline[language=C++]{size_t i = 0} which is initialized to zero. Note that the loop variable is only defined within the loop's body (The part between the curly braces). Second, the so--called condition statement \lstinline[language=C++]{i < n} which means that the loop body is repeated until the variable $i$ is larger than $n$. The third statement manipulates the loop variable, in our case the loop variable is incremented by one after the loop body was executed once. Note that we use the \lstinline[language=C++]|for| loop statement, if we know how often we have to loop through the loop body in advance.
+
+
+\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the for loop statement. \label{code:for:loop}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-3.cpp}
+
+The second option is using a \lstinline[language=C++]|while| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/while}}\index{loop!while statement} which shown in Listing~\ref{code:while:loop}. 
+
+
+\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example, which most languages start with.\label{code:while:loop}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-3.cpp}
+
+
+
+
+\begin{exercise}
+Define in your own words in which case you should use a \lstinline[language=C++]|for| loop statement and a \lstinline[language=C++]|while| loop statement. 
+\end{exercise}
+
+
 
 %----------------------------------------------------------------------------------------
 \subsubsection{Selection statements}
 %----------------------------------------------------------------------------------------
+\index{statements!selection}
+
+
+%----------------------------------------------------------------------------------------
+\subsubsection{Operators}
+%----------------------------------------------------------------------------------------
+\index{Operators}
 
 %----------------------------------------------------------------------------------------
 \subsection{Functions}
@@ -265,5 +295,15 @@ To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|b
 \printindex % Output the index
 
 %----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%	List of Listings
+%----------------------------------------------------------------------------------------
+
+\cleardoublepage % Make sure the index starts on an odd (right side) page
+\phantomsection
+\addcontentsline{toc}{chapter}{\textcolor{azure}{List of Listings}}
+\lstlistoflistings
+
 
 \end{document}
