@@ -116,17 +116,22 @@ The second line starts with a so-called include directive\endnote{\url{https://e
 The fourth line \lstinline[language=C++]{int main()} starts with the so-called Main function\endnote{\url{https://en.cppreference.com/w/cpp/language/main_function}} which is the entry point of the program and all code lines within are executed sequentially one by one. Every C++ which will be compiled to an executable needs exact one function called \lstinline[language=C++]|main| which have a integer \lstinline[language=C++]{int} as its return type. On most operation systems a return value of zero means that the program executed successfully and any other value indicates an failure. The second last line \lstinline[]|return| is the so--called return statement\endnote{\url{https://en.cppreference.com/w/cpp/language/return}} which has to match the return type in front of the \lstinline[language=C++]{int main()}.
 
 
-\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example, which most languages start with.\label{code:hello:world}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-1.cpp}
+\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example, which most languages start with.\label{code:hello:world}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-main.cpp}
 
 Once we have written the program, we have to compile the C++ code into an executable to run the code and print ``Hello world'' to the terminal. Note that there are plenty of C++ compilers\endnote{\url{https://en.wikipedia.org/wiki/List_of_compilers\#C++_compilers}} available, however this book will use the GNU Compiler Collection (GCC) for all examples. Line 1 in Listing~\ref{code:hello:world:compile} shows how to compile the file \lstinline[language=bash]|lecture1-1.cpp|, which contains the C++ code in Listing~\ref{code:hello:world}, to an executable. The GCC provides the \lstinline[language=bash]{g++} compiler to compile C++ code and the \lstinline[language=bash]{gcc} compiler to compile C code. As the first argument to the \lstinline[language=bash]{g++} compiler the file name of the C++ is provided and with the \lstinline[language=bash]|-o| option the name of the executable is specified. To run the generated executable, we type \lstinline[language=bash]|./lecture-1-1| in the terminal. Note for the basic usage of the Linux terminal we refer to~\cite{newham2005learning,robbins2016bash}.
 
-\lstinputlisting[language=bash,caption={Compilation and execution of the C++ program.\label{code:hello:world:compile}},float,floatplacement=h,firstline=2, lastline=3]{ParallelComputationMathExamples/chapter2/lecture1-1.sh}
+\lstinputlisting[language=bash,caption={Compilation and execution of the C++ program.\label{code:hello:world:compile}},float,floatplacement=h,firstline=2, lastline=3]{ParallelComputationMathExamples/chapter2/lecture1-main.sh}
+
+\begin{exercise}
+Download the example program\endnote{\url{https://github.com/diehlpkteaching/ParallelComputationMathExamples}} from GitHub and compile it with your favorite C++ compiler. After you ran the example you could try to modify it, for example you could print a different text or add a second line to the output.
+\end{exercise}
+
 
 %----------------------------------------------------------------------------------------
 \subsection{Fundamental data types}
 %----------------------------------------------------------------------------------------
 \index{data types!fundamental}
-In this section the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language are introduced. First, the numeric data types are introduced. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For all these data types following options: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long| are available. For more details about the binary numeral system we refer to~\cite{gilli1965binary}. To represent real numbers $\mathbb{R}$ the \lstinline[language=C++]|float| data type and \lstinline[language=C++]|double| data type are available. Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. Table~\ref{chapter2:table:datatypes} summarizes all the available numeric data types. 
+In this section the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language are introduced. First, the numeric data types are introduced. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For all these data types following options: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long| are available. For more details about the binary numeral system we refer to~\cite{gilli1965binary}. To represent real numbers $\mathbb{R}$ the \lstinline[language=C++]|float| data type and \lstinline[language=C++]|double| data type are available. Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. Table~\ref{chapter2:table:datatypes} summarizes all the available numeric data types and there ranges. The next section shows how to get the range of the IEEE 474 standard how floating point numbers.
 
 \begin{table}[h]
 \centering
@@ -142,7 +147,7 @@ Data type & Size (Bytes) & Min & Max \\\midrule
 \lstinline[language=C++]|short int| & 2 & -32,768 & 32,768 \\
 \lstinline[language=C++]|int| & 4 & -2,147,483,648 & 2,147,483,648 \\
 \lstinline[language=C++]|long long int| & 8 & $-2^{63}$ & $2^{63}-1$ \\\midrule
-\multicolumn{4}{c}{Teal numbers $\mathbb{R}$ }\\\midrule
+\multicolumn{4}{c}{Real numbers $\mathbb{R}$ }\\\midrule
 \lstinline[language=C++]|float| & 4 &  &  \\
 \lstinline[language=C++]|double| & 8 &  &  \\
 \bottomrule
@@ -152,6 +157,9 @@ Data type & Size (Bytes) & Min & Max \\\midrule
 \end{table}
 
 To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|bool| data type which has either one of the two values \lstinline[language=C++]|true| or \lstinline[language=C++]|false|.
+
+\subsection{Numerical limits}
+
 
 %----------------------------------------------------------------------------------------
 \subsection{Statements and flow control}
@@ -167,32 +175,33 @@ r = \sum\limits_{i=1}^n i\text{.}
 The first option is using a \lstinline[language=C++]|for| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/for}}\index{loop!for statement} which shown in Listing~\ref{code:for:loop}. Line 9 shows the \lstinline[language=C++]|for| loop statement with its three arguments. First, the so--called loop variable \lstinline[language=C++]{size_t i = 0} which is initialized to zero. Note that the loop variable is only defined within the loop's body (The part between the curly braces). Second, the so--called condition statement \lstinline[language=C++]{i < n} which means that the loop body is repeated until the variable $i$ is larger than $n$. The third statement manipulates the loop variable, in our case the loop variable is incremented by one after the loop body was executed once. Note that we use the \lstinline[language=C++]|for| loop statement, if we know how often we have to loop through the loop body in advance.
 
 
-\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the for loop statement. \label{code:for:loop}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-3.cpp}
+\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the for loop statement. \label{code:for:loop}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-for.cpp}
 
-The second option is using a \lstinline[language=C++]|while| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/while}}\index{loop!while statement} which shown in Listing~\ref{code:while:loop}. 
-
-
-\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example, which most languages start with.\label{code:while:loop}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-3.cpp}
+The second option is using a \lstinline[language=C++]|while| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/while}}\index{loop!while statement} which shown in Listing~\ref{code:while:loop}. Line 10 shows the \lstinline[language=C++]|while| loop statement with its one argument. This is the so-called condition statement  \lstinline[language=C++]{i < n} which means that the loop body is repeated until the variable $i$ is larger than $n$. Note in the previous example we had three arguments. Here, the loop variable is declared before the loop in Line 9 and the third statement is  in Line 13 where the loop variable is incremented by one in each iteration. Note that we use the \lstinline[language=C++]|while| loop statement, if we do not know the amount of iterations in advance. This example has shown that we can write every \lstinline[language=C++]|for| loop statement as a \lstinline[language=C++]|while| loop statement.   
 
 
-
+\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the while loop statement..\label{code:while:loop}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-while.cpp}
 
 \begin{exercise}
 Define in your own words in which case you should use a \lstinline[language=C++]|for| loop statement and a \lstinline[language=C++]|while| loop statement. 
 \end{exercise}
-
-
 
 %----------------------------------------------------------------------------------------
 \subsubsection{Selection statements}
 %----------------------------------------------------------------------------------------
 \index{statements!selection}
 
+\begin{align}
+r = \sum\limits_{i=1}^n f(i)\text{.}
+\end{align}
+
 
 %----------------------------------------------------------------------------------------
 \subsubsection{Operators}
 %----------------------------------------------------------------------------------------
 \index{Operators}
+For the example in Listing~\ref{code:for:loop} we have seen the operator \lstinline[language=C++]|i<n| which is a so--called comparison operator. Next to the comparison operators, C++ language has following operators\endnote{\url{https://en.cppreference.com/w/cpp/language/operator_precedence}}: logical operators, arithmetic, assignment, and increment/decrement.
+
 
 %----------------------------------------------------------------------------------------
 \subsection{Functions}
@@ -219,7 +228,7 @@ Define in your own words in which case you should use a \lstinline[language=C++]
 
 \section{Working with strings}
 
-\section{Random numbers}
+\section{Containers}
 
 
 \part{Linear algebra and solvers}
