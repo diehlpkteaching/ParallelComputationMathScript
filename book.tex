@@ -192,7 +192,11 @@ Define in your own words in which case you should use a \lstinline[language=C++]
 \index{statements!selection}
 
 \begin{align}
-r = \sum\limits_{i=1}^n f(i)\text{.}
+r = \sum\limits_{i=1}^n f(i) \text{  with  } f(i) = 
+\begin{cases}
+i, \text{ if } i \text{ is even} \\
+i^2, \text{ else}
+\end{cases}
 \end{align}
 
 
@@ -200,8 +204,86 @@ r = \sum\limits_{i=1}^n f(i)\text{.}
 \subsubsection{Operators}
 %----------------------------------------------------------------------------------------
 \index{Operators}
-For the example in Listing~\ref{code:for:loop} we have seen the operator \lstinline[language=C++]|i<n| which is a so--called comparison operator. Next to the comparison operators, C++ language has following operators\endnote{\url{https://en.cppreference.com/w/cpp/language/operator_precedence}}: logical operators, arithmetic, assignment, and increment/decrement.
+For the example in Listing~\ref{code:for:loop} we have seen the operator \lstinline[language=C++]|i<n| which is a so--called comparison operator. Next to the comparison operators, C++ language has following operators\endnote{\url{https://en.cppreference.com/w/cpp/language/operator_precedence}}:
+\begin{itemize}
+\item Comparison operators, see Table~\ref{sec:1:tab:operator:comp},
+\item Arithmetic operators, see Table~\ref{sec:1:tab:operator:arithmetic},
+\item Logical operators, see Table~\ref{sec:1:tab:operator:logical}, and
+\item Assignment operators, see Table~\ref{sec:1:tab:operator:assign},
+\end{itemize}
+ logical operators, arithmetic, and assignment.
 
+\begin{table}[h]
+\centering
+\begin{tabular}{clll}
+\toprule
+Operator & Name  & Example \\ 
+\midrule
+\lstinline|==| & Equal to & \lstinline|x==y|\\ 
+\lstinline|!=| & Not equal & \lstinline|x!=y|\\ 
+\lstinline|>| & Greater than & \lstinline|x > y|\\ 
+\lstinline|<| & Less than & \lstinline|x < y|\\ 
+\lstinline|>=| & Greater than or equal & \lstinline|x >= y|\\ 
+\lstinline|<=| & Less than or equal & \lstinline|x <= y|\\ 
+\bottomrule 
+\end{tabular} 
+\caption{Comparison operators}
+\label{sec:1:tab:operator:comp}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{clll}
+\toprule
+Operator & Name & Description & Example \\ 
+\midrule
+\lstinline|+| & Addition & Computes the sum of two values & $2+2=4$ \\ 
+\lstinline|-| & Subtraction  & Computes the difference of two values & $5-3=2$ \\ 
+\lstinline|/| & Division & Divides two values & $6/2=3$ \\ 
+\lstinline|*| & Multiplication & Multiplies two values & $2\times2=4$ \\ 
+\lstinline|%| & Modulo &  	Returns the division remainder & \lstinline|2%1=0| \\ 
+\lstinline|++| & Increments & Add plus one to the value & \lstinline|1++=2|\\ 
+\lstinline|--| & Decrements & Subtract one of the value & \lstinline|1--=0|\\ 
+\bottomrule 
+\end{tabular} 
+\caption{Arithmetic operators}
+\label{sec:1:tab:operator:arithmetic}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\begin{tabular}{clll}
+\toprule
+Operator & Name & Description & Example \\ 
+\midrule
+\lstinline|&&| & Logical and & Returns \lstinline|true| if both statements are true  & \lstinline| x > 5 && x < 10| \\ 
+\lstinline|||| & Logical or  & Returns \lstinline|true| if one statement is true & \lstinline| x > 5 || y < 10| \\ 
+\lstinline|!| & Logical not &  Inverse the statement & \lstinline| !(x > 5 && x < 10)| \\ 
+\bottomrule 
+\end{tabular} 
+\caption{Logical operators}
+\label{sec:1:tab:operator:logical}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\begin{tabular}{clll}
+\toprule
+Operator & Name & Example & Equivalent  \\ 
+\midrule
+\lstinline|=| & Assignment &   \lstinline| x = 5| &   \lstinline| x = 5 | \\ 
+\lstinline|+=| & Plus equal  & \lstinline| x+= 5|  & \lstinline| x = x + 5 | \\ 
+\lstinline|-=| & Minus equal & \lstinline| x-= 5|  & \lstinline| x = x - 5 | \\ 
+\lstinline|*=| & Multiplication equal &  \lstinline| x*= 5| & \lstinline| x= x * 5| \\ 
+\lstinline|/=| & Division equal &  \lstinline| x/= 5| & \lstinline| x= x / 5| \\ 
+\lstinline|%=| & Modulo equal &  \lstinline| x%= 5| & \lstinline| x = x % 5| \\ 
+\bottomrule 
+\end{tabular} 
+\caption{Assignment operators}
+\label{sec:1:tab:operator:assign}
+\end{table}
 
 %----------------------------------------------------------------------------------------
 \subsection{Functions}
