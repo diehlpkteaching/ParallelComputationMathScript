@@ -156,7 +156,7 @@ Data type & Size (Bytes) & Min & Max \\\midrule
 \label{chapter2:table:datatypes}
 \end{table}
 
-To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|bool| data type which has either one of the two values \lstinline[language=C++]|true| or \lstinline[language=C++]|false|.
+To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|bool| data type which has either one of the two values \lstinline[language=C++]|true| or \lstinline[language=C++]|false|. Note that the C++ STL offers \lstinline|std::complex|\endnote{\url{https://en.cppreference.com/w/cpp/numeric/complex}} for complex number $\mathbb{C}$, however, this one is not within the fundamental data types.
 
 \subsection{Numerical limits}
 
@@ -229,6 +229,7 @@ Operator & Name  & Example \\
 \end{tabular} 
 \caption{Comparison operators}
 \label{sec:1:tab:operator:comp}
+\index{Operators!comparison}
 \end{table}
 
 \begin{table}[h]
@@ -248,6 +249,7 @@ Operator & Name & Description & Example \\
 \end{tabular} 
 \caption{Arithmetic operators}
 \label{sec:1:tab:operator:arithmetic}
+\index{Operators!arithmetic}
 \end{table}
 
 
@@ -264,6 +266,7 @@ Operator & Name & Description & Example \\
 \end{tabular} 
 \caption{Logical operators}
 \label{sec:1:tab:operator:logical}
+\index{Operators!logical}
 \end{table}
 
 
@@ -283,7 +286,18 @@ Operator & Name & Example & Equivalent  \\
 \end{tabular} 
 \caption{Assignment operators}
 \label{sec:1:tab:operator:assign}
+\index{Operators!assignment}
 \end{table}
+
+\begin{exercise}
+Write a small C++ program using selection statements and operators to determine if a given year is a lap year. Following logical statements should be implemented: 
+\begin{itemize}
+	\item   If year is divided by 4 but not by 100, then it is a leap year.
+    \item If year is divided by both 100 and 400, then it is a leap year.
+    \item If year is divided by 400, then it is a leap year.
+    \item And in all other cases, it is not a leap year.
+\end{itemize}
+\end{exercise}
 
 %----------------------------------------------------------------------------------------
 \subsection{Functions}
@@ -300,6 +314,8 @@ Operator & Name & Example & Equivalent  \\
 %----------------------------------------------------------------------------------------
 \subsection{Classes}
 %----------------------------------------------------------------------------------------
+
+\newpage
 
 \theendnotes
 
