@@ -31,7 +31,7 @@
 
 \input{structure.tex} % Insert the commands.tex file which contains the majority of the structure behind the template
 
-%\hypersetup{pdftitle={Title},pdfauthor={Author}} % Uncomment and fill out to include PDF metadata for the author and title of the book
+\hypersetup{pdftitle={Parallel Computational Mathematics},pdfauthor={Patrick Diehl, Phd}} % Uncomment and fill out to include PDF metadata for the author and title of the book
 
 %----------------------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 \thispagestyle{empty} % Suppress headers and footers on the title page
 \begin{tikzpicture}[remember picture,overlay]
 %\node[inner sep=0pt] (background) at (current page.center) {\includegraphics[width=\paperwidth]{background.pdf}};
-\draw (current page.center) node [fill=azure!30!white,fill opacity=0.6,text opacity=1,inner sep=1cm]{\Huge\centering\bfseries\sffamily\parbox[c][][t]{\paperwidth}{\centering M4997: Parallel Computaitonal Mathematics\\[15pt] % Book title
+\draw (current page.center) node [fill=azure!30!white,fill opacity=0.6,text opacity=1,inner sep=1cm]{\Huge\centering\bfseries\sffamily\parbox[c][][t]{\paperwidth}{\centering Parallel Computaitonal Mathematics\\[15pt] % Book title
 {\Large Fall 2020}\\[20pt] % Subtitle
 {\huge Dr. Patrick Diehl}}}; % Author name
 \end{tikzpicture}
@@ -76,7 +76,7 @@
 
 %\usechapterimagefalse % If you don't want to include a chapter image, use this to toggle images off - it can be enabled later with \usechapterimagetrue
 
-\chapterimage{chapter_head_1.pdf} % Table of contents heading image
+%\chapterimage{chapter_head_1.pdf} % Table of contents heading image
 
 \pagestyle{empty} % Disable headers and footers for the following pages
 
@@ -85,6 +85,8 @@
 \cleardoublepage % Forces the first chapter to start on an odd page so it's on the right side of the book
 
 \pagestyle{fancy} % Enable headers and footers again
+
+\chapter*{Forward}
 
 %----------------------------------------------------------------------------------------
 %	PART
@@ -96,273 +98,87 @@
 %	CHAPTER 1
 %----------------------------------------------------------------------------------------
 
-\chapterimage{chapter_head_2.pdf} % Chapter heading image
+\include{sections/chapter1}
 
 %----------------------------------------------------------------------------------------
-\chapter{Introduction C++}
-%----------------------------------------------------------------------------------------
-
-%----------------------------------------------------------------------------------------
-\section{History of C and C++}
+\chapter{The C++ Standard Template Library (STL)}
+\label{chapter:stl}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
-\section{Getting started with C++}
-%----------------------------------------------------------------------------------------
-To begin with C++ programming, we look at a simple C++ program, the so-called ``Hello World'' example which most programming language start with. Listing~\ref{code:hello:world} shows this program and the first line in green a comment is shown. A  single-line comments always starts with \lstinline[language=C++]|//| and is used to explain the functionality of the program or the next lines of codes. It is also possible to use multi-line comments\endnote{\url{https://en.cppreference.com/w/cpp/comment}} by using \lstinline[language=C++]{/* */}. Comments are important to understand the program, especially if the code is shared with other collaborators. Fore more details we refer to~\cite{kernighan1974elements}.
-
-The second line starts with a so-called include directive\endnote{\url{https://en.cppreference.com/w/cpp/preprocessor/include}} \lstinline[language=C++]{#include <iostream>}. This include directive is needed to include functionality of the C++ standard library, see Chpater~\ref{chapter:stl}, in our case we include the \lstinline|iostream| header to print the Hello World to the terminal, see Line 6.
-
-The fourth line \lstinline[language=C++]{int main()} starts with the so-called Main function\endnote{\url{https://en.cppreference.com/w/cpp/language/main_function}} which is the entry point of the program and all code lines within are executed sequentially one by one. Every C++ which will be compiled to an executable needs exact one function called \lstinline[language=C++]|main| which have a integer \lstinline[language=C++]{int} as its return type. On most operation systems a return value of zero means that the program executed successfully and any other value indicates an failure. The second last line \lstinline[]|return| is the so--called return statement\endnote{\url{https://en.cppreference.com/w/cpp/language/return}} which has to match the return type in front of the \lstinline[language=C++]{int main()}.
-
-
-\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example, which most languages start with.\label{code:hello:world}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-main.cpp}
-
-Once we have written the program, we have to compile the C++ code into an executable to run the code and print ``Hello world'' to the terminal. Note that there are plenty of C++ compilers\endnote{\url{https://en.wikipedia.org/wiki/List_of_compilers\#C++_compilers}} available, however this book will use the GNU Compiler Collection (GCC) for all examples. Line 1 in Listing~\ref{code:hello:world:compile} shows how to compile the file \lstinline[language=bash]|lecture1-1.cpp|, which contains the C++ code in Listing~\ref{code:hello:world}, to an executable. The GCC provides the \lstinline[language=bash]{g++} compiler to compile C++ code and the \lstinline[language=bash]{gcc} compiler to compile C code. As the first argument to the \lstinline[language=bash]{g++} compiler the file name of the C++ is provided and with the \lstinline[language=bash]|-o| option the name of the executable is specified. To run the generated executable, we type \lstinline[language=bash]|./lecture-1-1| in the terminal. Note for the basic usage of the Linux terminal we refer to~\cite{newham2005learning,robbins2016bash}.
-
-\lstinputlisting[language=bash,caption={Compilation and execution of the C++ program.\label{code:hello:world:compile}},float,floatplacement=h,firstline=2, lastline=3]{ParallelComputationMathExamples/chapter2/lecture1-main.sh}
-
-\begin{exercise}
-Download the example program\endnote{\url{https://github.com/diehlpkteaching/ParallelComputationMathExamples}} from GitHub and compile it with your favorite C++ compiler. After you ran the example you could try to modify it, for example you could print a different text or add a second line to the output.
-\end{exercise}
-
-
-%----------------------------------------------------------------------------------------
-\subsection{Fundamental data types}
-%----------------------------------------------------------------------------------------
-\index{data types!fundamental}
-In this section the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language are introduced. First, the numeric data types are introduced. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For all these data types following options: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long| are available. For more details about the binary numeral system we refer to~\cite{gilli1965binary}. To represent real numbers $\mathbb{R}$ the \lstinline[language=C++]|float| data type and \lstinline[language=C++]|double| data type are available. Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. Table~\ref{chapter2:table:datatypes} summarizes all the available numeric data types and there ranges. The next section shows how to get the range of the IEEE 474 standard how floating point numbers.
-
-\begin{table}[h]
-\centering
-\begin{tabular}{lccc}
-\toprule
-Data type & Size (Bytes) & Min & Max \\\midrule
-\multicolumn{4}{c}{Natural numbers $\mathbb{N}$ }\\\midrule
-\lstinline[language=C++]|unsigned short int| & 2 & 0 & 65,535  \\ 
-\lstinline[language=C++]|unsigned int| & 4 & 0 & 4,294,967,295 \\ 
-\lstinline[language=C++]|unsigned long int| & 4 & 0 & 4,294,967,295 \\ 
-\lstinline[language=C++]|unsigned long long int| & 8 & 0 & 8,446,744,073,709,551,615 \\ \midrule
-\multicolumn{4}{c}{Integer numbers $\mathbb{Z}$ }\\\midrule
-\lstinline[language=C++]|short int| & 2 & -32,768 & 32,768 \\
-\lstinline[language=C++]|int| & 4 & -2,147,483,648 & 2,147,483,648 \\
-\lstinline[language=C++]|long long int| & 8 & $-2^{63}$ & $2^{63}-1$ \\\midrule
-\multicolumn{4}{c}{Real numbers $\mathbb{R}$ }\\\midrule
-\lstinline[language=C++]|float| & 4 &  &  \\
-\lstinline[language=C++]|double| & 8 &  &  \\
-\bottomrule
-\end{tabular} 
-\caption{Overview of the fundamental numeric data types.}
-\label{chapter2:table:datatypes}
-\end{table}
-
-To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|bool| data type which has either one of the two values \lstinline[language=C++]|true| or \lstinline[language=C++]|false|. Note that the C++ STL offers \lstinline|std::complex|\endnote{\url{https://en.cppreference.com/w/cpp/numeric/complex}} for complex number $\mathbb{C}$, however, this one is not within the fundamental data types.
-
-\subsection{Numerical limits}
-
-
-%----------------------------------------------------------------------------------------
-\subsection{Statements and flow control}
+\section{Overview of the STL}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
-\subsubsection{Iteration statements}
+\section{Strings}
+\index{STL!string}
+\index{string}
 %----------------------------------------------------------------------------------------
-\index{statements!iteration} For some applications, we have to repeat some operations multiple times. The C++ language provides the so-called iteration statements. There are two iteration statements, the \lstinline[language=C++]|for| loop and the \lstinline[language=C++]|while| loop, respectively. Let us look how to compute the sum of the numbers from one up ton $n$
-\begin{align}
-r = \sum\limits_{i=1}^n i\text{.}
-\end{align}
-The first option is using a \lstinline[language=C++]|for| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/for}}\index{loop!for statement} which shown in Listing~\ref{code:for:loop}. Line 9 shows the \lstinline[language=C++]|for| loop statement with its three arguments. First, the so--called loop variable \lstinline[language=C++]{size_t i = 0} which is initialized to zero. Note that the loop variable is only defined within the loop's body (The part between the curly braces). Second, the so--called condition statement \lstinline[language=C++]{i < n} which means that the loop body is repeated until the variable $i$ is larger than $n$. The third statement manipulates the loop variable, in our case the loop variable is incremented by one after the loop body was executed once. Note that we use the \lstinline[language=C++]|for| loop statement, if we know how often we have to loop through the loop body in advance.
+The STL provides the class \lstinline[language=C++]{string}\endnote{\url{http://www.cplusplus.com/reference/string/string/}} to store sequences of characters. For the usage of this class the header \lstinline[language=c++]{#include <string>} has to be added to the cpp file to make \lstinline[language=c++]{std::string} available. Listing~\ref{code:strings} shows how to use the string class to write a set of characters to standard output stream\endnote{\url{http://www.cplusplus.com/reference/iostream/cout/?kw=cout}} \lstinline[language=c++]{std::cout} and read them from standard input stream\endnote{\url{http://www.cplusplus.com/reference/iostream/cin/?kw=cin}} \lstinline[language=c++]{std::cin}. To use these functionality the \lstinline[language=c++]{#include <iostream>} header is needed. \index{iostream!cin}\index{iostream!cout} \\
+
+In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name: "} is written to the standard output stream using the operator \lstinline[language=c++]{<<}. In Line~9 a string object with the identifier \lstinline[language=c++]{name} is declared. All variables have a name \lstinline[language=c++]{name} and a type  \lstinline[language=c++]{std::string}. Since the variable is declared but not initialized yet, the variable is empty or a null string. The assignment operator \lstinline[language=c++]{=} is used to initialize the variable with a set of characters  \lstinline[language=c++]{std::string name = "Mike"}. In Line~10 the variable is initialized with the content provided by the standard input stream \lstinline[language=c++]{std::cin} and the \lstinline[language=c++]{>>} operator. In Line~12 the content of the variable is written to the standard output stream. Note that you can concatenate strings using the \lstinline[language=c++]{>>} operator multiple times. To generate a line break the statement \lstinline[language=c++]{std::endl} is used. Note that we only handled the basis features here, since these are necessary for the purpose of this course. For more details we refer to~\cite[Chapter~1]{andrew2000accelerated}.
 
 
-\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the for loop statement. \label{code:for:loop}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-for.cpp}
-
-The second option is using a \lstinline[language=C++]|while| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/while}}\index{loop!while statement} which shown in Listing~\ref{code:while:loop}. Line 10 shows the \lstinline[language=C++]|while| loop statement with its one argument. This is the so-called condition statement  \lstinline[language=C++]{i < n} which means that the loop body is repeated until the variable $i$ is larger than $n$. Note in the previous example we had three arguments. Here, the loop variable is declared before the loop in Line 9 and the third statement is  in Line 13 where the loop variable is incremented by one in each iteration. Note that we use the \lstinline[language=C++]|while| loop statement, if we do not know the amount of iterations in advance. This example has shown that we can write every \lstinline[language=C++]|for| loop statement as a \lstinline[language=C++]|while| loop statement.   
-
-
-\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the while loop statement..\label{code:while:loop}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-while.cpp}
-
-\begin{exercise}
-Define in your own words in which case you should use a \lstinline[language=C++]|for| loop statement and a \lstinline[language=C++]|while| loop statement. 
-\end{exercise}
-
-%----------------------------------------------------------------------------------------
-\subsubsection{Selection statements}
-%----------------------------------------------------------------------------------------
-\index{statements!selection}
-For some applications, we have to select different behavior of the code depending on conditions. Equation~\ref{eq:chapter2:if} shows how to compute the sum from one to $n$ with different cases for even and odd numbers, If the number is even the number keeps the same and for odd numbers the number is squared.
-\begin{align}
-r = \sum\limits_{i=1}^n f(i) \text{  with  } f(i) = 
-\begin{cases}
-i, \text{ if } i \text{ is even} \\
-i^2, \text{ else}
-\end{cases}
-\label{eq:chapter2:if}
-\end{align}
-Listing~\ref{code:example-if} shows the implementation of Equation~\ref{eq:chapter2:if} using a \lstinline[language=c++]{for} loop. The skeleton of the \lstinline[language=c++]{for} loop is identical to the one in Listing~\ref{code:for:loop}, but the \lstinline[language=c++]{if} statement\endnote{\url{https://en.cppreference.com/w/cpp/language/if}} in Line 8 is added to switch between even and odd numbers. The \lstinline[language=c++]{if} statement takes exactly one argument, the so--called condition statement. If the statement is evaluated as \lstinline[language=c++]{true} the code line between \lstinline[language=c++]{if} and \lstinline[language=c++]{else} is selected.  If the statement is evaluated as \lstinline[language=c++]{false} the code line after \lstinline[language=c++]{else} is selected. Multiple lines of codes have to be between curly braces. It is also possible to use \lstinline[language=c++]{else if} after the first \lstinline[language=c++]{if}. \\
-
-\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the selection statement.\label{code:example-if}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-if.cpp}
-
-
-The second selection statement is the \lstinline[language=c++]{switch} statement\endnote{\url{https://en.cppreference.com/w/cpp/language/switch}}. For example this statement can be used to execute different code branches depending on a single variable. Listing~\ref{code:example-switch} shows one example to write the name of the color to the standard output. In this case we use a enumeration \lstinline[language=c++]{enum}\endnote{\url{https://en.cppreference.com/w/cpp/language/enum}} to store the colors. The \lstinline[language=c++]{switch} takes one argument and execute the code between the matching \lstinline[language=c++]{case} and the following \lstinline[language=c++]{break}.
-
-
-\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the selection statement.\label{code:example-switch}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-switch.cpp}
+\lstinputlisting[language=C++,caption={.\label{code:strings}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-string-io.cpp}
 
 
 %----------------------------------------------------------------------------------------
-\subsubsection{Operators}
-%----------------------------------------------------------------------------------------
-\index{Operators}
-For the example in Listing~\ref{code:for:loop} we have seen the operator \lstinline[language=C++]|i<n| which is a so--called comparison operator. Next to the comparison operators, C++ language has following operators\endnote{\url{https://en.cppreference.com/w/cpp/language/operator_precedence}}:
-\begin{itemize}
-\item Comparison operators, see Table~\ref{sec:1:tab:operator:comp},
-\item Arithmetic operators, see Table~\ref{sec:1:tab:operator:arithmetic},
-\item Logical operators, see Table~\ref{sec:1:tab:operator:logical}, and
-\item Assignment operators, see Table~\ref{sec:1:tab:operator:assign},
-\end{itemize}
- logical operators, arithmetic, and assignment.
-
-\begin{table}[h]
-\centering
-\begin{tabular}{clll}
-\toprule
-Operator & Name  & Example \\ 
-\midrule
-\lstinline|==| & Equal to & \lstinline|x==y|\\ 
-\lstinline|!=| & Not equal & \lstinline|x!=y|\\ 
-\lstinline|>| & Greater than & \lstinline|x > y|\\ 
-\lstinline|<| & Less than & \lstinline|x < y|\\ 
-\lstinline|>=| & Greater than or equal & \lstinline|x >= y|\\ 
-\lstinline|<=| & Less than or equal & \lstinline|x <= y|\\ 
-\bottomrule 
-\end{tabular} 
-\caption{Comparison operators}
-\label{sec:1:tab:operator:comp}
-\index{Operators!comparison}
-\end{table}
-
-\begin{table}[h]
-\centering
-\begin{tabular}{clll}
-\toprule
-Operator & Name & Description & Example \\ 
-\midrule
-\lstinline|+| & Addition & Computes the sum of two values & $2+2=4$ \\ 
-\lstinline|-| & Subtraction  & Computes the difference of two values & $5-3=2$ \\ 
-\lstinline|/| & Division & Divides two values & $6/2=3$ \\ 
-\lstinline|*| & Multiplication & Multiplies two values & $2\times2=4$ \\ 
-\lstinline|%| & Modulo &  	Returns the division remainder & \lstinline|2%1=0| \\ 
-\lstinline|++| & Increments & Add plus one to the value & \lstinline|1++=2|\\ 
-\lstinline|--| & Decrements & Subtract one of the value & \lstinline|1--=0|\\ 
-\bottomrule 
-\end{tabular} 
-\caption{Arithmetic operators}
-\label{sec:1:tab:operator:arithmetic}
-\index{Operators!arithmetic}
-\end{table}
-
-
-\begin{table}[h]
-\centering
-\begin{tabular}{clll}
-\toprule
-Operator & Name & Description & Example \\ 
-\midrule
-\lstinline|&&| & Logical and & Returns \lstinline|true| if both statements are true  & \lstinline| x > 5 && x < 10| \\ 
-\lstinline|||| & Logical or  & Returns \lstinline|true| if one statement is true & \lstinline| x > 5 || y < 10| \\ 
-\lstinline|!| & Logical not &  Inverse the statement & \lstinline| !(x > 5 && x < 10)| \\ 
-\bottomrule 
-\end{tabular} 
-\caption{Logical operators}
-\label{sec:1:tab:operator:logical}
-\index{Operators!logical}
-\end{table}
-
-
-\begin{table}[h]
-\centering
-\begin{tabular}{clll}
-\toprule
-Operator & Name & Example & Equivalent  \\ 
-\midrule
-\lstinline|=| & Assignment &   \lstinline| x = 5| &   \lstinline| x = 5 | \\ 
-\lstinline|+=| & Plus equal  & \lstinline| x+= 5|  & \lstinline| x = x + 5 | \\ 
-\lstinline|-=| & Minus equal & \lstinline| x-= 5|  & \lstinline| x = x - 5 | \\ 
-\lstinline|*=| & Multiplication equal &  \lstinline| x*= 5| & \lstinline| x= x * 5| \\ 
-\lstinline|/=| & Division equal &  \lstinline| x/= 5| & \lstinline| x= x / 5| \\ 
-\lstinline|%=| & Modulo equal &  \lstinline| x%= 5| & \lstinline| x = x % 5| \\ 
-\bottomrule 
-\end{tabular} 
-\caption{Assignment operators}
-\label{sec:1:tab:operator:assign}
-\index{Operators!assignment}
-\end{table}
-
-\begin{exercise}
-Write a small C++ program using selection statements and operators to determine if a given year is a lap year. Following logical statements should be implemented: 
-\begin{itemize}
-	\item   If year is divided by 4 but not by 100, then it is a leap year.
-    \item If year is divided by both 100 and 400, then it is a leap year.
-    \item If year is divided by 400, then it is a leap year.
-    \item And in all other cases, it is not a leap year.
-\end{itemize}
-\end{exercise}
-
-%----------------------------------------------------------------------------------------
-\subsection{Functions}
+\section{Containers}
+\index{STL!containers}
+\index{containers}
 %----------------------------------------------------------------------------------------
 
-%----------------------------------------------------------------------------------------
-\subsection{Structuring source code}
-%----------------------------------------------------------------------------------------
-
-%----------------------------------------------------------------------------------------
-\subsubsection{Structs}
-%----------------------------------------------------------------------------------------
-
-%----------------------------------------------------------------------------------------
-\subsection{Classes}
-%----------------------------------------------------------------------------------------
-
-\newpage
 
 \theendnotes
 
-\chapter{The C++ Standard Template Library (STL)}
-\label{chapter:stl}
 
-\section{Overview of the STL}
-
-\section{Working with strings}
-
-\section{Containers}
-
-
+%----------------------------------------------------------------------------------------
 \part{Linear algebra and solvers}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \chapter{Linear algebra}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \section{Blaze library}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \chapter{Solvers}
+%----------------------------------------------------------------------------------------
 
-
+%----------------------------------------------------------------------------------------
 \part{Numerical examples}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \chapter{Numerical examples}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \section{Monte-Carlo methods}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \section{$N$-body problems}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \section{One-dimensional heat equation}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \section{Peridynamics}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \part{Parallel and distributes computing}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \chapter{Parallel computing}
+%----------------------------------------------------------------------------------------
 
 \section{Shared memory}
 

@@ -65,6 +65,8 @@
 }
 
 \newcommand{\orcid}[1]{\href{https://orcid.org/#1}{\includegraphics[height=10pt]{orcid}}}
+\newcommand{\link}[1]{\endnote{\url{#1}}}
+\newcommand{\cpp}[1]{\lstinline[language=cpp]{#1}}
 
 %----------------------------------------------------------------------------------------
 %	MARGINS
@@ -485,7 +487,7 @@ innerbottommargin=5pt]{cBox}
 
 % A switch to conditionally include a picture, implemented by Christian Hupfer
 \newif\ifusechapterimage
-\usechapterimagetrue
+\usechapterimagefalse
 \newcommand{\thechapterimage}{}%
 \newcommand{\chapterimage}[1]{\ifusechapterimage\renewcommand{\thechapterimage}{#1}\fi}%
 \newcommand{\autodot}{.}
