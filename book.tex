@@ -190,14 +190,24 @@ Define in your own words in which case you should use a \lstinline[language=C++]
 \subsubsection{Selection statements}
 %----------------------------------------------------------------------------------------
 \index{statements!selection}
-
+For some applications, we have to select different behavior of the code depending on conditions. Equation~\ref{eq:chapter2:if} shows how to compute the sum from one to $n$ with different cases for even and odd numbers, If the number is even the number keeps the same and for odd numbers the number is squared.
 \begin{align}
 r = \sum\limits_{i=1}^n f(i) \text{  with  } f(i) = 
 \begin{cases}
 i, \text{ if } i \text{ is even} \\
 i^2, \text{ else}
 \end{cases}
+\label{eq:chapter2:if}
 \end{align}
+Listing~\ref{code:example-if} shows the implementation of Equation~\ref{eq:chapter2:if} using a \lstinline[language=c++]{for} loop. The skeleton of the \lstinline[language=c++]{for} loop is identical to the one in Listing~\ref{code:for:loop}, but the \lstinline[language=c++]{if} statement\endnote{\url{https://en.cppreference.com/w/cpp/language/if}} in Line 8 is added to switch between even and odd numbers. The \lstinline[language=c++]{if} statement takes exactly one argument, the so--called condition statement. If the statement is evaluated as \lstinline[language=c++]{true} the code line between \lstinline[language=c++]{if} and \lstinline[language=c++]{else} is selected.  If the statement is evaluated as \lstinline[language=c++]{false} the code line after \lstinline[language=c++]{else} is selected. Multiple lines of codes have to be between curly braces. It is also possible to use \lstinline[language=c++]{else if} after the first \lstinline[language=c++]{if}. \\
+
+\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the selection statement.\label{code:example-if}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-if.cpp}
+
+
+The second selection statement is the \lstinline[language=c++]{switch} statement\endnote{\url{https://en.cppreference.com/w/cpp/language/switch}}. For example this statement can be used to execute different code branches depending on a single variable. Listing~\ref{code:example-switch} shows one example to write the name of the color to the standard output. In this case we use a enumeration \lstinline[language=c++]{enum}\endnote{\url{https://en.cppreference.com/w/cpp/language/enum}} to store the colors. The \lstinline[language=c++]{switch} takes one argument and execute the code between the matching \lstinline[language=c++]{case} and the following \lstinline[language=c++]{break}.
+
+
+\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the selection statement.\label{code:example-switch}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-switch.cpp}
 
 
 %----------------------------------------------------------------------------------------
