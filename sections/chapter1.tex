@@ -3,7 +3,14 @@
 %----------------------------------------------------------------------------------------
 \chapter{Introduction C++}
 %----------------------------------------------------------------------------------------
-
+This chapter gives a brief introduction to the core features of the C++ language. However, the focus on this chapter is to introduce the C++ standard template library, see Section~\ref{chapter:stl}, which is essential to implement mathematical equations and algorithms. Therefore, we quickly look into these features as we need them to implement the numerical examples in Part~\ref{part:numerical:examples}. For more details we refer to
+\begin{itemize}
+\item \fullcite{andrew2000accelerated}
+\end{itemize}
+since this book gives an excellent pragmatic overview with a lot of examples. For even more C++ basics, we refer to
+\begin{itemize}
+\item \fullcite{stroustrup2014programming}.
+\end{itemize}
 %----------------------------------------------------------------------------------------
 \section{History of C and C++}
 %----------------------------------------------------------------------------------------
@@ -30,7 +37,7 @@ Download the example program\endnote{\url{https://github.com/diehlpkteaching/Par
 
 
 %----------------------------------------------------------------------------------------
-\subsection{Fundamental data types}
+\section{Fundamental data types}
 %----------------------------------------------------------------------------------------
 \index{data types!fundamental}
 In this section the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language are introduced. First, the numeric data types are introduced. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For all these data types following options: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long| are available. For more details about the binary numeral system we refer to~\cite{gilli1965binary}. To represent real numbers $\mathbb{R}$ the \lstinline[language=C++]|float| data type and \lstinline[language=C++]|double| data type are available. Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. Table~\ref{chapter2:table:datatypes} summarizes all the available numeric data types and there ranges. The next section shows how to get the range of the IEEE 474 standard how floating point numbers.
@@ -61,16 +68,11 @@ Data type & Size (Bytes) & Min & Max \\\midrule
 To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|bool| data type which has either one of the two values \lstinline[language=C++]|true| or \lstinline[language=C++]|false|. Note that the C++ STL offers \lstinline|std::complex|\endnote{\url{https://en.cppreference.com/w/cpp/numeric/complex}} for complex number $\mathbb{C}$, however, this one is not within the fundamental data types.
 
 %----------------------------------------------------------------------------------------
-\subsection{Numerical limits}
-%----------------------------------------------------------------------------------------
-
-
-%----------------------------------------------------------------------------------------
-\subsection{Statements and flow control}
+\section{Statements and flow control}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
-\subsubsection{Iteration statements}
+\subsection{Iteration statements}
 %----------------------------------------------------------------------------------------
 \index{statements!iteration} For some applications, we have to repeat some operations multiple times. The C++ language provides the so-called iteration statements. There are two iteration statements, the \lstinline[language=C++]|for| loop and the \lstinline[language=C++]|while| loop, respectively. Let us look how to compute the sum of the numbers from one up ton $n$
 \begin{align}
@@ -91,7 +93,7 @@ Define in your own words in which case you should use a \lstinline[language=C++]
 \end{exercise}
 
 %----------------------------------------------------------------------------------------
-\subsubsection{Selection statements}
+\subsection{Selection statements}
 %----------------------------------------------------------------------------------------
 \index{statements!selection}
 For some applications, we have to select different behavior of the code depending on conditions. Equation~\ref{eq:chapter2:if} shows how to compute the sum from one to $n$ with different cases for even and odd numbers, If the number is even the number keeps the same and for odd numbers the number is squared.
@@ -115,7 +117,7 @@ The second selection statement is the \lstinline[language=c++]{switch} statement
 
 
 %----------------------------------------------------------------------------------------
-\subsubsection{Operators}
+\subsection{Operators}
 %----------------------------------------------------------------------------------------
 \index{Operators}
 For the example in Listing~\ref{code:for:loop} we have seen the operator \lstinline[language=C++]|i<n| which is a so--called comparison operator. Next to the comparison operators, C++ language has following operators\endnote{\url{https://en.cppreference.com/w/cpp/language/operator_precedence}}:
@@ -127,7 +129,7 @@ For the example in Listing~\ref{code:for:loop} we have seen the operator \lstinl
 \end{itemize}
  logical operators, arithmetic, and assignment.
 
-\begin{table}[h]
+\begin{table}[p]
 \centering
 \begin{tabular}{clll}
 \toprule
@@ -146,7 +148,7 @@ Operator & Name  & Example \\
 \index{Operators!comparison}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[p]
 \centering
 \begin{tabular}{clll}
 \toprule
@@ -167,7 +169,7 @@ Operator & Name & Description & Example \\
 \end{table}
 
 
-\begin{table}[h]
+\begin{table}[p]
 \centering
 \begin{tabular}{clll}
 \toprule
@@ -184,7 +186,7 @@ Operator & Name & Description & Example \\
 \end{table}
 
 
-\begin{table}[h]
+\begin{table}[p]
 \centering
 \begin{tabular}{clll}
 \toprule
@@ -214,21 +216,20 @@ Write a small C++ program using selection statements and operators to determine 
 \end{exercise}
 
 %----------------------------------------------------------------------------------------
-\subsection{Functions}
+\section{Functions}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
-\subsection{Structuring source code}
+\section{Structuring source code}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
-\subsubsection{Structs}
+\subsection{Structs}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
 \subsection{Classes}
 %----------------------------------------------------------------------------------------
-
 
 
 \theendnotes
