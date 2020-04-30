@@ -130,10 +130,20 @@ In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name
 
 
 %----------------------------------------------------------------------------------------
-\section{Random numbers}
-\index{STL!random numbers}
-\index{random numbers}
+\section{Random number generation}
+\index{STL!random number generation}
+\index{random number generation}
 %----------------------------------------------------------------------------------------
+For some applications, \emph{e.g.}\ Monte Carlo methods, see Chapter~\ref{sec:monte:carlo}, random numbers are essential. The trivial way to generate a integer random number in the range of zero and \cpp{RAND_MAX} is to use \cpp{std::rand}\link{http://www.cplusplus.com/reference/cstdlib/rand/} provided by the \cpp{#include <cstdlib>} header. Listing~\ref{code:srand} shows a small example to generate a random number. Note that one has to provide a seed to the random number generator to get a different random numbers each time the program is executed. One way to do so, is to use the current time \cpp{std::time(0)}\link{http://www.cplusplus.com/reference/ctime/time/?kw=time} provided by the \cpp{#include <ctime>} header. Line~10 shows how to use the current time passed as an argument \cpp{std::srand(std::time(0))} as a seed for the random number generator. Line~\mbox{12} shows how to get one random number. Note that the seed has to be set only once, but always before any random number is drawn.\\
+
+\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:srand}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-random.cpp}
+
+For more advanced usage of random number generators the \cpp{#include<random>} header is provided. More advanced means that not only integer random number can be drawn and range can be provided. Listing~\ref{code:distrand} shows how to generate uniform distributed random numbers. Line~8 generates a random number device \cpp{std::random_device rd}\link{http://www.cplusplus.com/reference/random/random_device/}. Next, the engine for the random number generation is chosen. In this case the \cpp{mersenne_twister_engine}~\cite{matsumoto1998mersenne} is used by providing the random device as an argument \cpp{std::mt19937 gen(rd())}\link{http://www.cplusplus.com/reference/random/mersenne_twister_engine/}. Next the uniform distribution has to be specified by \cpp{std::uniform_int_distribution} for integer values and \cpp{std::uniform_real_distribution} for floating point numbers. In Line~12 the interval from 1 to 6 for integer numbers and in Line~14 for double numbers is specified. Line~15 shows how to get a random number by using the distribution by passing the engine as an argument \cpp{dis(gen)}.
+
+\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:distrand}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-distrandom.cpp}
+
+
+
 
 
 %----------------------------------------------------------------------------------------
@@ -167,6 +177,7 @@ In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name
 
 %----------------------------------------------------------------------------------------
 \chapter{Monte-Carlo methods}
+\label{sec:monte:carlo}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
