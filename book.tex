@@ -101,138 +101,6 @@
 \include{sections/chapter1}
 
 %----------------------------------------------------------------------------------------
-\chapter{The C++ Standard Template Library (STL)}
-\label{chapter:stl}
-%----------------------------------------------------------------------------------------
-
-%----------------------------------------------------------------------------------------
-\section{Overview of the STL}
-%----------------------------------------------------------------------------------------
-Figure~\ref{fig:stl:components} shows the four components of the C++ Standard Template Library (STL). The main focus in this course is on the algorithm component, container component, and iterators component. The functions component provides the so--called \texttt{Functors}\link{https://www.geeksforgeeks.org/functors-in-cpp/}. A functor is an object, which is treated a function or a function pointer. The component iterators\link{https://en.cppreference.com/w/cpp/iterator} provides six iterators for working upon a sequence of values, \emph{e.g.}\ containers. The usage of iterators will be discussed in Section~\ref{ref:stl:iterators}. For the Algorithms component\link{https://en.cppreference.com/w/cpp/algorithm} following algorithm classes:
-\begin{itemize}
-\item Sorting - Ordering elements in a container with respect to their order,
-\item Searching - Searching for elements in a sorted array, and
-\item STL algorithms - Provides algorithms, like finding the largest element in an container or compute the sum of all elements;
-\end{itemize}
-will be reviewed. All of these algorithm classes will be showcased on the container \cpp{std::vector} in Section~\ref{sec:containers}. For more details on the STL we refer to~\cite{o2017mastering,stepanov1995standard}, but remember leraing C++ is like learning a new sportive activity, practicing (writing code) is essential to improve your skills.\\ 
-
-\textcolor{azure}{Most important take away of this Section is: 
-\begin{itemize}
-\item Never implement your own algorithm or container, if you can find it within the STL.
-\item If you can not find it within the STL, think if you really need this feature.
-\end{itemize}
-}
-
-\begin{figure}[tb]
-    \centering
-    \begin{tikzpicture}
-      [mindmap,
-      grow cyclic,
-      every node/.style=concept,
-      concept color=cadetgrey!40,
-      level 1/.append style={sibling angle=360/4},
-      level 2/.append style={sibling angle=37.5},
-      ]
-    \node [root concept] {STL}
-        child{
-          node    {Algorithms} 
-          child { node {Sorting} }         
-          child { node {Searching} }      
-          child { node {STL algorithms} }
-          child { node {Array algoritms} }
-          child { node {Partion operaitons } }         
-        }
-        child{
-          node    {Containers}
-          child { node {Sequence containers}
-			child{ node{\cpp{std::vector}} }
-			child{ node{\cpp{std::list}} } 
-			child{ node{\cpp{std::array}} }                     
-           }
-          child { node {Container adaptors } }
-          child { node {Associative containers } }
-          child { node {Unordered associative containers } }
-        }
-        child{
-          node    {Functions}
-        }
-        child{
-          node    {Iterators}
-        }
-        ;
-    \end{tikzpicture}
-    \caption{Overview of the C++ Standard Template Library (STL): Algorithms, Containers, Iterators, and Functions. This course will mainly focus on the Algorithms and Container components.}
-    \label{fig:stl:components}
-\end{figure}
-
-
-
-%----------------------------------------------------------------------------------------
-\section{Strings}
-\index{STL!string}
-\index{string}
-%----------------------------------------------------------------------------------------
-The STL provides the class \lstinline[language=C++]{string}\endnote{\url{http://www.cplusplus.com/reference/string/string/}} to store sequences of characters. For the usage of this class the header \lstinline[language=c++]{#include <string>} has to be added to the cpp file to make \lstinline[language=c++]{std::string} available. Listing~\ref{code:strings} shows how to use the string class to write a set of characters to standard output stream\endnote{\url{http://www.cplusplus.com/reference/iostream/cout/?kw=cout}} \lstinline[language=c++]{std::cout} and read them from standard input stream\endnote{\url{http://www.cplusplus.com/reference/iostream/cin/?kw=cin}} \lstinline[language=c++]{std::cin}. To use these functionality the \lstinline[language=c++]{#include <iostream>} header is needed. \index{iostream!cin}\index{iostream!cout} \\
-
-In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name: "} is written to the standard output stream using the operator \lstinline[language=c++]{<<}. In Line~9 a string object with the identifier \lstinline[language=c++]{name} is declared. All variables have a name \lstinline[language=c++]{name} and a type  \lstinline[language=c++]{std::string}. Since the variable is declared but not initialized yet, the variable is empty or a null string. The assignment operator \lstinline[language=c++]{=} is used to initialize the variable with a set of characters  \lstinline[language=c++]{std::string name = "Mike"}. In Line~10 the variable is initialized with the content provided by the standard input stream \lstinline[language=c++]{std::cin} and the \lstinline[language=c++]{>>} operator. In Line~12 the content of the variable is written to the standard output stream. Note that you can concatenate strings using the \lstinline[language=c++]{>>} operator multiple times. To generate a line break the statement \lstinline[language=c++]{std::endl} is used. Note that we only handled the basis features here, since these are necessary for the purpose of this course. For more details we refer to~\cite[Chapter~1]{andrew2000accelerated}.
-
-
-\lstinputlisting[language=C++,caption={.\label{code:strings}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-string-io.cpp}
-
-
-%----------------------------------------------------------------------------------------
-\section{Containers}
-\index{STL!containers}
-\index{containers}
-\label{sec:containers}
-%----------------------------------------------------------------------------------------
-
-
-%----------------------------------------------------------------------------------------
-\subsection{Vector}
-%----------------------------------------------------------------------------------------
-
-%----------------------------------------------------------------------------------------
-\subsection{Iterators}
-\label{ref:stl:iterators}
-%----------------------------------------------------------------------------------------
-
-%----------------------------------------------------------------------------------------
-\subsection{Array}
-%----------------------------------------------------------------------------------------
-
-
-%----------------------------------------------------------------------------------------
-\subsection{List}
-%----------------------------------------------------------------------------------------
-
-
-%----------------------------------------------------------------------------------------
-\section{Random number generation}
-\index{STL!random number generation}
-\index{random number generation}
-%----------------------------------------------------------------------------------------
-For some applications, \emph{e.g.}\ Monte Carlo methods, see Chapter~\ref{sec:monte:carlo}, random numbers are essential. The trivial way to generate a integer random number in the range of zero and \cpp{RAND_MAX} is to use \cpp{std::rand}\link{http://www.cplusplus.com/reference/cstdlib/rand/} provided by the \cpp{#include <cstdlib>} header. Listing~\ref{code:srand} shows a small example to generate a random number. Note that one has to provide a seed to the random number generator to get a different random numbers each time the program is executed. One way to do so, is to use the current time \cpp{std::time(0)}\link{http://www.cplusplus.com/reference/ctime/time/?kw=time} provided by the \cpp{#include <ctime>} header. Line~10 shows how to use the current time passed as an argument \cpp{std::srand(std::time(0))} as a seed for the random number generator. Line~\mbox{12} shows how to get one random number. Note that the seed has to be set only once, but always before any random number is drawn.\\
-
-\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:srand}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-random.cpp}
-
-For more advanced usage of random number generators the \cpp{#include<random>} header is provided. More advanced means that not only integer random number can be drawn and range can be provided. Listing~\ref{code:distrand} shows how to generate uniform distributed random numbers. Line~8 generates a random number device \cpp{std::random_device rd}\link{http://www.cplusplus.com/reference/random/random_device/}. Next, the engine for the random number generation is chosen. In this case the \cpp{mersenne_twister_engine}~\cite{matsumoto1998mersenne} is used by providing the random device as an argument \cpp{std::mt19937 gen(rd())}\link{http://www.cplusplus.com/reference/random/mersenne_twister_engine/}. Next the uniform distribution has to be specified by \cpp{std::uniform_int_distribution} for integer values and \cpp{std::uniform_real_distribution} for floating point numbers. In Line~12 the interval from 1 to 6 for integer numbers and in Line~14 for double numbers is specified. Line~15 shows how to get a random number by using the distribution by passing the engine as an argument \cpp{dis(gen)}.
-
-\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:distrand}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-distrandom.cpp}
-
-
-
-
-
-%----------------------------------------------------------------------------------------
-\section{Numerical limits}
-%----------------------------------------------------------------------------------------
-
-
-\theendnotes
-
-
-%----------------------------------------------------------------------------------------
 \part{Linear algebra and solvers}
 %----------------------------------------------------------------------------------------
 
@@ -326,8 +194,6 @@ For more advanced usage of random number generators the \cpp{#include<random>} h
 \printindex % Output the index
 
 %----------------------------------------------------------------------------------------
-
-%----------------------------------------------------------------------------------------
 %	List of Listings
 %----------------------------------------------------------------------------------------
 
@@ -336,5 +202,13 @@ For more advanced usage of random number generators the \cpp{#include<random>} h
 \addcontentsline{toc}{chapter}{\textcolor{azure}{List of Listings}}
 \lstlistoflistings
 
+%----------------------------------------------------------------------------------------
+%	List of Figures
+%----------------------------------------------------------------------------------------
+
+\cleardoublepage % Make sure the index starts on an odd (right side) page
+\phantomsection
+\addcontentsline{toc}{chapter}{\textcolor{azure}{List of Figures}}
+\listoffigures
 
 \end{document}

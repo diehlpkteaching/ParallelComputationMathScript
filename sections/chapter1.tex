@@ -73,6 +73,7 @@ To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|b
 
 %----------------------------------------------------------------------------------------
 \subsection{Iteration statements}
+\label{sec:iteration:statements}
 %----------------------------------------------------------------------------------------
 \index{statements!iteration} For some applications, we have to repeat some operations multiple times. The C++ language provides the so-called iteration statements. There are two iteration statements, the \lstinline[language=C++]|for| loop and the \lstinline[language=C++]|while| loop, respectively. Let us look how to compute the sum of the numbers from one up ton $n$
 \begin{align}
@@ -217,6 +218,7 @@ Write a small C++ program using selection statements and operators to determine 
 
 %----------------------------------------------------------------------------------------
 \section{Functions}
+\index{functions}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
@@ -229,6 +231,161 @@ Write a small C++ program using selection statements and operators to determine 
 
 %----------------------------------------------------------------------------------------
 \subsection{Classes}
+%----------------------------------------------------------------------------------------
+
+
+\theendnotes
+
+
+%----------------------------------------------------------------------------------------
+\chapter{The C++ Standard Template Library (STL)}
+\label{chapter:stl}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+\section{Overview of the STL}
+%----------------------------------------------------------------------------------------
+Figure~\ref{fig:stl:components} shows the four components of the C++ Standard Template Library (STL). The main focus in this course is on the algorithm component, container component, and iterators component. The functions component provides the so--called \texttt{Functors}\link{https://www.geeksforgeeks.org/functors-in-cpp/}. A functor is an object, which is treated a function or a function pointer. The component iterators\link{https://en.cppreference.com/w/cpp/iterator} provides six iterators for working upon a sequence of values, \emph{e.g.}\ containers. The usage of iterators will be discussed in Section~\ref{ref:stl:iterators}. For the Algorithms component\link{https://en.cppreference.com/w/cpp/algorithm} following algorithm classes:
+\begin{itemize}
+\item Sorting\link{https://en.cppreference.com/w/cpp/algorithm/sort} - Ordering elements in a container with respect to their order,
+\item Searching\link{https://en.cppreference.com/w/cpp/algorithm/search} - Searching for elements in a sorted array, and
+\item STL algorithms - Provides algorithms, like finding the largest element (max\link{https://en.cppreference.com/w/cpp/algorithm/max}) in an container or compute the sum\link{https://en.cppreference.com/w/cpp/algorithm/accumulate} of all elements;
+\end{itemize}
+will be reviewed. All of these algorithm classes will be showcased on the container \cpp{std::vector} in Section~\ref{sec:containers}. For more details on the STL we refer to~\cite{o2017mastering,stepanov1995standard}, but remember learning C++ is like learning a new sportive activity, practicing (writing code) is essential to improve your skills.\\ 
+
+\textcolor{azure}{Most important take away of this Section is: 
+\begin{itemize}
+\item Never implement your own algorithm or container, if you can find it within the STL.
+\item If you can not find it within the STL, think if you really need this feature.
+\end{itemize}
+}
+
+\begin{figure}[tb]
+    \centering
+    \begin{tikzpicture}
+      [mindmap,
+      grow cyclic,
+      every node/.style=concept,
+      concept color=cadetgrey!40,
+      level 1/.append style={sibling angle=360/4},
+      level 2/.append style={sibling angle=37.5},
+      ]
+    \node [root concept] {STL}
+        child{
+          node    {Algorithms} 
+          child { node {Sorting} }         
+          child { node {Searching} }      
+          child { node {STL algorithms} }
+          child { node {Array algoritms} }
+          child { node {Partion operaitons } }         
+        }
+        child{
+          node    {Containers}
+          child { node {Sequence containers}
+			child{ node{\cpp{std::vector}} }
+			child{ node{\cpp{std::list}} } 
+			child{ node{\cpp{std::array}} }                     
+           }
+          child { node {Container adaptors } }
+          child { node {Associative containers } }
+          child { node {Unordered associative containers } }
+        }
+        child{
+          node    {Functions}
+        }
+        child{
+          node    {Iterators}
+        }
+        ;
+    \end{tikzpicture}
+    \caption{Overview of the C++ Standard Template Library (STL): Algorithms, Containers, Iterators, and Functions. This course will mainly focus on the Algorithms and Container components.}
+    \label{fig:stl:components}
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+\section{Strings}
+\index{STL!string}
+\index{string}
+%----------------------------------------------------------------------------------------
+The STL provides the class \lstinline[language=C++]{string}\endnote{\url{http://www.cplusplus.com/reference/string/string/}} to store sequences of characters. For the usage of this class the header \lstinline[language=c++]{#include <string>} has to be added to the cpp file to make \lstinline[language=c++]{std::string} available. Listing~\ref{code:strings} shows how to use the string class to write a set of characters to standard output stream\endnote{\url{http://www.cplusplus.com/reference/iostream/cout/?kw=cout}} \lstinline[language=c++]{std::cout} and read them from standard input stream\endnote{\url{http://www.cplusplus.com/reference/iostream/cin/?kw=cin}} \lstinline[language=c++]{std::cin}. To use these functionality the \lstinline[language=c++]{#include <iostream>} header is needed. \index{iostream!cin}\index{iostream!cout} \\
+
+In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name: "} is written to the standard output stream using the operator \lstinline[language=c++]{<<}. In Line~9 a string object with the identifier \lstinline[language=c++]{name} is declared. All variables have a name \lstinline[language=c++]{name} and a type  \lstinline[language=c++]{std::string}. Since the variable is declared but not initialized yet, the variable is empty or a null string. The assignment operator \lstinline[language=c++]{=} is used to initialize the variable with a set of characters  \lstinline[language=c++]{std::string name = "Mike"}. In Line~10 the variable is initialized with the content provided by the standard input stream \lstinline[language=c++]{std::cin} and the \lstinline[language=c++]{>>} operator. In Line~12 the content of the variable is written to the standard output stream. Note that you can concatenate strings using the \lstinline[language=c++]{>>} operator multiple times. To generate a line break the statement \lstinline[language=c++]{std::endl} is used. Note that we only handled the basis features here, since these are necessary for the purpose of this course. For more details we refer to~\cite[Chapter~1]{andrew2000accelerated}.
+
+
+\lstinputlisting[language=C++,caption={Example reading and writing strings.\label{code:strings}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-string-io.cpp}
+
+
+%----------------------------------------------------------------------------------------
+\section{Containers}
+\index{STL!containers}
+\index{containers}
+\label{sec:containers}
+%----------------------------------------------------------------------------------------
+Before we look into the containers, we start with an example to showcase the need of containers. Let us assume we want to compute the average
+\begin{align}
+a = \frac{1}{n}\sum\limits_{i=1}^n i
+\end{align}
+of the number from one to $n$. Listing~\ref{code:average} sketches how to compute the average using the ingredients of the previous chapter. Only one new feature \cpp{std::setprecision}\link{https://en.cppreference.com/w/cpp/io/manip/setprecision} is a new feature provided by \cpp{#include <iomanip>} header and you should be able to understand this code. If you have any issues, we highly recommend to go back to the previous chapter and read one more time the section about loop statements, see Section~\ref{sec:iteration:statements}. With \cpp{std::setprecision(3)} it is specified that only three digits of the following floating point number are printed. For example if one wants to print \cpp{const long double pi = std::acos(-1.L);} and uses \cpp{std::setprecision(3)} only $3.14$ is printed. Thus, depending on the application the accuracy can be varied.\\
+
+In this example multiple values are read from the standard input using \cpp{while (std::cin >> x)} in Line~9. The \cpp{while} statement reads a new value from the standard input device, stores it in the variable \cpp{x}, until the users types \cpp{\\n}, which corresponds to a line break, since the loop condition is \cpp{false}. However, if we want to compute the median of a list of elements, we need to store the elements, process them, and print the average. To store these elements, we will look into the \cpp{std::vector} container and the \cpp{#include<algorithm>} header. In Section~\ref{sec:stl:algorithms} an example to compute the average is provided, since we have all the needed ingredients studied.
+
+\lstinputlisting[language=C++,caption={Computation of the average of the numbers from one to $n$.\label{code:average}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-average.cpp}
+
+%----------------------------------------------------------------------------------------
+\subsection{Vector}
+\index{STL!vector}
+\index{vector}
+%----------------------------------------------------------------------------------------
+The container \cpp{std::vector} represents an object to store an arbitrary amount of the same data types. From the mathematical point of view the \cpp{std::vector} is comparable to a vector
+\begin{align}
+\mathbf{v} = \{v_i \,\vert\, i=1,\ldots,n \} \text{ with } \mathbf{v}[i] = v_i \text{ and }  \vert v\vert = n\text{.} 
+\end{align}
+Note in C++ the elements in a vector start with index zero and the index of the last element is $n-1$ with a vector length of $n$. To initialize an empty vector with the name \cpp{values} the expression \cpp{std::vector<double> values;} is used. Between the parenthesis the data type of all elements of the vector is specified. In this case only \cpp{double} values can be stored in the vector. In this case the length of the vector \cpp{values.size()} will return zero and \cpp{values.empty()} will return \cpp{true} since the vector is empty with the meaning that there are not elements stored. In addition, a vector can be filled with values during its definition using \cpp{std::vector<double> v = {1, 2.5};}. In this case the length of the vector \cpp{values.size()} will return two and \cpp{values.empty()} will return \cpp{false}.\\
+
+Let us write the computation of the average again using the \cpp{std::vector}. Listing~\ref{code:averagecontainers} shows the new implantation of the computation of the average (Listing~\ref{code:average}). In Line~7 the \cpp{std::vector} with the name \cpp{values} for storing \cpp{double} values is declared. In Line~11 with \cpp{values.push_back{x}} the value of \cpp{x} is inserted at the end of the vector. To replace the third element of the vector by the value $1.5$ the expression \cpp{values[3]=1.4} is used. To replace the last element with zero the expression \cpp{values[values.size()-1]=0} is used. To access the elements on the $i$-th index the expression \cpp{values[i]} is used. The first element is accessed using \cpp{values.first()} and the last element using \cpp{values.last()}. More details about iterators are discussed in Section~\ref{ref:stl:iterators}. The last element is deleted by using \cpp{values.pop_back()} and the $i$-th element by \cpp{values.erase(values.start()+i}.\\
+
+
+In Line~14 the sum of all elements in the vector is computed by using \cpp{std::accumulate} from the Algorithms component. The first argument \cpp{values.begin()} and the second argument \cpp{values.end()} defines the range of the vector. Here, it is the full vector, but for example to keep out the first element of sum, one can use \cpp{values.begin()+1}. The third argument is the initial value of the sum. More details about the Algorithms will be studied in Section~\ref{sec:stl:algorithms}.
+
+\lstinputlisting[language=C++,caption={Computation of the average of the numbers from one to $n$ using containers.\label{code:averagecontainers}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-averagecontainers.cpp}
+
+%----------------------------------------------------------------------------------------
+\subsection{Iterators}
+\label{ref:stl:iterators}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+\subsection{Array}
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+\subsection{List}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+\section{Algorithms}
+\index{STL!algorithms}
+\index{algorithms}
+\label{sec:stl:algorithms}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+\section{Random number generation}
+\index{STL!random number generation}
+\index{random number generation}
+%----------------------------------------------------------------------------------------
+For some applications, \emph{e.g.}\ Monte Carlo methods, see Chapter~\ref{sec:monte:carlo}, random numbers are essential. The trivial way to generate a integer random number in the range of zero and \cpp{RAND_MAX} is to use \cpp{std::rand}\link{http://www.cplusplus.com/reference/cstdlib/rand/} provided by the \cpp{#include <cstdlib>} header. Listing~\ref{code:srand} shows a small example to generate a random number. Note that one has to provide a seed to the random number generator to get a different random numbers each time the program is executed. One way to do so, is to use the current time \cpp{std::time(0)}\link{http://www.cplusplus.com/reference/ctime/time/?kw=time} provided by the \cpp{#include <ctime>} header. Line~10 shows how to use the current time passed as an argument \cpp{std::srand(std::time(0))} as a seed for the random number generator. Line~\mbox{12} shows how to get one random number. Note that the seed has to be set only once, but always before any random number is drawn.\\
+
+\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:srand}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-random.cpp}
+
+For more advanced usage of random number generators the \cpp{#include<random>} header is provided. More advanced means that not only integer random number can be drawn and range can be provided. Listing~\ref{code:distrand} shows how to generate uniform distributed random numbers. Line~8 generates a random number device \cpp{std::random_device rd}\link{http://www.cplusplus.com/reference/random/random_device/}. Next, the engine for the random number generation is chosen. In this case the \cpp{mersenne_twister_engine}~\cite{matsumoto1998mersenne} is used by providing the random device as an argument \cpp{std::mt19937 gen(rd())}\link{http://www.cplusplus.com/reference/random/mersenne_twister_engine/}. Next the uniform distribution has to be specified by \cpp{std::uniform_int_distribution} for integer values and \cpp{std::uniform_real_distribution} for floating point numbers. In Line~12 the interval from 1 to 6 for integer numbers and in Line~14 for double numbers is specified. Line~15 shows how to get a random number by using the distribution by passing the engine as an argument \cpp{dis(gen)}.
+
+\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:distrand}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-distrandom.cpp}
+
+
+%----------------------------------------------------------------------------------------
+\section{Numerical limits}
 %----------------------------------------------------------------------------------------
 
 
