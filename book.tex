@@ -108,6 +108,64 @@
 %----------------------------------------------------------------------------------------
 \section{Overview of the STL}
 %----------------------------------------------------------------------------------------
+Figure~\ref{fig:stl:components} shows the four components of the C++ Standard Template Library (STL). The main focus in this course is on the algorithm component, container component, and iterators component. The functions component provides the so--called \texttt{Functors}\link{https://www.geeksforgeeks.org/functors-in-cpp/}. A functor is an object, which is treated a function or a function pointer. The component iterators\link{https://en.cppreference.com/w/cpp/iterator} provides six iterators for working upon a sequence of values, \emph{e.g.}\ containers. The usage of iterators will be discussed in Section~\ref{ref:stl:iterators}. For the Algorithms component\link{https://en.cppreference.com/w/cpp/algorithm} following algorithm classes:
+\begin{itemize}
+\item Sorting - Ordering elements in a container with respect to their order,
+\item Searching - Searching for elements in a sorted array, and
+\item STL algorithms - Provides algorithms, like finding the largest element in an container or compute the sum of all elements;
+\end{itemize}
+will be reviewed. All of these algorithm classes will be showcased on the container \cpp{std::vector} in Section~\ref{sec:containers}. For more details on the STL we refer to~\cite{o2017mastering,stepanov1995standard}, but remember leraing C++ is like learning a new sportive activity, practicing (writing code) is essential to improve your skills.\\ 
+
+\textcolor{azure}{Most important take away of this Section is: 
+\begin{itemize}
+\item Never implement your own algorithm or container, if you can find it within the STL.
+\item If you can not find it within the STL, think if you really need this feature.
+\end{itemize}
+}
+
+\begin{figure}[tb]
+    \centering
+    \begin{tikzpicture}
+      [mindmap,
+      grow cyclic,
+      every node/.style=concept,
+      concept color=cadetgrey!40,
+      level 1/.append style={sibling angle=360/4},
+      level 2/.append style={sibling angle=37.5},
+      ]
+    \node [root concept] {STL}
+        child{
+          node    {Algorithms} 
+          child { node {Sorting} }         
+          child { node {Searching} }      
+          child { node {STL algorithms} }
+          child { node {Array algoritms} }
+          child { node {Partion operaitons } }         
+        }
+        child{
+          node    {Containers}
+          child { node {Sequence containers}
+			child{ node{\cpp{std::vector}} }
+			child{ node{\cpp{std::list}} } 
+			child{ node{\cpp{std::array}} }                     
+           }
+          child { node {Container adaptors } }
+          child { node {Associative containers } }
+          child { node {Unordered associative containers } }
+        }
+        child{
+          node    {Functions}
+        }
+        child{
+          node    {Iterators}
+        }
+        ;
+    \end{tikzpicture}
+    \caption{Overview of the C++ Standard Template Library (STL): Algorithms, Containers, Iterators, and Functions. This course will mainly focus on the Algorithms and Container components.}
+    \label{fig:stl:components}
+\end{figure}
+
+
 
 %----------------------------------------------------------------------------------------
 \section{Strings}
@@ -126,6 +184,26 @@ In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name
 \section{Containers}
 \index{STL!containers}
 \index{containers}
+\label{sec:containers}
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Vector}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+\subsection{Iterators}
+\label{ref:stl:iterators}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+\subsection{Array}
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+\subsection{List}
 %----------------------------------------------------------------------------------------
 
 
