@@ -29,11 +29,21 @@
 
 \usepackage{graphicx} % Required for including pictures
 \graphicspath{{Pictures/}} % Specifies the directory where pictures are stored
+\usepackage{wrapfig}
+\usepackage{subcaption}
 
 \usepackage{lipsum} % Inserts dummy text
 
 \usepackage{tikz} % Required for drawing custom shapes
 \usetikzlibrary{mindmap}
+\usetikzlibrary{shapes.geometric, arrows,matrix}
+\usetikzlibrary{calc}
+\usetikzlibrary{fit}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=0.5cm,text centered, draw=black, fill=cadetgrey!30]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=0.5cm, text centered, draw=black] %, fill=blue!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=0.5cm, text centered, draw=black] %, fill=orange!30]
+\tikzstyle{decision} = [diamond, minimum width=2cm, minimum height=0.25cm, text centered, draw=black] %, fill=green!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
 
 \usepackage{endnotes}
 
@@ -66,6 +76,8 @@
     numberstyle=\tiny,
     frame = single,
 }
+
+\usepackage{xfrac}
 
 \newcommand{\orcid}[1]{\href{https://orcid.org/#1}{\includegraphics[height=10pt]{orcid}}}
 \newcommand{\link}[1]{\endnote{\url{#1}}}

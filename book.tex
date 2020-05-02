@@ -125,6 +125,178 @@
 \chapter{Monte-Carlo methods}
 \label{sec:monte:carlo}
 %----------------------------------------------------------------------------------------
+Monte Carlo methods are computational algorithms which rely on repeated random sampling to obtain numerical results. The principle is to use randomness to solve the problem because it is difficult or impossible to utilize other approaches. A fun fact is that when the Monte Carlo Method was developed in the 1940s by Ulam and von Neumann they called the method Monte Carlo which refers to the Monte Carlo Casino in Monaco where Ulam's uncle gambled. Today Monte Carlo methods are widely used in following three problem classes:
+\begin{itemize}
+\item Optimization,
+\item Numerical integration, and
+\item Probability distributions.
+\end{itemize}
+For the importance of the method we refer to~\cite{kroese2014monte} and for more details about Monte Carlo Methods, we refer to~\cite{shonkwiler2009explorations}.\\
+
+Let us look into the computational aspects of the Monte Carlo methods. Independent on the problem class a general pattern is observed
+\begin{enumerate}
+\item Define the input parameters,
+\item Randomly chose input parameters,
+\item Do deterministic computations on the inputs,
+\item Aggregate the results\text{.}
+\end{enumerate}
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+  \begin{center}
+  \begin{tikzpicture}
+\draw (0,0) -- (2,0) -- (2,2) -- (0,2) -- cycle;
+\draw (1,1) circle (1cm);
+\end{tikzpicture}
+  \end{center}
+  \caption{Sketch of the Monte Carlo method to estimate the number $\pi$.}
+  \label{fig:monte}
+\end{wrapfigure}
+To understand these for steps, we will compute the value of $\pi$ using a Monte Carlo method. Note that this example is just for educational purposes. Figure~\ref{fig:monte} sketches the two ingredient a unit square and a circle needed to estimate $\pi$. First, a unit square $1 \times 1$ which means both sides have the length of one is drawn. The area $A_s$ is one, since we have a unit square. Second, a circle with the radius of $r=\sfrac{1}{2}$ is drawn at the center of the unit square. The area of the circle is $A_c=\pi r^2$. Using the radius $r=\sfrac{1}{2}$ the area is $A_c=\pi(\sfrac{1}{2})^2=\sfrac{\pi}{4}$. Now, since we have defined the area of the circle and the square, we can use them to estimate the value of $\pi$ by
+\begin{align}
+A_c &= \sfrac{\pi}{4} \notag\\
+\pi &= 4 A_c \notag\\
+\pi &= 4 \sfrac{A_c}{A_s}\text{.}
+\end{align}
+Note that the going from the first equation to the second one is just a multiplication by four. Going from the second line to the third line, we use the fact that the area of the square is one. \\
+
+Now, we can estimate $\pi$ by the general pattern described above
+\begin{itemize}
+\item \textbf{Define the input parameters}: \\ A coordinate  $(x,y)\in\mathbb{R}$ in the domain of the unit square $[0,1]\times [0,1]$
+\item\textbf{ Randomly chose input parameters}:\\ We randomly draw values for $x$ and $y$ in the range of $[0,1]$ for $N$ times
+\item \textbf{Do deterministic computations on the inputs}:  \\
+we have to validate if the coordinate $(x,y)$ is inside the circle or not by do the computation $x^2+y^2\leq 1$. If the coordinate is inside the circle we increment $N_C$.
+\item \textbf{Aggregate the results}: \\
+We compute $\pi\approx \sfrac{4N_c}{N}$
+\end{itemize}
+\vspace{0.25cm}
+
+Figure~\ref{fig:algorithm:monte} shows the flow chart of the algorithm for estimating $\pi$ using the Monte Carlo method. First, the decision if the current draw of the random number is less than the total amount of random numbers $N$. If we have not draw enough random numbers, we have to guess to two random numbers $x$ and $y$, see Section~\ref{sec:random:numbers} for how to generate random numbers in C++. Next, we have to check if the drawn coordinate $(x,y)$ is within the circle and update the number of points within the circle $N_c$. We have to repeat this tasks until $i>N$. If we have drawn enough random number, we can compute $\pi\approx\sfrac{4N_c}{N}$ and finish the program.\\
+
+\begin{figure}[tb]
+    \centering
+	\begin{tikzpicture}[node distance=1.125cm, scale=0.75, transform shape]
+	\node (start) [startstop] {Start}; 
+	\node (dec1) [decision, below of=start , yshift=-1.cm] { $i < N$};
+	\node (n0) [process, below of=dec1,yshift=-1.cm] {Draw random number $x$ and $y$};
+	\node (dec2) [decision, below of=n0 , yshift=-1.cm] { $x^2 + y^2 < 1$};
+	\node (n1) [process, below of=dec2,yshift=-1.cm] {Increment $N_C$};
+	\node (n2) [process, below of=n1,yshift=-1.cm] {Increment $i$};
+	\node (n2) [process, below of=n1,yshift=-1.cm] {Increment $i$};
+	\node (n3) [process, right of=dec1,xshift=2.5cm] {Compute $\sfrac{4N_c}{N}$};
+	\node (stop) [startstop, right of=dec1, xshift=6.cm] {Finished}; 
+	%lines
+	\draw [->] (start) -- (dec1);
+	\draw [->] (dec1) -- (n0);
+	\draw [->] (n0) -- (dec2);
+	\draw [->] (n1) -- (n2);
+	\draw [->] (n3) -- (stop);
+	%dec1
+	\draw [->] (dec1) -- node[anchor=north] {no} (n3);
+	\draw [->] (dec1) -- node[anchor=west] {yes} (n0);	
+	\draw [->] (dec2) -- node[anchor=west] {yes} (n1);	
+	\draw [->] (n2.west) -- ++(-3.0,0) -- ++(0,8.5) -- ++(3.5,0);
+	\draw [->] (dec2)  -- ++(-4.5,0) ;
+	\end{tikzpicture}
+	\caption{Flow chart for the Monte Carlo method to estimate $\pi$.}
+	\label{fig:algorithm:monte}
+\end{figure}
+
+Next, we can ask the question what is a good choice for $N$ to get a good approximation of $pi$. Figure~\ref{fig:monte:carlo:samples} shows the distribution of the point inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers. One can see that a certain amount of random numbers is needed to have enough samples inside and outside of the circle.
+
+
+\begin{figure}[ht]
+\begin{subfigure}{.3\textwidth}
+  \centering
+  % include first image
+\def\x{0}
+\def\y{0}
+\def\k{0}
+\def\radius{4}
+\begin{tikzpicture}
+    \draw[fill=cadetgrey, opacity=0.1] (\radius,0) arc(0:90:\radius) -- (0,0) -- cycle;
+    \draw[gray, opacity=0.25] (0,0) rectangle (\radius,\radius);
+    \draw[->] (0,0) -- (1.1*\radius,0);
+    \draw[->] (0,0) -- (0,1.1*\radius);
+    \foreach \i in {1,2,...,10}{%
+        \typeout{Point \i}%
+        \pgfmathsetmacro\x{\radius*rnd}%
+        \typeout{X \x}%
+        \pgfmathsetmacro\y{\radius*rnd}%
+        \typeout{Y \y}%
+        \pgfmathsetmacro\k{(pow(\x,2)+pow(\y,2)) <pow(\radius,2)}%
+        \typeout{im Kreis?: \k}%
+        \pgfmathparse{ifthenelse(\k==1,"amaranth","azure")}%
+        \fill[\pgfmathresult] (\x,\y)circle(0.75pt);%
+    }
+\end{tikzpicture}
+  \caption{$N=10$}
+  \label{fig:sub-first}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.3\textwidth}
+  \centering
+% include second image
+\def\x{0}
+\def\y{0}
+\def\k{0}
+\def\radius{4}
+\begin{tikzpicture}
+    \draw[fill=cadetgrey, opacity=0.1] (\radius,0) arc(0:90:\radius) -- (0,0) -- cycle;
+    \draw[gray, opacity=0.25] (0,0) rectangle (\radius,\radius);
+    \draw[->] (0,0) -- (1.1*\radius,0);
+    \draw[->] (0,0) -- (0,1.1*\radius);
+    \foreach \i in {1,2,...,100}{%
+        \typeout{Point \i}%
+        \pgfmathsetmacro\x{\radius*rnd}%
+        \typeout{X \x}%
+        \pgfmathsetmacro\y{\radius*rnd}%
+        \typeout{Y \y}%
+        \pgfmathsetmacro\k{(pow(\x,2)+pow(\y,2)) <pow(\radius,2)}%
+        \typeout{im Kreis?: \k}%
+        \pgfmathparse{ifthenelse(\k==1,"amaranth","azure")}%
+        \fill[\pgfmathresult] (\x,\y)circle(0.75pt);%
+    }
+\end{tikzpicture}
+  \caption{$N=100$}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.3\textwidth}
+  \centering
+  % include second image
+\def\x{0}
+\def\y{0}
+\def\k{0}
+\def\radius{4}
+\begin{tikzpicture}
+    \draw[fill=cadetgrey, opacity=0.1] (\radius,0) arc(0:90:\radius) -- (0,0) -- cycle;
+    \draw[gray, opacity=0.25] (0,0) rectangle (\radius,\radius);
+    \draw[->] (0,0) -- (1.1*\radius,0);
+    \draw[->] (0,0) -- (0,1.1*\radius);
+    \foreach \i in {1,2,...,1000}{%
+        \typeout{Point \i}%
+        \pgfmathsetmacro\x{\radius*rnd}%
+        \typeout{X \x}%
+        \pgfmathsetmacro\y{\radius*rnd}%
+        \typeout{Y \y}%
+        \pgfmathsetmacro\k{(pow(\x,2)+pow(\y,2)) <pow(\radius,2)}%
+        \typeout{im Kreis?: \k}%
+        \pgfmathparse{ifthenelse(\k==1,"amaranth","azure")}%
+        \fill[\pgfmathresult] (\x,\y)circle(0.75pt);%
+    }
+\end{tikzpicture}
+  \caption{$N=1000$}
+  \label{fig:sub-second}
+\end{subfigure}
+\caption{Distribution of the point inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers.}
+\label{fig:monte:carlo:samples}
+\end{figure}
+
+
+
+\begin{exercise}
+Make a list of which C++ features we need to implement the flow chart in Figure~\ref{fig:algorithm:monte}.
+\end{exercise}
+
 
 %----------------------------------------------------------------------------------------
 \chapter{$N$-body problems}
@@ -159,10 +331,6 @@
 \section{Parallel algorithms}
 
 \section{Asynchronous programming}
-
-
-
-
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
