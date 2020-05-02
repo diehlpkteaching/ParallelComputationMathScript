@@ -201,13 +201,12 @@ Figure~\ref{fig:algorithm:monte} shows the flow chart of the algorithm for estim
 	\label{fig:algorithm:monte}
 \end{figure}
 
-Next, we can ask the question what is a good choice for $N$ to get a good approximation of $pi$. Figure~\ref{fig:monte:carlo:samples} shows the distribution of the point inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers. One can see that a certain amount of random numbers is needed to have enough samples inside and outside of the circle.
+Next, we can ask the question what is a good choice for $N$ to get a good approximation of $pi$. Figure~\ref{fig:monte:carlo:samples} shows the distribution of the point inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers. One can see that a certain amount of random numbers is needed to have enough samples inside and outside of the circle. Figure shows the relative error in percent for various amount of random numbers.
 
 
-\begin{figure}[ht]
+\begin{figure}[bt]
 \begin{subfigure}{.3\textwidth}
   \centering
-  % include first image
 \def\x{0}
 \def\y{0}
 \def\k{0}
@@ -235,7 +234,6 @@ Next, we can ask the question what is a good choice for $N$ to get a good approx
 \hfill
 \begin{subfigure}{.3\textwidth}
   \centering
-% include second image
 \def\x{0}
 \def\y{0}
 \def\k{0}
@@ -262,7 +260,6 @@ Next, we can ask the question what is a good choice for $N$ to get a good approx
 \hfill
 \begin{subfigure}{.3\textwidth}
   \centering
-  % include second image
 \def\x{0}
 \def\y{0}
 \def\k{0}
@@ -289,9 +286,27 @@ Next, we can ask the question what is a good choice for $N$ to get a good approx
 \end{subfigure}
 \caption{Distribution of the point inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers.}
 \label{fig:monte:carlo:samples}
+% This example was adapted from https://tex.stackexchange.com/questions/244488/monte-carlo-method-drawing
 \end{figure}
 
 
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}
+\begin{axis}
+[
+	xmin=0,   xmax=4,
+	grid=major,
+	xlabel=Numer of random numbers $10^x$,
+	ylabel=Absolute Error (\%)
+]
+\montecarlo{10}{1}
+\montecarlo{100}{2}
+\montecarlo{1000}{3}
+\end{axis}
+\end{tikzpicture}
+\caption{}
+\end{figure}
 
 \begin{exercise}
 Make a list of which C++ features we need to implement the flow chart in Figure~\ref{fig:algorithm:monte}.

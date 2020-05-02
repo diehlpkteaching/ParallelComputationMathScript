@@ -44,6 +44,38 @@
 \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=0.5cm, text centered, draw=black] %, fill=orange!30]
 \tikzstyle{decision} = [diamond, minimum width=2cm, minimum height=0.25cm, text centered, draw=black] %, fill=green!30]
 \tikzstyle{arrow} = [thick,->,>=stealth]
+\usepackage{pgfplots}
+
+\newcommand\montecarlo[2]{
+\def\x{0}
+\def\y{0}
+\def\k{0}
+\def\n{0}
+\def\r{0}
+\def\pi{3.1415}
+\def\e{0}
+\def\radius{0.5}
+    \foreach \i in {1,2,...,#1}{%
+        \typeout{Point \i}%
+        \pgfmathsetmacro\x{abs(\radius*rnd)}%
+        \typeout{X \x}%
+        \pgfmathsetmacro\y{abs(\radius*rnd)}%
+        \typeout{Y \y}%
+        \pgfmathsetmacro\k{(pow(\x,2)+pow(\y,2)) <pow(\radius,2)}%
+        \typeout{im Kreis?: \k}%
+        \pgfmathparse{ifthenelse(\k==1,1,0)}%
+        \pgfmathparse{\n+\pgfmathresult}
+        \xdef\n{\pgfmathresult}
+        \typeout{N \n} 
+        }
+\pgfmathparse{4*\n/#1}
+\xdef\r{\pgfmathresult}
+\typeout{R \r}
+\pgfmathparse{(\r-\pi)/\pi*100}
+\xdef\e{abs(\pgfmathresult)}
+\typeout{E \e}
+\addplot [only marks,mark=*] coordinates { (#2,\e) };		        
+}
 
 \usepackage{endnotes}
 
