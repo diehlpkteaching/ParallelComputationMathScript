@@ -201,7 +201,7 @@ Figure~\ref{fig:algorithm:monte} shows the flow chart of the algorithm for estim
 	\label{fig:algorithm:monte}
 \end{figure}
 
-Next, we can ask the question what is a good choice for $N$ to get a good approximation of $pi$. Figure~\ref{fig:monte:carlo:samples} shows the distribution of the point inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers. One can see that a certain amount of random numbers is needed to have enough samples inside and outside of the circle. Figure shows the relative error in percent for various amount of random numbers.
+Next, we can ask the question what is a good choice for $N$ to get a good approximation of $pi$. Figure~\ref{fig:monte:carlo:samples} shows the distribution of the point inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers. One can see that a certain amount of random numbers is needed to have enough samples inside and outside of the circle. Figure~\ref{fig:monte:carlo} shows the absolute error in percent for various amount of random numbers. One can see that with thousand random numbers the accuracy is quite reasonable. 
 
 
 \begin{figure}[bt]
@@ -305,7 +305,8 @@ Next, we can ask the question what is a good choice for $N$ to get a good approx
 \montecarlo{1000}{3}
 \end{axis}
 \end{tikzpicture}
-\caption{}
+\caption{The absolute error in percent for various amount of random numbers. One can see that with thousand random numbers the accuracy is quite reasonable. }
+\label{fig:monte:carlo}
 \end{figure}
 
 \begin{exercise}
