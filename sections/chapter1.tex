@@ -40,7 +40,11 @@ Download the example program\endnote{\url{https://github.com/diehlpkteaching/Par
 \section{Fundamental data types}
 %----------------------------------------------------------------------------------------
 \index{data types!fundamental}
-In this section the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language are introduced. First, the numeric data types are introduced. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For all these data types following options: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long| are available. For more details about the binary numeral system we refer to~\cite{gilli1965binary}. To represent real numbers $\mathbb{R}$ the \lstinline[language=C++]|float| data type and \lstinline[language=C++]|double| data type are available. Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. Table~\ref{chapter2:table:datatypes} summarizes all the available numeric data types and there ranges. The next section shows how to get the range of the IEEE 474 standard how floating point numbers.
+In this section the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language are introduced. First, the numeric data types are introduced. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For all these data types following options: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long| are available. In the \cpp{#include <climits>}\link{https://en.cppreference.com/w/cpp/header/climits} header the minimal and maximal value of all integer data types are defined. For example the minimal value of \cpp{int} data type is given by \cpp{INT_MIN} and the maximal value by \cpp{INT_MAX}, respectively. For more details about the binary numeral system we refer to~\cite{gilli1965binary}. 
+
+To represent real numbers $\mathbb{R}$ the \lstinline[language=C++]|float| data type and \lstinline[language=C++]|double| data type are available. In the \cpp{#include <cfloat>}\link{https://en.cppreference.com/w/cpp/header/cfloat} header the minimal and maximal value of all floating point data types are defined. For example the minimal value of \cpp{double} data type is given by \cpp{DBL_MIN} and the maximal value by \cpp{DBL_MAX}, respectively. 
+
+Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. Table~\ref{chapter2:table:datatypes} summarizes all the available numeric data types and there ranges. The next section shows how to get the range of the IEEE 474 standard how floating point numbers.
 
 \begin{table}[h]
 \centering
@@ -236,6 +240,48 @@ Write a small C++ program using selection statements and operators to determine 
 
 \theendnotes
 
+%----------------------------------------------------------------------------------------
+\chapter{The C standard library}
+\label{chapter:cpp:lib}
+%----------------------------------------------------------------------------------------
+The ANSI C standard\link{http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1124.pdf}\index{ANSI C} is the specification for the C standard library (libc). The C standard library provides following functionality
+\begin{itemize}
+\item Handling set of characters in the \cpp{#include <cstring>} header,
+\item handling times and dates in the \cpp{#include <ctime>} header,
+\item Support of complex numbers in the \cpp{#include <ccomplex>},
+\item Mathematical functions in the \cpp{#include <cmath>} header,
+\item Limits of integer types in the \cpp{#include <climits>} header,
+\end{itemize}
+and many more features. However, these are the features we will use most in this course. 
+
+%----------------------------------------------------------------------------------------
+\section{Strings}
+\index{libc!string}
+\index{string}
+%----------------------------------------------------------------------------------------
+The STL provides the class \lstinline[language=C++]{string}\endnote{\url{http://www.cplusplus.com/reference/string/string/}} to store sequences of characters. For the usage of this class the header \lstinline[language=c++]{#include <string>} has to be added to the cpp file to make \lstinline[language=c++]{std::string} available. Listing~\ref{code:strings} shows how to use the string class to write a set of characters to standard output stream\endnote{\url{http://www.cplusplus.com/reference/iostream/cout/?kw=cout}} \lstinline[language=c++]{std::cout} and read them from standard input stream\endnote{\url{http://www.cplusplus.com/reference/iostream/cin/?kw=cin}} \lstinline[language=c++]{std::cin}. To use these functionality the \lstinline[language=c++]{#include <iostream>} header is needed. \index{iostream!cin}\index{iostream!cout} \\
+
+In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name: "} is written to the standard output stream using the operator \lstinline[language=c++]{<<}. In Line~9 a string object with the identifier \lstinline[language=c++]{name} is declared. All variables have a name \lstinline[language=c++]{name} and a type  \lstinline[language=c++]{std::string}. Since the variable is declared but not initialized yet, the variable is empty or a null string. The assignment operator \lstinline[language=c++]{=} is used to initialize the variable with a set of characters  \lstinline[language=c++]{std::string name = "Mike"}. In Line~10 the variable is initialized with the content provided by the standard input stream \lstinline[language=c++]{std::cin} and the \lstinline[language=c++]{>>} operator. In Line~12 the content of the variable is written to the standard output stream. Note that you can concatenate strings using the \lstinline[language=c++]{>>} operator multiple times. To generate a line break the statement \lstinline[language=c++]{std::endl} is used. Note that we only handled the basis features here, since these are necessary for the purpose of this course. For more details we refer to~\cite[Chapter~1]{andrew2000accelerated}.
+
+
+\lstinputlisting[language=C++,caption={Example reading and writing strings.\label{code:strings}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-string-io.cpp}
+
+
+%----------------------------------------------------------------------------------------
+\section{Random number generation}
+\index{libc!random number generation}
+\index{random number generation}
+\label{sec:random:numbers}
+%----------------------------------------------------------------------------------------
+For some applications, \emph{e.g.}\ Monte Carlo methods, see Chapter~\ref{sec:monte:carlo}, random numbers are essential. The trivial way to generate a integer random number in the range of zero and \cpp{RAND_MAX} is to use \cpp{std::rand}\link{http://www.cplusplus.com/reference/cstdlib/rand/} provided by the \cpp{#include <cstdlib>} header. Listing~\ref{code:srand} shows a small example to generate a random number. Note that one has to provide a seed to the random number generator to get a different random numbers each time the program is executed. One way to do so, is to use the current time \cpp{std::time(0)}\link{http://www.cplusplus.com/reference/ctime/time/?kw=time} provided by the \cpp{#include <ctime>} header. Line~10 shows how to use the current time passed as an argument \cpp{std::srand(std::time(0))} as a seed for the random number generator. Line~\mbox{12} shows how to get one random number. Note that the seed has to be set only once, but always before any random number is drawn.\\
+
+\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:srand}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-random.cpp}
+
+For more advanced usage of random number generators the \cpp{#include<random>} header is provided. More advanced means that not only integer random number can be drawn and range can be provided. Listing~\ref{code:distrand} shows how to generate uniform distributed random numbers. Line~8 generates a random number device \cpp{std::random_device rd}\link{http://www.cplusplus.com/reference/random/random_device/}. Next, the engine for the random number generation is chosen. In this case the \cpp{mersenne_twister_engine}~\cite{matsumoto1998mersenne} is used by providing the random device as an argument \cpp{std::mt19937 gen(rd())}\link{http://www.cplusplus.com/reference/random/mersenne_twister_engine/}. Next the uniform distribution has to be specified by \cpp{std::uniform_int_distribution} for integer values and \cpp{std::uniform_real_distribution} for floating point numbers. In Line~12 the interval from 1 to 6 for integer numbers and in Line~14 for double numbers is specified. Line~15 shows how to get a random number by using the distribution by passing the engine as an argument \cpp{dis(gen)}.
+
+\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:distrand}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-distrandom.cpp}
+
+\theendnotes
 
 %----------------------------------------------------------------------------------------
 \chapter{The C++ Standard Template Library (STL)}
@@ -303,19 +349,6 @@ will be reviewed. All of these algorithm classes will be showcased on the contai
 \end{figure}
 
 %----------------------------------------------------------------------------------------
-\section{Strings}
-\index{STL!string}
-\index{string}
-%----------------------------------------------------------------------------------------
-The STL provides the class \lstinline[language=C++]{string}\endnote{\url{http://www.cplusplus.com/reference/string/string/}} to store sequences of characters. For the usage of this class the header \lstinline[language=c++]{#include <string>} has to be added to the cpp file to make \lstinline[language=c++]{std::string} available. Listing~\ref{code:strings} shows how to use the string class to write a set of characters to standard output stream\endnote{\url{http://www.cplusplus.com/reference/iostream/cout/?kw=cout}} \lstinline[language=c++]{std::cout} and read them from standard input stream\endnote{\url{http://www.cplusplus.com/reference/iostream/cin/?kw=cin}} \lstinline[language=c++]{std::cin}. To use these functionality the \lstinline[language=c++]{#include <iostream>} header is needed. \index{iostream!cin}\index{iostream!cout} \\
-
-In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name: "} is written to the standard output stream using the operator \lstinline[language=c++]{<<}. In Line~9 a string object with the identifier \lstinline[language=c++]{name} is declared. All variables have a name \lstinline[language=c++]{name} and a type  \lstinline[language=c++]{std::string}. Since the variable is declared but not initialized yet, the variable is empty or a null string. The assignment operator \lstinline[language=c++]{=} is used to initialize the variable with a set of characters  \lstinline[language=c++]{std::string name = "Mike"}. In Line~10 the variable is initialized with the content provided by the standard input stream \lstinline[language=c++]{std::cin} and the \lstinline[language=c++]{>>} operator. In Line~12 the content of the variable is written to the standard output stream. Note that you can concatenate strings using the \lstinline[language=c++]{>>} operator multiple times. To generate a line break the statement \lstinline[language=c++]{std::endl} is used. Note that we only handled the basis features here, since these are necessary for the purpose of this course. For more details we refer to~\cite[Chapter~1]{andrew2000accelerated}.
-
-
-\lstinputlisting[language=C++,caption={Example reading and writing strings.\label{code:strings}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture1-string-io.cpp}
-
-
-%----------------------------------------------------------------------------------------
 \section{Containers}
 \index{STL!containers}
 \index{containers}
@@ -370,19 +403,7 @@ In Line~14 the sum of all elements in the vector is computed by using \cpp{std::
 \label{sec:stl:algorithms}
 %----------------------------------------------------------------------------------------
 
-%----------------------------------------------------------------------------------------
-\section{Random number generation}
-\index{STL!random number generation}
-\index{random number generation}
-\label{sec:random:numbers}
-%----------------------------------------------------------------------------------------
-For some applications, \emph{e.g.}\ Monte Carlo methods, see Chapter~\ref{sec:monte:carlo}, random numbers are essential. The trivial way to generate a integer random number in the range of zero and \cpp{RAND_MAX} is to use \cpp{std::rand}\link{http://www.cplusplus.com/reference/cstdlib/rand/} provided by the \cpp{#include <cstdlib>} header. Listing~\ref{code:srand} shows a small example to generate a random number. Note that one has to provide a seed to the random number generator to get a different random numbers each time the program is executed. One way to do so, is to use the current time \cpp{std::time(0)}\link{http://www.cplusplus.com/reference/ctime/time/?kw=time} provided by the \cpp{#include <ctime>} header. Line~10 shows how to use the current time passed as an argument \cpp{std::srand(std::time(0))} as a seed for the random number generator. Line~\mbox{12} shows how to get one random number. Note that the seed has to be set only once, but always before any random number is drawn.\\
 
-\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:srand}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-random.cpp}
-
-For more advanced usage of random number generators the \cpp{#include<random>} header is provided. More advanced means that not only integer random number can be drawn and range can be provided. Listing~\ref{code:distrand} shows how to generate uniform distributed random numbers. Line~8 generates a random number device \cpp{std::random_device rd}\link{http://www.cplusplus.com/reference/random/random_device/}. Next, the engine for the random number generation is chosen. In this case the \cpp{mersenne_twister_engine}~\cite{matsumoto1998mersenne} is used by providing the random device as an argument \cpp{std::mt19937 gen(rd())}\link{http://www.cplusplus.com/reference/random/mersenne_twister_engine/}. Next the uniform distribution has to be specified by \cpp{std::uniform_int_distribution} for integer values and \cpp{std::uniform_real_distribution} for floating point numbers. In Line~12 the interval from 1 to 6 for integer numbers and in Line~14 for double numbers is specified. Line~15 shows how to get a random number by using the distribution by passing the engine as an argument \cpp{dis(gen)}.
-
-\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:distrand}},float,floatplacement=h]{ParallelComputationMathExamples/chapter2/lecture2-distrandom.cpp}
 
 
 %----------------------------------------------------------------------------------------
