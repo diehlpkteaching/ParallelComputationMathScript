@@ -142,16 +142,23 @@ Let us look into the computational aspects of the Monte Carlo methods. Independe
 \item Aggregate the results\text{.}
 \end{enumerate}
 
-\begin{wrapfigure}{r}{0.25\textwidth}
+\begin{figure}[h]
   \begin{center}
   \begin{tikzpicture}
 \draw (0,0) -- (2,0) -- (2,2) -- (0,2) -- cycle;
-\draw (1,1) circle (1cm);
+\draw[fill=cadetgrey, opacity=0.5] (1,1) circle (1cm);
+\draw[->] (1,1) -- (2,1);
+\draw[fill=black] (1,1) circle (0.05cm);
+\node[above] at (1.5,1) {\small $r=\sfrac{1}{2}$};
+\draw[<->] (0,-0.35) -- (2,-0.35);
+\node[below] at (1,-0.35) {\small $1$};
+\draw[<->] (-0.35,0) -- (-0.35,2);
+\node[left] at (-0.35,1) {\small $1$};
 \end{tikzpicture}
   \end{center}
-  \caption{Sketch of the Monte Carlo method to estimate the number $\pi$.}
+  \caption{Sketch of the geometry used within the Monte Carlo method to estimate the number $\pi$.}
   \label{fig:monte}
-\end{wrapfigure}
+\end{figure}
 To understand these for steps, we will compute the value of $\pi$ using a Monte Carlo method. Note that this example is just for educational purposes. Figure~\ref{fig:monte} sketches the two ingredient a unit square and a circle needed to estimate $\pi$. First, a unit square $1 \times 1$ which means both sides have the length of one is drawn. The area $A_s$ is one, since we have a unit square. Second, a circle with the radius of $r=\sfrac{1}{2}$ is drawn at the center of the unit square. The area of the circle is $A_c=\pi r^2$. Using the radius $r=\sfrac{1}{2}$ the area is $A_c=\pi(\sfrac{1}{2})^2=\sfrac{\pi}{4}$. Now, since we have defined the area of the circle and the square, we can use them to estimate the value of $\pi$ by
 \begin{align}
 A_c &= \sfrac{\pi}{4} \notag\\
