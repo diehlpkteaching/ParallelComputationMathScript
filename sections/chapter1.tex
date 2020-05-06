@@ -230,7 +230,7 @@ Write a small C++ program using selection statements and operators to determine 
 \section{Functions}
 \index{functions}
 %----------------------------------------------------------------------------------------
-To use code again and do not have to repeat code blocks multiple times, one can use function definitions\link{https://en.cppreference.com/w/c/language/function_definition}. Listings~\ref{code:functions:max} shows the definition of the function \cpp{max}. In Line~1 the return type \cpp{int} of the function is defined which means that this function will return one integer value. This is happening in Line~3 using the \cpp{return} keyword. In Line~1 the name of the function \cpp{max} is defined and in the parentheses the function arguments are provided separated by commas. In this example two integer values with the name \cpp{a} and \cpp{b} are provided. For the return value, a short form of the \cpp{if} statement. the so--called conditional operator\link{https://en.cppreference.com/w/cpp/language/operator_other\#Conditional_operator}, is provided which means if $a>b$ return $a$ and else return $b$. The function is called as \cpp{double result = max(5,7.7)}. For more details we refer to~\cite[Chapter~2]{andrew2000accelerated}.  \\
+To use code again and do not have to repeat code blocks multiple times, one can use function definitions\link{https://en.cppreference.com/w/c/language/function_definition}. Listings~\ref{code:functions:max} shows the definition of the function \cpp{max}. In Line~1 the return type \cpp{int} of the function is defined which means that this function will return one integer value. This is happening in Line~3 using the \cpp{return}\link{https://en.cppreference.com/w/cpp/language/return} keyword. In Line~1 the name of the function\link{https://en.cppreference.com/w/cpp/language/functions} \cpp{max} is defined and in the parentheses the function arguments are provided separated by commas. In this example two integer values with the name \cpp{a} and \cpp{b} are provided. For the return value, a short form of the \cpp{if} statement. the so--called conditional operator\link{https://en.cppreference.com/w/cpp/language/operator_other\#Conditional_operator}, is provided which means if $a>b$ return $a$ and else return $b$. The function is called as \cpp{double result = max(5,7.7)}.   \\
 
 \begin{lstlisting}[language=c++,caption={Example for a function definition to compute the maximum of two numbers.\label{code:functions:max}},float,floatplacement=tb]
 int max(int a, int b)
@@ -239,16 +239,19 @@ return a>b?a:b;
 }
 \end{lstlisting}
 
-Function are defined between \cpp{#include} and \cpp{int main (void)} in the source code file. Listing~\ref{} shows the usage of a function definition for the example in Equation~\ref{eq:chapter2:if}. 
+Function are defined between \cpp{#include} and \cpp{int main (void)} in the source code file. Listing~\ref{code:example-function} shows the usage of a function definition for the example in Equation~\ref{eq:chapter2:if}. For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
+
+\lstinputlisting[language=C++,caption={Example for a function definition to compute Equation~\ref{eq:chapter2:if}.\label{code:example-function}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture2-function.cpp}
+
 
 %----------------------------------------------------------------------------------------
 \subsection{Structs}
 %----------------------------------------------------------------------------------------
-
+For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
 %----------------------------------------------------------------------------------------
 \subsection{Classes}
 %----------------------------------------------------------------------------------------
-
+For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
 
 \theendnotes
 
@@ -311,7 +314,7 @@ Figure~\ref{fig:stl:components} shows the four components of the C++ Standard Te
 \end{itemize}
 will be reviewed. All of these algorithm classes will be showcased on the container \cpp{std::vector} in Section~\ref{sec:containers}. For more details on the STL we refer to~\cite{o2017mastering,stepanov1995standard}, but remember learning C++ is like learning a new sportive activity, practicing (writing code) is essential to improve your skills.\\ 
 
-\textcolor{azure}{Most important take away of this Section is: 
+\textcolor{azure}{Most important take away of this section is: 
 \begin{itemize}
 \item Never implement your own algorithm or container, if you can find it within the STL.
 \item If you can not find it within the STL, think if you really need this feature.
@@ -413,6 +416,68 @@ In Line~14 the sum of all elements in the vector is computed by using \cpp{std::
 \index{STL!algorithms}
 \index{algorithms}
 \label{sec:stl:algorithms}
+%----------------------------------------------------------------------------------------
+In this section some of the algorithms provided by the STL are studied. For a complete list of all available algorithms we refer to\link{https://en.cppreference.com/w/cpp/algorithm}. The median for a sorted list of numbers $\mathbf{v}=\{v_i \vert i =1,\ldots,n\}$ is given as
+\begin{align}
+median = \begin{cases}
+v[\frac{n}{2}] \text{ if } n \text{ is even} \\
+\frac{1}{2}\left( v[\frac{n}{2}] + v[\frac{n}{2}-1] \right) \text{else}
+\end{cases} \text{.}
+\end{align}
+To compute the median of a \cpp{std::vector}, we have to sort the vector first. The STL provides the \cpp{std::sort} algorithm in the \cpp{#include <algorithm>} header. Listings~\ref{code:median} shows the computation of the median using the STL. In Line~6 a new feature \cpp{typedef}\link{https://en.cppreference.com/w/cpp/language/typedef} to shorten long lines of codes is introduced. In that case we do not want to type each time \cpp{std::vector<double>:: size_type} to get the data type of the vector size and want to use \cpp{vec_sz} instead. Each time the compiler recognizes \cpp{vec_sz} it will replace it by the long form. This is a neat feature to make the code more readable.\\
+
+Line~13 shows how to use sort the values stored in the \cpp{std::vector} in Line~9--12. one has to provide the range of the vector to the sort function. Note that the current values in the vector will be replaced by the sorted ones. To keep the unsorted valued, a copy of the vector can be obtained by the \cpp{std::copy}\link{https://en.cppreference.com/w/cpp/algorithm/copy} algorithm.\\
+
+\lstinputlisting[language=C++,caption={Computation of the median using the sorting algorithm provided by the STL.\label{code:median}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture2-median.cpp}
+
+Another example is to compute the sum of all elements of a \cpp{std::vector} using a \cpp{for} loop or using the \cpp{std::accumulate}\link{https://en.cppreference.com/w/cpp/algorithm/accumulate} provided by the \cpp{#include <numerics>}\link{https://en.cppreference.com/w/cpp/header/numeric} header. Listing~\ref{code:algorithms:showcase} shows how to compute the sum and some neat algorithms. To fill a vector with the values one to ten, the function \cpp{std::ito}\link{https://en.cppreference.com/w/cpp/algorithm/iota} in Line~8 is used instead of writing a for loop. In Line~12--13 the sum is computed using the loop and in Line~17 the sum computed using the STL. One can easily see that the code in Line~17 is shorter and easier to understand. Therefore, it is recommended to use the STL were possible. In line~25--29 the values of the vector are printed to the standard output stream using a \cpp{for} loop. In Line~32 instead of using the \cpp{for} loop, the expression \cpp{std::for_each}\link{https://en.cppreference.com/w/cpp/algorithm/for_each} provided by the \cpp{#include <algorithm>} header is used. This lien of code iterates over all elements in the vector and call the function \cpp{print} and passes each element to the function. Note that the function can have only one argument and its type has to match the type of the vector.\\
+
+There are many more algorithms in the STL as shown here. These algorithms will be introduced in the reaming parts of the book, especially with the numerical examples in Chapter~\ref{part:numerical:examples}. We recommend to have a look in the algorithms to write more efficient and less confusing code.   
+
+
+\begin{lstlisting}[language=c++,caption={Example for a function definition to compute the maximum of two numbers.\label{code:algorithms:showcase}},float,floatplacement=tb]
+#include <vector> 
+#include <iostream>
+#include <numerics>
+#include <algorithm>
+
+void print(double v){
+	std::cout << v << " ";
+}
+
+int main(){
+
+std::vector<double> values (10);
+std::iota(values.begin(), values.end(), 1);
+
+//Compute the sum using a for loop
+double sum = 0;
+for( auto& v : values)
+	sum += v;
+std::cout << "Sum:" << sum << std::endl;
+
+//Compute the sum using STL 
+sum = std::accumulate((values.begin(), values.end(),0);
+std::cout << "Sum:" << sum << std::endl;
+
+//Check the result by printing the vector using a for loop
+for( size_t i = 0 ; i < values.size(); i++)
+	std::cout << values[i] << " ";
+	std::cout << std::endl;
+
+}
+
+//Check the result by printing the vector using STL
+std::for_each(values.begin(), values.end(), print);
+\end{lstlisting}
+
+
+
+%----------------------------------------------------------------------------------------
+\section{Parallel Algorithms}
+%\index{STL!algorithms}
+%\index{algorithms}
+%\label{sec:stl:algorithms}
 %----------------------------------------------------------------------------------------
 
 
