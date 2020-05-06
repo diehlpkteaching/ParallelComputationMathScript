@@ -122,7 +122,7 @@ The second selection statement is the \lstinline[language=c++]{switch} statement
 
 
 %----------------------------------------------------------------------------------------
-\subsection{Operators}
+\section{Operators}
 %----------------------------------------------------------------------------------------
 \index{Operators}
 For the example in Listing~\ref{code:for:loop} we have seen the operator \lstinline[language=C++]|i<n| which is a so--called comparison operator. Next to the comparison operators, C++ language has following operators\endnote{\url{https://en.cppreference.com/w/cpp/language/operator_precedence}}:
@@ -220,6 +220,9 @@ Write a small C++ program using selection statements and operators to determine 
 \end{itemize}
 \end{exercise}
 
+%----------------------------------------------------------------------------------------
+\subsection{Operator overloading}
+%----------------------------------------------------------------------------------------
 
 
 %----------------------------------------------------------------------------------------
@@ -230,7 +233,7 @@ Write a small C++ program using selection statements and operators to determine 
 \section{Functions}
 \index{functions}
 %----------------------------------------------------------------------------------------
-To use code again and do not have to repeat code blocks multiple times, one can use function definitions\link{https://en.cppreference.com/w/c/language/function_definition}. Listings~\ref{code:functions:max} shows the definition of the function \cpp{max}. In Line~1 the return type \cpp{int} of the function is defined which means that this function will return one integer value. This is happening in Line~3 using the \cpp{return}\link{https://en.cppreference.com/w/cpp/language/return} keyword. In Line~1 the name of the function\link{https://en.cppreference.com/w/cpp/language/functions} \cpp{max} is defined and in the parentheses the function arguments are provided separated by commas. In this example two integer values with the name \cpp{a} and \cpp{b} are provided. For the return value, a short form of the \cpp{if} statement. the so--called conditional operator\link{https://en.cppreference.com/w/cpp/language/operator_other\#Conditional_operator}, is provided which means if $a>b$ return $a$ and else return $b$. The function is called as \cpp{double result = max(5,7.7)}.   \\
+To use code again and do not have to repeat code blocks multiple times, one can use function definitions\link{https://en.cppreference.com/w/c/language/function_definition}. Listings~\ref{code:functions:max} shows the definition of the function \cpp{max}. In Line~1 the return type \cpp{int} of the function is defined which means that this function will return one integer value. This is happening in Line~3 using the \cpp{return}\link{https://en.cppreference.com/w/cpp/language/return} keyword. If the function has no return value, the keyword \cpp{void} is used. In Line~1 the name of the function\link{https://en.cppreference.com/w/cpp/language/functions} \cpp{max} is defined and in the parentheses the function arguments are provided separated by commas. In this example two integer values with the name \cpp{a} and \cpp{b} are provided. For the return value, a short form of the \cpp{if} statement. the so--called conditional operator\link{https://en.cppreference.com/w/cpp/language/operator_other\#Conditional_operator}, is provided which means if $a>b$ return $a$ and else return $b$. The function is called as \cpp{double result = max(5,7.7)}.   \\
 
 \begin{lstlisting}[language=c++,caption={Example for a function definition to compute the maximum of two numbers.\label{code:functions:max}},float,floatplacement=tb]
 int max(int a, int b)
