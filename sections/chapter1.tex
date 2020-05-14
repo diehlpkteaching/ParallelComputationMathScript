@@ -256,6 +256,7 @@ For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
 %----------------------------------------------------------------------------------------
 For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
 
+\newpage
 \theendnotes
 
 %----------------------------------------------------------------------------------------
@@ -293,12 +294,47 @@ In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name
 %----------------------------------------------------------------------------------------
 For some applications, \emph{e.g.}\ Monte Carlo methods, see Chapter~\ref{sec:monte:carlo}, random numbers are essential. The trivial way to generate a integer random number in the range of zero and \cpp{RAND_MAX} is to use \cpp{std::rand}\link{http://www.cplusplus.com/reference/cstdlib/rand/} provided by the \cpp{#include <cstdlib>} header. Listing~\ref{code:srand} shows a small example to generate a random number. Note that one has to provide a seed to the random number generator to get a different random numbers each time the program is executed. One way to do so, is to use the current time \cpp{std::time(0)}\link{http://www.cplusplus.com/reference/ctime/time/?kw=time} provided by the \cpp{#include <ctime>} header. Line~10 shows how to use the current time passed as an argument \cpp{std::srand(std::time(0))} as a seed for the random number generator. Line~\mbox{12} shows how to get one random number. Note that the seed has to be set only once, but always before any random number is drawn.\\
 
-\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:srand}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture2-random.cpp}
+\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:srand}},float,floatplacement=tbp]{ParallelComputationMathExamples/chapter2/lecture2-random.cpp}
 
 For more advanced usage of random number generators the \cpp{#include<random>} header is provided. More advanced means that not only integer random number can be drawn and range can be provided. Listing~\ref{code:distrand} shows how to generate uniform distributed random numbers. Line~8 generates a random number device \cpp{std::random_device rd}\link{http://www.cplusplus.com/reference/random/random_device/}. Next, the engine for the random number generation is chosen. In this case the \cpp{mersenne_twister_engine}~\cite{matsumoto1998mersenne} is used by providing the random device as an argument \cpp{std::mt19937 gen(rd())}\link{http://www.cplusplus.com/reference/random/mersenne_twister_engine/}. Next the uniform distribution has to be specified by \cpp{std::uniform_int_distribution} for integer values and \cpp{std::uniform_real_distribution} for floating point numbers. In Line~12 the interval from 1 to 6 for integer numbers and in Line~14 for double numbers is specified. Line~15 shows how to get a random number by using the distribution by passing the engine as an argument \cpp{dis(gen)}.
 
-\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:distrand}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture2-distrandom.cpp}
+\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:distrand}},float,floatplacement=tbp]{ParallelComputationMathExamples/chapter2/lecture2-distrandom.cpp}
 
+%----------------------------------------------------------------------------------------
+\section{Numerical limits}
+\index{numerical limits}
+%----------------------------------------------------------------------------------------
+Since the limits of the numerical data types depend on the various things, the \cpp{#include <limits>} header\link{https://en.cppreference.com/w/cpp/types/numeric_limits} is available to access this information. For the integer data types, the function \cpp{std::numeric_limits<unsigned int>::min()} is provided to receive the smallest finite value and the function \cpp{std::numeric_limits<unsigned int>::max()} the largest finite value of the \cpp{unsigned int} data type.\\
+
+For floating point numbers, two additional values are accessible, see Listing~\ref{code:numerical:limits}. In Line~8 the rounding error \cpp{std::numeric_limits<double>::round_error()}\link{https://en.cppreference.com/w/cpp/types/numeric_limits/round_error} which returns the maximum rounding error of
+the given floating-point type is shown. In Line~9 the value epsilon \cpp{std::numeric_limits<double>::epsilon()}\link{https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon} which is the difference between 1.0 and the next representable value of the given floating-point type is obtained. Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. The next two lines of code show how to access the minimal and maximal value.
+
+
+\lstinputlisting[language=C++,caption={Example accessing the numerical limits of floating point types.\label{code:numerical:limits}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture3-limits2.cpp}
+
+
+%----------------------------------------------------------------------------------------
+\section{Reading and writing files}
+%----------------------------------------------------------------------------------------
+For numerical simulations, it is essential to read files, \emph{e.g.}\ configuration files, and store their values or write the simulation results to permanent storage. First, we look into how to read the content of a file line by line. To do so, the \cpp{ifstream}\link{https://en.cppreference.com/w/cpp/io/basic_ifstream} provided by the \cpp{#include <fstream>}\link{https://en.cppreference.com/w/cpp/header/fstream} header. Listing~\ref{code:io:reading} shows how to read the file's content \cpp{"example.txt"} line by line. In Line~7 a \cpp{ifstream} with the name \cpp{myfile} is declared. With the parentheses its constructor is called and the parameter is the file name of the file we want to open. Note that we assume that the file is located next to the cpp file. In Line~8 we check if the file could be opened successful. In that case the function \cpp{is_open()}\link{https://en.cppreference.com/w/cpp/io/basic_fstream/is_open} will return \cpp{true}. In line~10 the function \cpp{getline}\link{https://en.cppreference.com/w/cpp/string/basic_string/getline} is called to access the each line of the file. The first argument is the \cpp{ifstream} and the second argument is a \cpp{std::string} where the line of the file is stored. Each time the function is called there is new content in the argument \cpp{line}. If there is no next line. the function returns \cpp{false} and the \cpp{while} loop stops. In Line~16 the \cpp{ifstream} is closed by calling the \cpp{close()}\link{https://en.cppreference.com/w/cpp/io/basic_ifstream/close} function.\\
+
+\lstinputlisting[language=C++,caption={Example for reading the content of file "example.txt" line by line.\label{code:io:reading}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture3-reading.cpp}
+
+\begin{exercise}
+Instead of printing the file content to the standard output device, store each line of the file in a \cpp{std::vector<string>}.
+\end{exercise}
+\vspace{0.25cm}
+
+Second, we look into how to write the text \cpp{"Writing this to a file"} into the file \cpp{"example.txt"}, see Listing~\ref{code:io:writing}. In Line~6 the \cpp{std::ofstream}\link{https://en.cppreference.com/w/cpp/io/basic_ostream} is declared. In Line~7 the function \cpp{open()}\link{https://en.cppreference.com/w/cpp/io/basic_ofstream/open} is called. The first argument is the file name of the file to create. The second argument is the file mode \cpp{std::ios::out}\link{https://en.cppreference.com/w/cpp/io/ios_base/openmode}. In Line~8 the operator \cpp{<<} is used to write the string to the file. By using \cpp{"\n"} we indicate a line break and all content after will be in a new line of the file. In Line~9 the file is closed by calling the \cpp{close()}\link{https://en.cppreference.com/w/cpp/io/basic_ofstream/close} method.
+
+\begin{exercise}
+Instead writing one string to the file, write all string in a \cpp{std::vector<string>} to the file with each string in a new line.
+\end{exercise}
+
+\lstinputlisting[language=C++,caption={Example for writing to the file "example.txt".\label{code:io:writing}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture3-writing.cpp}. 
+
+
+\newpage
 \theendnotes
 
 %----------------------------------------------------------------------------------------
@@ -308,6 +344,7 @@ For more advanced usage of random number generators the \cpp{#include<random>} h
 
 %----------------------------------------------------------------------------------------
 \section{Overview of the STL}
+\index{STL}
 %----------------------------------------------------------------------------------------
 Figure~\ref{fig:stl:components} shows the four components of the C++ Standard Template Library (STL). The main focus in this course is on the algorithm component, container component, and iterators component. The functions component provides the so--called \texttt{Functors}\link{https://www.geeksforgeeks.org/functors-in-cpp/}. A functor is an object, which is treated a function or a function pointer. The component iterators\link{https://en.cppreference.com/w/cpp/iterator} provides six iterators for working upon a sequence of values, \emph{e.g.}\ containers. The usage of iterators will be discussed in Section~\ref{ref:stl:iterators}. For the Algorithms component\link{https://en.cppreference.com/w/cpp/algorithm} following algorithm classes:
 \begin{itemize}
@@ -315,7 +352,7 @@ Figure~\ref{fig:stl:components} shows the four components of the C++ Standard Te
 \item Searching\link{https://en.cppreference.com/w/cpp/algorithm/search} - Searching for elements in a sorted array, and
 \item STL algorithms - Provides algorithms, like finding the largest element (max\link{https://en.cppreference.com/w/cpp/algorithm/max}) in an container or compute the sum\link{https://en.cppreference.com/w/cpp/algorithm/accumulate} of all elements;
 \end{itemize}
-will be reviewed. All of these algorithm classes will be showcased on the container \cpp{std::vector} in Section~\ref{sec:containers}. For more details on the STL we refer to~\cite{o2017mastering,stepanov1995standard}, but remember learning C++ is like learning a new sportive activity, practicing (writing code) is essential to improve your skills.\\ 
+will be reviewed. All of these algorithm classes will be showcased on the container \cpp{std::vector} in Section~\ref{sec:containers}. For more details on the STL we refer to~\cite{o2017mastering,stepanov1995standard}, but remember learning C++ is like learning a new sportive activity, practicing (writing code) is essential to improve your skills. For further watching, we recommend the C++ Lecture 1 - The Standard Template Library\link{https://www.youtube.com/watch?v=asGZTCR53KY&list=PL7vEgTL3FalY2eBxud1wsfz8OKvE9sd_z}.\\ 
 
 \textcolor{azure}{Most important take away of this section is: 
 \begin{itemize}
@@ -396,14 +433,30 @@ Note in C++ the elements in a vector start with index zero and the index of the 
 Let us write the computation of the average again using the \cpp{std::vector}. Listing~\ref{code:averagecontainers} shows the new implantation of the computation of the average (Listing~\ref{code:average}). In Line~7 the \cpp{std::vector} with the name \cpp{values} for storing \cpp{double} values is declared. In Line~11 with \cpp{values.push_back{x}} the value of \cpp{x} is inserted at the end of the vector. To replace the third element of the vector by the value $1.5$ the expression \cpp{values[3]=1.4} is used. To replace the last element with zero the expression \cpp{values[values.size()-1]=0} is used. To access the elements on the $i$-th index the expression \cpp{values[i]} is used. The first element is accessed using \cpp{values.first()} and the last element using \cpp{values.last()}. More details about iterators are discussed in Section~\ref{ref:stl:iterators}. The last element is deleted by using \cpp{values.pop_back()} and the $i$-th element by \cpp{values.erase(values.start()+i}.\\
 
 
-In Line~14 the sum of all elements in the vector is computed by using \cpp{std::accumulate} from the Algorithms component. The first argument \cpp{values.begin()} and the second argument \cpp{values.end()} defines the range of the vector. Here, it is the full vector, but for example to keep out the first element of sum, one can use \cpp{values.begin()+1}. The third argument is the initial value of the sum. More details about the Algorithms will be studied in Section~\ref{sec:stl:algorithms}.
+In Line~14 the sum of all elements in the vector is computed by using \cpp{std::accumulate} from the Algorithms component. The first argument \cpp{values.begin()} and the second argument \cpp{values.end()} defines the range of the vector. Here, it is the full vector, but for example to keep out the first element of sum, one can use \cpp{values.begin()+1}. The third argument is the initial value of the sum. More details about the Algorithms will be studied in Section~\ref{sec:stl:algorithms}. \\
+
+Compared to other containers, \emph{e.g.}\ \cpp{std::list}, the \cpp{std::vector} is designed for
+\begin{enumerate}
+\item Are sufficient for small amount of elements. A good estimate is around 7000 elements,
+\item Are optimized to access elements arbitrary, and
+\item Performs well adding one element by the time to the end of the vector.
+\end{enumerate}
+For example the complexity for inserting or removing an element in a vector is $\mathcal{O}(n^2)$ and for the container \cpp{std::list} the complexity is $\mathcal{O}(n)$~\cite{michalewicz2013genetic,knuth1997art}.
 
 \lstinputlisting[language=C++,caption={Computation of the average of the numbers from one to $n$ using containers.\label{code:averagecontainers}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture2-averagecontainers.cpp}
 
+
 %----------------------------------------------------------------------------------------
-\subsection{Iterators}
-\label{ref:stl:iterators}
+\subsection{List}
+\index{list}
+\index{STL!list}
 %----------------------------------------------------------------------------------------
+Depending on the use case next to the \cpp{std::vector} container, the \cpp{std::list} container is available. The \cpp{std::list} container is provided by the \cpp{#include <list>} header. The usage of this container is similar to the \cpp{std::vector} and one can just replace \cpp{std::vector} by \cpp{std::list} in the code. Therefore, we will not provide any source code example here, since you can just look on them in the previous section. Compared to other containers, \emph{e.g.}\ \cpp{std::vector}, the \cpp{std::list} is designed for
+\begin{enumerate}
+\item Are slower for small amount of elements, and
+\item Are optimized to insert and delete elements anywhere.
+\end{enumerate}
+For example the complexity for inserting or removing an element in a vector is $\mathcal{O}(n^2)$ and for the container \cpp{std::list} the complexity is $\mathcal{O}(n)$~\cite{michalewicz2013genetic,knuth1997art}.
 
 %----------------------------------------------------------------------------------------
 \subsection{Array}
@@ -411,8 +464,10 @@ In Line~14 the sum of all elements in the vector is computed by using \cpp{std::
 
 
 %----------------------------------------------------------------------------------------
-\subsection{List}
+\subsection{Iterators}
+\label{ref:stl:iterators}
 %----------------------------------------------------------------------------------------
+
 
 %----------------------------------------------------------------------------------------
 \section{Algorithms}
@@ -483,12 +538,5 @@ std::for_each(values.begin(), values.end(), print);
 %\label{sec:stl:algorithms}
 %----------------------------------------------------------------------------------------
 
-
-
-
-%----------------------------------------------------------------------------------------
-\section{Numerical limits}
-%----------------------------------------------------------------------------------------
-
-
+\newpage
 \theendnotes
