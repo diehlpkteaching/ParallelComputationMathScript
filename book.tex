@@ -225,13 +225,9 @@ Next, we can ask the question what is a good choice for $N$ to get a good approx
     \draw[->] (0,0) -- (1.1*\radius,0);
     \draw[->] (0,0) -- (0,1.1*\radius);
     \foreach \i in {1,2,...,10}{%
-        \typeout{Point \i}%
         \pgfmathsetmacro\x{\radius*rnd}%
-        \typeout{X \x}%
         \pgfmathsetmacro\y{\radius*rnd}%
-        \typeout{Y \y}%
         \pgfmathsetmacro\k{(pow(\x,2)+pow(\y,2)) <pow(\radius,2)}%
-        \typeout{im Kreis?: \k}%
         \pgfmathparse{ifthenelse(\k==1,"amaranth","azure")}%
         \fill[\pgfmathresult] (\x,\y)circle(0.75pt);%
     }
@@ -252,13 +248,9 @@ Next, we can ask the question what is a good choice for $N$ to get a good approx
     \draw[->] (0,0) -- (1.1*\radius,0);
     \draw[->] (0,0) -- (0,1.1*\radius);
     \foreach \i in {1,2,...,100}{%
-        \typeout{Point \i}%
         \pgfmathsetmacro\x{\radius*rnd}%
-        \typeout{X \x}%
         \pgfmathsetmacro\y{\radius*rnd}%
-        \typeout{Y \y}%
         \pgfmathsetmacro\k{(pow(\x,2)+pow(\y,2)) <pow(\radius,2)}%
-        \typeout{im Kreis?: \k}%
         \pgfmathparse{ifthenelse(\k==1,"amaranth","azure")}%
         \fill[\pgfmathresult] (\x,\y)circle(0.75pt);%
     }
@@ -278,13 +270,9 @@ Next, we can ask the question what is a good choice for $N$ to get a good approx
     \draw[->] (0,0) -- (1.1*\radius,0);
     \draw[->] (0,0) -- (0,1.1*\radius);
     \foreach \i in {1,2,...,1000}{%
-        \typeout{Point \i}%
         \pgfmathsetmacro\x{\radius*rnd}%
-        \typeout{X \x}%
         \pgfmathsetmacro\y{\radius*rnd}%
-        \typeout{Y \y}%
         \pgfmathsetmacro\k{(pow(\x,2)+pow(\y,2)) <pow(\radius,2)}%
-        \typeout{im Kreis?: \k}%
         \pgfmathparse{ifthenelse(\k==1,"amaranth","azure")}%
         \fill[\pgfmathresult] (\x,\y)circle(0.75pt);%
     }
@@ -325,13 +313,15 @@ Make a list of which C++ features we need to implement the flow chart in Figure~
 %----------------------------------------------------------------------------------------
 \chapter{$N$-body problems}
 %----------------------------------------------------------------------------------------
+The $N$-body problem is the physically problem of predicting the individual motions of a group of celestial objects interacting with each others gravitationally. 
+
 
 %----------------------------------------------------------------------------------------
 \chapter{One-dimensional heat equation}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
-\section{Peridynamics}
+\chapter{Peridynamics}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
