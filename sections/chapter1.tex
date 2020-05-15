@@ -230,8 +230,10 @@ Write a small C++ program using selection statements and operators to determine 
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
-\section{Functions}
+\subsection{Functions}
 \index{functions}
+\index{structure!function}
+\label{sec:functions}
 %----------------------------------------------------------------------------------------
 To use code again and do not have to repeat code blocks multiple times, one can use function definitions\link{https://en.cppreference.com/w/c/language/function_definition}. Listings~\ref{code:functions:max} shows the definition of the function \cpp{max}. In Line~1 the return type \cpp{int} of the function is defined which means that this function will return one integer value. This is happening in Line~3 using the \cpp{return}\link{https://en.cppreference.com/w/cpp/language/return} keyword. If the function has no return value, the keyword \cpp{void} is used. In Line~1 the name of the function\link{https://en.cppreference.com/w/cpp/language/functions} \cpp{max} is defined and in the parentheses the function arguments are provided separated by commas. In this example two integer values with the name \cpp{a} and \cpp{b} are provided. For the return value, a short form of the \cpp{if} statement. the so--called conditional operator\link{https://en.cppreference.com/w/cpp/language/operator_other\#Conditional_operator}, is provided which means if $a>b$ return $a$ and else return $b$. The function is called as \cpp{double result = max(5,7.7)}.   \\
 
@@ -248,13 +250,83 @@ Function are defined between \cpp{#include} and \cpp{int main (void)} in the sou
 
 
 %----------------------------------------------------------------------------------------
-\subsection{Structs}
+\subsection{Struct}
+\index{struct}
+\index{structure!struct}
 %----------------------------------------------------------------------------------------
-For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
+In some case, we like to group data, for example to represent a vector $v=(x,y,z)^T\in \mathbb{R}^3$. Here, the \cpp{struct}\link{https://en.cppreference.com/w/c/language/struct} expression is provided. Note that the struct was introduced in the C language and its companion in the C++ language is the \cpp{class} expression. However, to make the C language a subset of the C++ language, the \cpp{struct} is still available. Listing~\ref{code:struct} shows the struct with the three variables for each direction of the vector space. To declare a vector, we just write \cpp{struct vector v} to have an vector with the name \cpp{v} and to initialize the vector with the unit vector \cpp{struct vector v = \{1,1,1\}}\link{https://en.cppreference.com/w/c/language/struct_initialization}. To access the x component of the vector, we write \cpp{v.x} and to assign a new value the expression \cpp{v.x=42} is used. For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
+
+%----------------------------------------------------------------------------------------
+\subsubsection{Constructor}
+\index{constructor}
+\index{structure!constructor}
+%----------------------------------------------------------------------------------------
+Each \cpp{struct} and \cpp{class} has a default constructor\link{https://en.cppreference.com/w/cpp/language/default_constructor}. However, one can overload the constructor for example to initialize the vector a zero $v=\{0,0,0\}$. Line~11 shows the constructor to initialize an zero vector. The constructor is like a function without the \cpp{return} option with the same name as the \cpp{struct} and \cpp{class}. As the constructor arguments the three vector components are given. Note that we assign the value zero to all of them. In Line~12 we assign the argument's values to the variables within the struct by using \cpp{x(x)} which means that we assign the \cpp{double x} of the \cpp{struct} the value of the \cpp{x} in the parentheses. Now we can initialize the \cpp{struct} in two different ways. First, using \cpp{struct vector v;} will result in $v=\{0,0,0\}$ since we assign zero to all the values. Second, using \cpp{struct vector v = vector(1,2,3);} will result in $v=\{1,2,3\}$. For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
+
+%----------------------------------------------------------------------------------------
+\subsubsection{Member function}
+\index{member function}
+\index{structure! member function}
+%----------------------------------------------------------------------------------------
+A often used task is to compute the length of a vector $\sqrt{x^2+y^2+z^2}$, thus we want to add this function to the \cpp{struct vector} to call \cpp{norm()} to compute the norm, see Line~15. The syntax for member functions is the same as for functions. see Section~\ref{sec:functions}. The main difference is that the function definition is between the parentheses of the \cpp{struct} definition. For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
+
+\begin{lstlisting}[language=c++,caption={Example for a structure for a three dimensional vector.\label{code:struct}},float,floatplacement=tb]
+#include <cmath>
+
+struct vector 
+{
+// vector components
+double x;
+double y;
+double z;
+
+// constructor
+vector(double x=0, double y=0, double z=0)
+	x(x), y(y), z(z) {}
+
+// member function to compute the vector's length
+double norm(){
+	return std::sqrt(x*x+y*y+z*z);
+}
+}
+\end{lstlisting}
+
+
+
 %----------------------------------------------------------------------------------------
 \subsection{Classes}
 %----------------------------------------------------------------------------------------
-For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
+For more details we refer to~\cite[Chapter~9]{andrew2000accelerated}.
+
+
+%----------------------------------------------------------------------------------------
+\section{Generic programming}
+%----------------------------------------------------------------------------------------
+In some cases, we need to write the same function for different data types, \emph{e.g.}\ \cpp{double} and \cpp{float}, see Listing~\ref{code:generix:example}. We would need to write the same function for all data types. Thus, we will produce the same computation multiple time and have too much redundant code.If there is an error in the computation, we would have to correct it for all of the functions. Function templates\link{https://en.cppreference.com/w/cpp/language/function_template}\index{function~template} are provided by the C++ language. Listing~\ref{code:generix:example} shows starting at Line~11 how to combine the previous two function into one. In Line~11 the expression \cpp{typename} indicates that we define a function template and within the parentheses the \cpp{typename T} is defined which is a placeholder for the explicit data type. For the remaining function definition everything keeps the same and only the specific data type, \emph{e.g.}\ \cpp{double} and \cpp{float}, is replaced by \cpp{T}. Now, the function is used as \cpp{add<double>} or \cpp{add<float>} or \cpp{add<int>} for the various data types without explicit implementing all of them. This is a neat feature to reduce the amount of code.\\
+
+\begin{lstlisting}[language=c++,caption={Example for the usage function templates.
+\label{code:generix:example}},float,floatplacement=tb]
+// Definition of multiple functions
+double add(double a, double b) {
+	return a + b;
+}
+
+float add(float a, float b) {
+	return a + b;
+}
+
+// Function template
+template<typename T>
+T add(T a, Tb){
+	return a+b;
+}
+\end{lstlisting}
+
+The same is possible for \cpp{struct} and \cpp{classes} by adding \cpp{template<typename T>}\link{https://en.cppreference.com/w/cpp/language/templates} above the definition and using the \cpp{T} instead of \cpp{double} as in Listing~\ref{code:struct}.  Now, the function is used as \cpp{struct vector <double> v;} or \cpp{struct vector<float> v;} or \cpp{struct vector<int> v;} for the various data types without explicit implementing all of them. For the function \cpp{norm()} there is no need to use \cpp{template<typename T>} again and the return type \cpp{double} is replaced by \cpp{T}. Fore more details, we refer to~\cite{josuttis2003c++}. For further watching, we recommend the C++ Lecture 2 - Template Programming 2\link{https://www.youtube.com/watch?v=iU3wsiJ5mts} and C++ Lecture 4 - Template Meta Programming\link{https://www.youtube.com/watch?v=6PWUByLZO0g}.
+
+\begin{exercise}
+Use the \cpp{struct} in Listing~\ref{code:struct} and make it a generic one by adding the \cpp{template<typename T>} and replace all \cpp{double} by \cpp{T}.
+\end{exercise}
 
 \newpage
 \theendnotes
@@ -271,7 +343,7 @@ The ANSI C standard\link{http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1124.p
 \item Mathematical functions in the \cpp{#include <cmath>} header,
 \item Limits of integer types in the \cpp{#include <climits>} header,
 \end{itemize}
-and many more features. However, these are the features we will use most in this course. 
+and many more features. However, these are the features we will use most in this course. For more details, we refer to~\cite{josuttis2012c++}.
 
 %----------------------------------------------------------------------------------------
 \section{Strings}
@@ -490,7 +562,7 @@ Line~13 shows how to use sort the values stored in the \cpp{std::vector} in Line
 
 Another example is to compute the sum of all elements of a \cpp{std::vector} using a \cpp{for} loop or using the \cpp{std::accumulate}\link{https://en.cppreference.com/w/cpp/algorithm/accumulate} provided by the \cpp{#include <numerics>}\link{https://en.cppreference.com/w/cpp/header/numeric} header. Listing~\ref{code:algorithms:showcase} shows how to compute the sum and some neat algorithms. To fill a vector with the values one to ten, the function \cpp{std::ito}\link{https://en.cppreference.com/w/cpp/algorithm/iota} in Line~8 is used instead of writing a for loop. In Line~12--13 the sum is computed using the loop and in Line~17 the sum computed using the STL. One can easily see that the code in Line~17 is shorter and easier to understand. Therefore, it is recommended to use the STL were possible. In line~25--29 the values of the vector are printed to the standard output stream using a \cpp{for} loop. In Line~32 instead of using the \cpp{for} loop, the expression \cpp{std::for_each}\link{https://en.cppreference.com/w/cpp/algorithm/for_each} provided by the \cpp{#include <algorithm>} header is used. This lien of code iterates over all elements in the vector and call the function \cpp{print} and passes each element to the function. Note that the function can have only one argument and its type has to match the type of the vector.\\
 
-There are many more algorithms in the STL as shown here. These algorithms will be introduced in the reaming parts of the book, especially with the numerical examples in Chapter~\ref{part:numerical:examples}. We recommend to have a look in the algorithms to write more efficient and less confusing code.   
+There are many more algorithms in the STL as shown here. These algorithms will be introduced in the reaming parts of the book, especially with the numerical examples in Chapter~\ref{part:numerical:examples}. We recommend to have a look in the algorithms to write more efficient and less confusing code. For more details we refer to~\cite[Chapter~6]{andrew2000accelerated}.   
 
 
 \begin{lstlisting}[language=c++,caption={Example for a function definition to compute the maximum of two numbers.\label{code:algorithms:showcase}},float,floatplacement=tb]
