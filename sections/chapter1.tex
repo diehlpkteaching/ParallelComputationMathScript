@@ -539,6 +539,14 @@ For example the complexity for inserting or removing an element in a vector is $
 \subsection{Iterators}
 \label{ref:stl:iterators}
 %----------------------------------------------------------------------------------------
+Iterators\index{iterator} provided by the \lstinline|\#include<iterator>|\link{https://en.cppreference.com/w/cpp/header/iterator} header are pointing to some specific element, \emph{e.g.}\ \cpp{std::array} or \cpp{std::vector}, and provides some fast way to iterator over all elements in the range. As the example, we use the a vector \cpp{std::vector<int> v = \{1,2,3,4,5\};} and to access the first element \cpp{v.begin()}\link{https://www.cplusplus.com/reference/iterator/begin/} and to access the last element \cpp{v.end()}\link{https://www.cplusplus.com/reference/iterator/end/} is used. For the algorithms in the next Section, we use these for example to sort \cpp{std::sort(v.begin(),s.end(),std::greater<int>()}\link{https://en.cppreference.com/w/cpp/utility/functional/greater} from the largest to the lowest number. We can also use \cpp{v.next()}\link{http://www.cplusplus.com/reference/iterator/next/} to get the next element and \cpp{v.prev()}\link{http://www.cplusplus.com/reference/iterator/prev/} to get the previous element.\\
+
+Using iterators, we can do advanced iterating over vectors, see Listing~\ref{code:for:iterator}. In Line~9 a constant iterator \cpp{std::vector<int>::const_iter} and assign the first element of the vector to it. For the \cpp{for} loop in Section~\ref{sec:iteration:statements} this would be equivalent to loop variable \cpp{size_t i = 0}. In Line~11 we use the not equal operator \cpp{iter != values.end()} as the condition statement. The equivalent for the \cpp{for} loop would be \cpp{ i < vector.size()}. In~12 the manipulation statement \cpp{++iter} is used and for the \cpp{for} loop we would use \cpp{i++}.To get the content of the vector, we use the deference operator \cpp{*iter}. Note for the \cpp{for} loop we would use \cpp{values[i]}.\\
+
+With the iterators erasing elements gets easier, since we can use the expression \cpp{values.erase(iter)}\link{https://en.cppreference.com/w/cpp/string/basic_string/erase} instead of \cpp{vlaues.erase(values.begin()+i)}. Note that the \cpp{erase} function returns the iterator of the element the iterator is pointing to after the deletion \cpp{iter = vlaues.erase(iter)} which is useful for some algorithms.
+
+\lstinputlisting[language=C++,caption={Printing a vector using iterators.\label{code:for:iterator}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture3-for-iterator.cpp}
+
 
 
 %----------------------------------------------------------------------------------------

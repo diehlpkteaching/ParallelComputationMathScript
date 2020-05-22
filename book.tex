@@ -111,6 +111,103 @@
 %----------------------------------------------------------------------------------------
 \section{Blaze library}
 %----------------------------------------------------------------------------------------
+Blaze is an open-source, high-performance C++ math library for dense and sparse arithmetic. With its state-of-the-art Smart Expression Template implementation Blaze combines the elegance and ease of use of a domain-specific language with HPC-grade performance, making it one of the most intuitive and fastest C++ math libraries available. More details about the implementation details~\cite{doi:10.1137/110830125,6266939}.
+
+%----------------------------------------------------------------------------------------
+\subsection{Vectors}
+\index{Blaze!vector}
+%----------------------------------------------------------------------------------------
+A $n$ dimensional vector space (or linear space) $\mathbf{u}$ is defined as $\mathbf{u}=(u_1,u_2,\ldots,u_{n-1},u_{n-2})\in \mathbb{R}^n$. In Blaze, a three dimensional vector\link{https://bitbucket.org/blaze-lib/blaze/wiki/Vectors} is defined as \cpp{blaze::DynamicVector<int> c (3UL);}\link{https://bitbucket.org/blaze-lib/blaze/wiki/Vector\%20Types\#!dynamicvector}. Note the Blaze is a template based library as the STL and we have to provide the data type of the vector in the parenthesizes \cpp{<int>} and in the second parenthesizes \cpp{(3UL)} the size of the vector. as for the \cpp{std::vector} we can get the size of the vector by the expression \cpp{c.size()} and to access a value, we use \cpp{auto value = c[i];}. Listing~\ref{code:blaze:vector:iterator} shows how to iterate over a Blaze vector using the access operator \cpp{c[i]} and iterators \cpp{it-value}. For more details on iterators we refer to Section~\ref{ref:stl:iterators}. \\
+
+\begin{lstlisting}[language=c++,caption={Iterating over a Blaze vector using a for loop with iterators.\label{code:blaze:vector:iterator}},float,floatplacement=tb]
+#include <blaze/Math.h>
+
+int main()
+{
+blaze::StaticVector<int,3UL> c{ 4, -2, 5 };
+
+// Loop over the vector
+for( size_t i=0UL; i< c.size(); ++i )
+   std::cout << c[i] << std::endl;
+   
+// Iterate over a vector
+blaze::CompressedVector<int> d{ 0, 2, 0, 0};
+for( CompressedVector<int>::Iterator it=d.begin(); 
+  it!=d.end(); ++it ) 
+    std::cout << it->value() << std::endl;
+
+}
+\end{lstlisting}
+
+For the three dimensional vector space, we look into so some common operations which are often needed in simulations, \emph{e.g.}\ in $N$-body simulation (Section~\ref{sec:nbody}) or peridyanmic simulation (Section~\ref{sec:pd}). For a vector $\mathbf{u}=(x,y,z)\in\mathbb{R}^3$ the norm\index{vector!norm} or length of the vector reads as
+\begin{align}
+\vert\mathbf{u}\vert = \sqrt{x^2+y^2+z^2}
+\end{align}
+and its direction is given as $\sfrac{\mathbf{u}}{\vert\mathbf{u}\vert}$. The norm of the vector $\vert c \vert$ is computed in Blaze using the expression \cpp{const double norm = norm( b );}\link{https://bitbucket.org/blaze-lib/blaze/wiki/Vector\%20Operations\#!norms}. The inner product\index{vector!inner product} $\bullet$ reads as
+\begin{align}
+\mathbf{u}_1 \bullet \mathbf{u}_2 = x_1x_2 + y_1y_2 + z_1z_2\text{.}
+\end{align}
+Figure~\ref{fig:vector:inner} shows the angle $\Theta$ between the two vectors $\mathbf{u}_1$ and $\mathbf{u}_2$ defined using the inner product $\bullet$.  The inner product $\mathbf{u}_1 \bullet \mathbf{u}_2 $ is computed in Blaze using the expression \cpp{int result2 = inner(v1,v2);}\link{https://bitbucket.org/blaze-lib/blaze/wiki/Vector-Vector\%20Multiplication\#!inner-product-scalar-product-dot-product}. The cross product $\times$ is defined by
+\begin{align}
+\mathbf{u}_1 \times \mathbf{u}_2 = \vert\mathbf{u}_1 \vert \vert\mathbf{u}_2 \vert sin(\theta) \mathbf{n}
+\end{align}
+and its geometric interpretation is sketches in Figure~\ref{fig:vector:cross}. The cross product of the two vector is the orthogonal vector on the two vectors. In addition, the norm of the cross product $\vert\textcolor{azure}{\mathbf{u}_1}\times\textcolor{amaranth}{\mathbf{u}_2}\vert$ is the are spanned by the two vectors. A more accessible form is
+\begin{align}
+\left( \begin{matrix}
+c_0 \\ c_1 \\ c_2
+\end{matrix}\right) = \left( \begin{matrix}
+y_2 z_2 - z_1 x_2 \\
+z_1 x_2 - x_1 z_2 \\
+x_1 y_2 - y_1x_2
+\end{matrix}\right) \text{.}
+\end{align}
+The inner product $\mathbf{u}_1 \times \mathbf{u}_2 $ is computed in Blaze using the expression \cpp{cross(u1,u2);}.
+
+\begin{figure}[tb]
+\begin{subfigure}{.5\textwidth}
+\center
+\begin{tikzpicture}
+\draw [->] (0,0) -- (2,2);
+\draw [->] (0,0) -- (2,-2);
+\draw [azure,thick,domain=-45:45] plot ({cos(\x)}, {sin(\x)});
+
+\node at (3,0) {$\Theta=\arccos(\sfrac{\mathbf{u_1}\bullet\mathbf{u_2}}{\vert\mathbf{u_1}\vert\vert \mathbf{u_2}\vert})$};
+\node[above] at (2,2) {$\mathbf{u}_1$};
+\node[below] at (2,-2) {$\mathbf{u}_2$};
+\end{tikzpicture}
+\caption{The angle $\Theta$ between the two vectors $\mathbf{u}_1$ and $\mathbf{u}_2$ defined using the inner product $\bullet$. }
+\label{fig:vector:inner}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\begin{tikzpicture}
+\draw[->,azure,thick] (0,0) -- (2,0);
+\draw[->] (0,0) -- (0,2);
+\draw[->,amaranth,thick] (0,0) -- (1,1);
+\draw (1,1) -- (3,1) -- (2,0);
+\draw [black,domain=0:45] plot ({cos(\x)}, {sin(\x)});
+
+\node[below,azure] at (1,0) {$\mathbf{u}_1$};
+\node[left,amaranth] at (0.75,0.75) {$\mathbf{u}_2$};
+\node[above] at (0,2) {$\textcolor{azure}{\mathbf{u}_1}\times\textcolor{amaranth}{\mathbf{u}_2}$};
+\node[above] at (3,1) {$\vert\textcolor{azure}{\mathbf{u}_1}\times\textcolor{amaranth}{\mathbf{u}_2}\vert$};
+\node at (0.5,0.25) {$\Theta$};
+\end{tikzpicture}
+\caption{Visualization of the inner product $\vert\textcolor{azure}{\mathbf{u}_1}\times\textcolor{amaranth}{\mathbf{u}_2}\vert$ which is the orthogonal vector on the two others. }
+\label{fig:vector:cross}
+\end{subfigure}
+\caption{Geometric interpretation of the inner product $\bullet$ (\subref{fig:vector:inner}) and the cross product $\times$ (\subref{fig:vector:cross}).}
+\end{figure}
+
+
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Matrices}
+\index{Blaze!vector}
+%----------------------------------------------------------------------------------------
+
+
+
 
 %----------------------------------------------------------------------------------------
 \chapter{Solvers}
@@ -312,8 +409,10 @@ Make a list of which C++ features we need to implement the flow chart in Figure~
 
 %----------------------------------------------------------------------------------------
 \chapter{$N$-body problems}
+\index{$N$-body problems}
+\label{sec:nbody}
 %----------------------------------------------------------------------------------------
-The $N$-body problem is the physically problem of predicting the individual motions of a group of celestial objects interacting with each others gravitationally. 
+The $N$-body problem is the physically problem of predicting the individual motions of a group of celestial objects interacting with each others gravitationally. In laymen terms we want to predict the interactive forces and the motion of all celestial bodies in all future times. We assume that the know their orbital properties, \emph{e.g.}\ the initial positions, velocity, and time.
 
 
 %----------------------------------------------------------------------------------------
@@ -322,6 +421,7 @@ The $N$-body problem is the physically problem of predicting the individual moti
 
 %----------------------------------------------------------------------------------------
 \chapter{Peridynamics}
+\label{sec:pd}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
