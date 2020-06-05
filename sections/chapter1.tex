@@ -38,6 +38,7 @@ Download the example program\endnote{\url{https://github.com/diehlpkteaching/Par
 
 %----------------------------------------------------------------------------------------
 \section{Fundamental data types}
+\label{sec:fundamental:types}
 %----------------------------------------------------------------------------------------
 \index{data types!fundamental}
 In this section the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language are introduced. First, the numeric data types are introduced. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For all these data types following options: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long| are available. In the \cpp{#include <climits>}\link{https://en.cppreference.com/w/cpp/header/climits} header the minimal and maximal value of all integer data types are defined. For example the minimal value of \cpp{int} data type is given by \cpp{INT_MIN} and the maximal value by \cpp{INT_MAX}, respectively. For more details about the binary numeral system we refer to~\cite{gilli1965binary}. 
@@ -222,12 +223,54 @@ Write a small C++ program using selection statements and operators to determine 
 
 %----------------------------------------------------------------------------------------
 \subsection{Operator overloading}
+\index{operator! overloading}
 %----------------------------------------------------------------------------------------
+The operators in the previous section are defined for the fundamental data types, see Section~\ref{sec:fundamental:types}, and for the STL containers, see Section~\ref{sec:containers}, if applicable. However, for own defined \cpp{struct} and \cpp{class} these are not defined and the programmer has to define them. With C++ 17 38 operators can be overloaded and two more operators were added since C++ 20\link{https://en.cppreference.com/w/cpp/language/operators}. Let us look into the \cpp{struct} for the mathematical vector. We refer to Section~\ref{sec:struct} for more details about \cpp{struct} and focus on the overloading of operators in this section.\\
 
+Listing~\ref{code:operator:overloading} shows the definition of the \cpp{struct} vector as a template \cpp{template<typename T>}. For more details, we refer to Section~\ref{sec:generic:programming}. To do some operation like to add two vectors \cpp{vector<double>a;} and \cpp{vector<double>b;} we have to define the operator \cpp{+}. This is done in Line~7 and is similar to the definition of a function. The name of the function has to be \cpp{operator+} since we overload the plus operator. As the argument a second vector \cpp{rhs} in our example the vector \cpp{b} is provided. Since we return a new vector the return type of the function is \cpp{vector<T>}. The values of the new vector are the additions of the vector components. Because we overloaded the plus operator, we can write following expression \cpp{vector<double> c = a+b;}. However, for the expression \cpp{vector<double> c = a-b;} the C++ compiler would report following error ''error: no match for ‘operator-’ (operand types are ‘vector’ and ‘vector’)`` since the minus operator was not overloaded.
+
+\begin{exercise}
+Overload the minus and the multiplication operator for the \cpp{struct vector}.
+\end{exercise}
+
+In Line~11 the output parameter \cpp{<<} is overloaded to print the coordinate values to the standard output stream. For this operator two arguments are provided. The \cpp{ostream& os} and after this the vector to be printed. In Line~13 the vector coordinates are printed to the output stream with the predefined operator \cpp{<<}. The return type of the operator overload function is of the type \cpp{ostream&}. For this operator overload, the keyword \cpp{friend}\index{friend}\link{https://en.cppreference.com/w/cpp/language/friend} is needed. using the \cpp{friend} declarations allows a function or another class access to private and protected members of the struct.
+
+\begin{lstlisting}[language=c++,caption={Example for the operator overload for the plus operator and the output operator.\label{code:operator:overloading}},float,floatplacement=tb]
+template<typename T>
+struct vector {
+T x;
+T y;
+T z;
+// Overload the addition operator
+vector<T> operator+(const vector<T> rhs){
+return vector<T>( x + rhs.x, y + rhs.y, z + rhs.z );
+}
+//Overload the output operator
+friend ostream& operator
+	<<(ostream& os, const vector<T>& vec)
+{
+    os << vec.x << " " << vec.y << " " <<  vec.z;
+    return os;
+}
+};
+\end{lstlisting}
+
+
+\begin{exercise}
+Overload the input operator \cpp{>>} for the \cpp{struct vector}.
+\end{exercise}
 
 %----------------------------------------------------------------------------------------
 \section{Structuring source code}
 %----------------------------------------------------------------------------------------
+For large code bases, we like to organize the code and avoid to have one huge file with thousand of lines. There, C++ provides two fundamental ways to organize the code
+\begin{enumerate}
+\item To structure the code it self, we can use functions, \emph{e.g.}\ \cpp{double norm()}, and \cpp{struct} or \cpp{class}.
+\item To split the code into separated files to make all files shorter and
+separate the code by its functionality, we can use the s-called header files and source files.
+\end{enumerate}
+For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}. Within the computer science, the research area software engineering deals with the aspect how to organize large code bases and make it maintainable. For more details, we refer to~\cite{hunt1900pragmatic,sommerville2011software}. 
+
 
 %----------------------------------------------------------------------------------------
 \subsection{Functions}
@@ -253,6 +296,7 @@ Function are defined between \cpp{#include} and \cpp{int main (void)} in the sou
 \subsection{Struct}
 \index{struct}
 \index{structure!struct}
+\label{sec:struct}
 %----------------------------------------------------------------------------------------
 In some case, we like to group data, for example to represent a vector $v=(x,y,z)^T\in \mathbb{R}^3$. Here, the \cpp{struct}\link{https://en.cppreference.com/w/c/language/struct} expression is provided. Note that the struct was introduced in the C language and its companion in the C++ language is the \cpp{class} expression. However, to make the C language a subset of the C++ language, the \cpp{struct} is still available. Listing~\ref{code:struct} shows the struct with the three variables for each direction of the vector space. To declare a vector, we just write \cpp{struct vector v} to have an vector with the name \cpp{v} and to initialize the vector with the unit vector \cpp{struct vector v = \{1,1,1\}}\link{https://en.cppreference.com/w/c/language/struct_initialization}. To access the x component of the vector, we write \cpp{v.x} and to assign a new value the expression \cpp{v.x=42} is used. For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
 
@@ -291,6 +335,84 @@ double norm(){
 }
 \end{lstlisting}
 
+%----------------------------------------------------------------------------------------
+\subsection{Header and Source files}
+\index{header file}
+%----------------------------------------------------------------------------------------
+A header file\link{https://docs.microsoft.com/en-us/cpp/cpp/header-files-cpp?view=vs-2019} is a text file and a common naming convention is that header files end with \textit{.h} or \textit{.hpp}, \emph{e.g.}\ \textit{average.h}. To use the defined function in the header file, the file is included using the \cpp{#include}\link{https://en.cppreference.com/w/cpp/preprocessor/include} expression for example \cpp{#include<average.h>}. Note that the header files if the C++ standard library and the C++ STL do not end with  \textit{.h} or \textit{.hpp}. Before we look into the syntax of a header file, some remarks on good and bad practice are given.\\ 
+
+\noindent Following things are considered as good practice:
+\begin{itemize}
+\item Each header file provides exactly one functionality 
+\item Each header file includes all its dependencies
+\end{itemize}
+Following things should not be in header files and be considered as bad practice:\\
+\begin{itemize}
+\item built-in type definitions at namespace or global scope
+\item non-inline function definitions
+\item non-const variable definitions
+\item aggregate definitions
+\item unnamed namespaces
+\item using directives
+\end{itemize}
+
+\begin{lstlisting}[language=c++,caption={Example for header file.\label{code:header}},float,floatplacement=tb]
+#ifndef UTIL_H  //include guard
+#define UTIL_H
+
+#include <vector>
+#include <algorithm>
+
+// Utilities for the vector container
+namespace util {
+
+double average(std::vector<double> vec){
+return std::accumulate(vec.begin(), vec.end(), 0.0f) 
+     / vec.size();
+}
+}
+#endif
+\end{lstlisting}
+\vspace{0.25cm}
+
+Listing~\ref{code:header} shows an example for a header file for the median function. At the beginning and at the end of each header file, the so-called include guards avoid that functions or data structures have multiple definitions. In Line~1 we check if the definition \cpp{UTIL_H} is not defined by using the expression \cpp{ifndef}\link{https://en.cppreference.com/w/cpp/preprocessor/conditional} and is closed in Line~15. The compiler checks if the  definition \cpp{UTIL_H} was already seen and only if not, the source code is compiled. To let the compiler know that the code was compiled the expression \cpp{define}\link{https://en.cppreference.com/w/cpp/preprocessor/replace} in Line~2 is used. A short form is the \cpp{#pragma once}\link{https://en.cppreference.com/w/cpp/preprocessor/impl}. Next, all headers needed in this file are included.\\
+
+In Line~8 the \cpp{namespace}\link{https://en.cppreference.com/w/cpp/language/namespace} expression is used to avoid naming conflicts and structure in large projects. Because the function \cpp{average} is within \cpp{namespace util} defnied, the usage of this function is \cpp{double res = util::average(vector);}. With the namespaces one can structure the projects as computation, util, and IO for example. So by using the namespace it is more defined which functionality is provided. It is possible to nest namespaces to have more structure.\\
+
+A common folder structure for a project with header files in shown in Listing~\ref{code:folder:header}. In the folder \textit{includes} all header files (*.hpp) and the folder \textit{sources} all source files (*.cpp) are collected. Listing~\ref{code:main:header} shows the usage of the average function defined in the file \textit{util.h}. However, to compile the file \textit{main.cpp} file, the compiler needs to know where the \textit{util.h} is located. The compilation of the \textit{main.cpp} is the same as before, but the path to the header files needs to be specified as \bash{-I ../includes}, see Listing~\ref{code:compile:header}.
+
+\begin{minipage}{\linewidth}
+
+\begin{minipage}{0.45\linewidth}
+\begin{lstlisting}[language=bash,caption={Folder structure for a project with header files.\label{code:folder:header}}]
+sources/
+    main.cpp
+includes/
+    util.h
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\linewidth}
+\begin{lstlisting}[language=bash,caption={Example for the main.cpp file using a header file.\label{code:main:header}}]
+#include<util.h>
+
+int main(void){
+
+std::vector<double> vec = {1,2,3};
+
+double res = util::average(vec);
+}
+\end{lstlisting}
+\end{minipage}
+
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=bash,caption={Compilation of the main.cpp file using a header file.\label{code:compile:header}}]
+g++ -o main -I ../includes main.cpp
+\end{lstlisting}
+\end{minipage}
+
+\end{minipage}
 
 
 %----------------------------------------------------------------------------------------
@@ -301,6 +423,7 @@ For more details we refer to~\cite[Chapter~9]{andrew2000accelerated}.
 
 %----------------------------------------------------------------------------------------
 \section{Generic programming}
+\label{sec:generic:programming}
 %----------------------------------------------------------------------------------------
 In some cases, we need to write the same function for different data types, \emph{e.g.}\ \cpp{double} and \cpp{float}, see Listing~\ref{code:generix:example}. We would need to write the same function for all data types. Thus, we will produce the same computation multiple time and have too much redundant code.If there is an error in the computation, we would have to correct it for all of the functions. Function templates\link{https://en.cppreference.com/w/cpp/language/function_template}\index{function~template} are provided by the C++ language. Listing~\ref{code:generix:example} shows starting at Line~11 how to combine the previous two function into one. In Line~11 the expression \cpp{typename} indicates that we define a function template and within the parentheses the \cpp{typename T} is defined which is a placeholder for the explicit data type. For the remaining function definition everything keeps the same and only the specific data type, \emph{e.g.}\ \cpp{double} and \cpp{float}, is replaced by \cpp{T}. Now, the function is used as \cpp{add<double>} or \cpp{add<float>} or \cpp{add<int>} for the various data types without explicit implementing all of them. This is a neat feature to reduce the amount of code.\\
 
