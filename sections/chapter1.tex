@@ -339,6 +339,10 @@ double norm(){
 }
 \end{lstlisting}
 
+\begin{exercise}
+Transform the \cpp{struct} in Listing~\ref{code:struct} to a \cpp{class}.
+\end{exercise}
+
 %----------------------------------------------------------------------------------------
 \subsection{Header and Source files}
 \index{header file}
@@ -397,7 +401,7 @@ includes/
 \end{minipage}
 \hfill
 \begin{minipage}{0.45\linewidth}
-\begin{lstlisting}[language=bash,caption={Example for the main.cpp file using a header file.\label{code:main:header}}]
+\begin{lstlisting}[language=c++,caption={Example for the main.cpp file using a header file.\label{code:main:header}}]
 #include<util.h>
 
 int main(void){
@@ -422,17 +426,69 @@ g++ -o main -I ../includes main.cpp
 %----------------------------------------------------------------------------------------
 \subsection{Classes}
 %----------------------------------------------------------------------------------------
-For more details we refer to~\cite[Chapter~9]{andrew2000accelerated}.
+One important feature provided by the C++ language is the feature \cpp{class}\link{https://en.cppreference.com/w/cpp/language/classes}. Note the with C we had \cpp{struct} which are very similar to the \cpp{class}. However, one thing of the C++ language is the compatibility to the C language. Meaning that it is possible to compile C code using a C++ compiler. Therefore, the \cpp{struct} keyword is still available but not really needed since the keyword \cpp{class} is provided. \\
+
+Listing~\ref{code:class:definition} shows the definition of a \cpp{class} for a three dimensional vector. In Line~1 a \cpp{class} with the name \cpp{vector3} is defined. All source code within the \cpp{\{ \};} is in the scope of the \cpp{class}. Three so-called privacy\link{https://en.cppreference.com/w/cpp/language/access} option are available for classes. The first option is shown in Line~3. The \cpp{private} option means that the \cpp{double} values are only accessible within the \cpp{class} itself. So these values are hidden and can not be changed without using any of the \cpp{public} methods below. The methods below Line~7 are declared as public. Which means the are accessible from outside the \cpp{class}. Let us make an example for the accessibility by creating \cpp{Vector3 vector;} an object. Since \cpp{double x} is declared as \cpp{private}, we can not call \cpp{vector.x;} since it is not accessible from outside the class. However, we can type \cpp{double len = vec.norm();} since this method is defined as \cpp{public}. The third option is the \cpp{friend}\link{https://en.cppreference.com/w/cpp/language/friend} option. The \cpp{friend} option allows a function or another class access to private members. \\
+
+A common practice is to have header files and class files to provide the functionality of a \cpp{class} to other classes. Listing~\ref{code:header:definition} shows the header file extracted from the \cpp{class} definition in Listing~\ref{code:class:definition}. In the header file the attributes and the member functions of the \cpp{class} are defined. For example the function \cpp{double norm();} has no definition in this file and it is not define how the function is implemented. However, we know that the \cpp{class vector3} has this function. The implementation of the function is done in the corresponding source file, see Listing~\ref{code:class:definition2}. Note that we have to include the corresponding header file in Line~1. In addition, in a class file, we have to add the name of the \cpp{class} to all functions, see Line~3, we have to add \cpp{vector3::} to the constructor and the function in Line~8. For more details we refer to~\cite[Chapter~9]{andrew2000accelerated}.\\
+
+For the compilation, we have to first compile the source file using \bash{g++ -c vector3.cpp} to compile the class file \bash{vector3.cpp}. Note since we compile a file without a \cpp{int main()} function the option \bash{-c} is needed. The last step is to compile the \bash{main.cpp} file using \bash{g++ main.cpp vector3.o -o main}. Note the file \bash{vector3.o} was generated with the previous command. For more details about making compilation easier, we refer to Section~\ref{sec:cmake}.
+
+
+\begin{lstlisting}[language=c++,caption={Example for a class definition.\label{code:class:definition}},float,floatplacement=tb]
+class vector3 {
+
+private:
+
+double x , y , z;
+
+public:
+
+vector3(double x = 0, double y=0, double z=0)
+    : x(x) , y(y) ,z(z) {}
+    
+double norm(){ return std::sqrt(x*x+y*y+z*z);}
+};
+\end{lstlisting}
+
+
+\begin{lstlisting}[language=c++,caption={Corresponding header file to the class definition in Listing~\ref{code:class:definition}.\label{code:header:definition}},float,floatplacement=tb]
+class vector3 {
+
+private:
+
+double x , y , z;
+
+public:
+vector3(double x = 0, double y=0, double z=0);
+
+double norm();
+};
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=c++,caption={Corresponding class file to the class definition in Listing~\ref{code:class:definition}.\label{code:class:definition2}},float,floatplacement=tb]
+#include "vector3.h"
+
+vector3::vector2(double x, double y, double z)
+{
+    x = x; x = y; z = z;
+}
+
+double vector3::norm(){return std::sqrt(x*x+y*y+z*z)}
+\end{lstlisting}
+
 
 %----------------------------------------------------------------------------------------
 \subsection{Building with CMake}
 \index{CMake}
+\label{sec:cmake}
 %----------------------------------------------------------------------------------------
 CMake\link{https://cmake.org/} is a cross-platform free and open-source software tool for managing the build process of software using a compiler-independent method. It supports directory hierarchies and applications that depend on multiple libraries. It is used in conjunction with native build environments such as Make, Ninja, Apple's Xcode, and Microsoft Visual Studio. It has minimal dependencies, requiring only a C++ compiler on its own build system\link{https://en.wikipedia.org/wiki/CMake}. \\
 
-In the previous two section, we learned how to compile using header files and classes using the GNU compiler. However, for large code bases, one do not want to compile all files by hand or write a script to do so. CMake is a neat tool to generate the build recipe for us. First, we start to look into how to compile a single source file (\bash{main.cpp}). Therefore, we generate a \bash{CMakeLists.txt} file in the same folder as the source file is located. The content of the \bash{CMakeLists.txt} is shown in Listing~\ref{code:cmake:main}. In Line~1 the minimum required CMake version is specified. This is important because some features are only available in this version or are deprecated in any older version. In Line~2 the project's name is defined. In Line~3 we define that we want to compile the file \bash{main.cpp} as an executable with the name out. This would be equivalent to \bash{g++ main.cpp -o hello}. Listing~\ref{code:cmake:compile} shows how to compile the \bash{main.cpp} file using CMake. In line~\ref{1} a new folder with the name \bash{build} is generated. The best practice is to have a build folder where the code is compiled. So we can easily delete the folder and have a clean build. In Line~2 we change to the build folder. In Line~3 we call \bash{cmake ..} to generate the \bash{Makefile}. Note that we have to use the two dots, because the \bash{CMakeLists.txt} is located one folder above. In Line~4 we call \bash{make} to compile the code and in Line~5 we execute the compiled program. 
+In the previous two section, we learned how to compile using header files and classes using the GNU compiler. However, for large code bases, one do not want to compile all files by hand or write a script to do so. CMake is a neat tool to generate the build recipe for us. First, we start to look into how to compile a single source file (\bash{main.cpp}). Therefore, we generate a \bash{CMakeLists.txt} file in the same folder as the source file is located. The content of the \bash{CMakeLists.txt} is shown in Listing~\ref{code:cmake:main}. In Line~1 the minimum required CMake version is specified. This is important because some features are only available in this version or are deprecated in any older version. In Line~2 the project's name is defined. In Line~3 we define that we want to compile the file \bash{main.cpp} as an executable with the name out. This would be equivalent to \bash{g++ main.cpp -o hello}. Listing~\ref{code:cmake:compile} shows how to compile the \bash{main.cpp} file using CMake. In line~1 a new folder with the name \bash{build} is generated. The best practice is to have a build folder where the code is compiled. So we can easily delete the folder and have a clean build. In Line~2 we change to the build folder. In Line~3 we call \bash{cmake ..} to generate the \bash{Makefile}. Note that we have to use the two dots, because the \bash{CMakeLists.txt} is located one folder above. In Line~4 we call \bash{make} to compile the code and in Line~5 we execute the compiled program. \\
 
-For a project with class and header files, a common folder structure is shown in Listing~\ref{code:cmake:complex}. A common practice is to have a folder \bash{include} for the header files, a folder \bash{src} for the source files, and the \bash{CMakeLists.txt}. Listing~\ref{code:cmake:complex} shows the corresponding \bash{CMakeLists.txt} file. In Line~4 the include directory is added to the project which means \bash{-I ../includes} is added as an argument to the compiler. In Line~6 the source files to compile are added manually by specifying their file names. This is feasible for small projects, however, for large amount of files it is too much work. Line~10 shows are more handy way to add all source code files in the folder \bash{src}.The last step is to add all the sources to the executable in Line~12.        
+For a project with class and header files, a common folder structure is shown in Listing~\ref{code:cmake:complex}. A common practice is to have a folder \bash{include} for the header files, a folder \bash{src} for the source files, and the \bash{CMakeLists.txt}. Listing~\ref{code:cmake:complex} shows the corresponding \bash{CMakeLists.txt} file. In Line~4 the include directory is added to the project which means \bash{-I ../includes} is added as an argument to the compiler. In Line~6 the source files to compile are added manually by specifying their file names. This is feasible for small projects, however, for large amount of files it is too much work. Line~10 shows are more handy way to add all source code files in the folder \bash{src}.The last step is to add all the sources to the executable in Line~12. Note that we only covered the minimal basics of CMake. For more details, we refer to~\cite{cmake}.        
 
 
 \begin{minipage}{\linewidth}
@@ -445,7 +501,7 @@ add_executable(hello main.cpp)
 \end{minipage}
 \hfill
 \begin{minipage}{0.45\linewidth}
-\begin{lstlisting}[language=bash,caption={Build instructions for CMake.\label{code:cmake:folder}}]
+\begin{lstlisting}[language=bash,caption={Build instructions for CMake.\label{code:cmake:compile}}]
 mkdir build 
 cd build
 cmake ..
