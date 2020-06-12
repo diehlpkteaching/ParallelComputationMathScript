@@ -424,6 +424,70 @@ g++ -o main -I ../includes main.cpp
 %----------------------------------------------------------------------------------------
 For more details we refer to~\cite[Chapter~9]{andrew2000accelerated}.
 
+%----------------------------------------------------------------------------------------
+\subsection{Building with CMake}
+\index{CMake}
+%----------------------------------------------------------------------------------------
+CMake\link{https://cmake.org/} is a cross-platform free and open-source software tool for managing the build process of software using a compiler-independent method. It supports directory hierarchies and applications that depend on multiple libraries. It is used in conjunction with native build environments such as Make, Ninja, Apple's Xcode, and Microsoft Visual Studio. It has minimal dependencies, requiring only a C++ compiler on its own build system\link{https://en.wikipedia.org/wiki/CMake}. \\
+
+In the previous two section, we learned how to compile using header files and classes using the GNU compiler. However, for large code bases, one do not want to compile all files by hand or write a script to do so. CMake is a neat tool to generate the build recipe for us. First, we start to look into how to compile a single source file (\bash{main.cpp}). Therefore, we generate a \bash{CMakeLists.txt} file in the same folder as the source file is located. The content of the \bash{CMakeLists.txt} is shown in Listing~\ref{code:cmake:main}. In Line~1 the minimum required CMake version is specified. This is important because some features are only available in this version or are deprecated in any older version. In Line~2 the project's name is defined. In Line~3 we define that we want to compile the file \bash{main.cpp} as an executable with the name out. This would be equivalent to \bash{g++ main.cpp -o hello}. Listing~\ref{code:cmake:compile} shows how to compile the \bash{main.cpp} file using CMake. In line~\ref{1} a new folder with the name \bash{build} is generated. The best practice is to have a build folder where the code is compiled. So we can easily delete the folder and have a clean build. In Line~2 we change to the build folder. In Line~3 we call \bash{cmake ..} to generate the \bash{Makefile}. Note that we have to use the two dots, because the \bash{CMakeLists.txt} is located one folder above. In Line~4 we call \bash{make} to compile the code and in Line~5 we execute the compiled program. 
+
+For a project with class and header files, a common folder structure is shown in Listing~\ref{code:cmake:complex}. A common practice is to have a folder \bash{include} for the header files, a folder \bash{src} for the source files, and the \bash{CMakeLists.txt}. Listing~\ref{code:cmake:complex} shows the corresponding \bash{CMakeLists.txt} file. In Line~4 the include directory is added to the project which means \bash{-I ../includes} is added as an argument to the compiler. In Line~6 the source files to compile are added manually by specifying their file names. This is feasible for small projects, however, for large amount of files it is too much work. Line~10 shows are more handy way to add all source code files in the folder \bash{src}.The last step is to add all the sources to the executable in Line~12.        
+
+
+\begin{minipage}{\linewidth}
+\begin{minipage}{0.45\linewidth}
+\begin{lstlisting}[language=bash,caption={Content of the CMakeLists.txt.\label{code:cmake:main}},emph={project, add_executable,cmake_minimum_required},emphstyle={\color{azure}\bfseries}]
+cmake_minimum_required(VERSION 3.10.1)
+project(hello_world)
+add_executable(hello main.cpp)
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\linewidth}
+\begin{lstlisting}[language=bash,caption={Build instructions for CMake.\label{code:cmake:folder}}]
+mkdir build 
+cd build
+cmake ..
+make
+./hello
+\end{lstlisting}
+\end{minipage}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\begin{minipage}{0.45\linewidth}
+\begin{lstlisting}[language=bash,caption={Structure of a CMake project.\label{code:cmake:folder}},emph={project, add_executable,cmake_minimum_required},emphstyle={\color{azure}\bfseries\underbar}]
+ .
+ |-- CMakeLists.txt
+ |-- build
+ |-- include
+ |   \-- vector2.h
+ \-- src
+     |-- vector2.cpp
+     \-- main.cpp
+ 3 directories, 4 files
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\linewidth}
+\begin{lstlisting}[language=bash,caption={Build instructions for CMake.\label{code:cmake:complex}},emph={project, add_executable,cmake_minimum_required,include_directories,file},emphstyle={\color{azure}\bfseries\underbar}]
+project(directory_test)
+ 
+#Include headers
+include_directories(include)
+ 
+#Adding all sources 
+#set(SOURCES src/main.cpp src/vector2.cpp)
+ 
+#Adding sources easier
+file(GLOB SOURCES "src/*.cpp")
+ 
+add_executable(test ${SOURCES})
+\end{lstlisting}
+\end{minipage}
+\end{minipage}
+
 
 %----------------------------------------------------------------------------------------
 \section{Generic programming}
