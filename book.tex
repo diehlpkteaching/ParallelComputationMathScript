@@ -598,9 +598,94 @@ Implement the $N$-body problem using the template code\link{https://github.com/d
 \chapter{Parallel computing}
 %----------------------------------------------------------------------------------------
 
-\section{Shared memory}
 
-\section{Distributed memory}
+%----------------------------------------------------------------------------------------
+\section{Caution: Data races and dead locks}
+%----------------------------------------------------------------------------------------
+Remember with great power comes great responsibility! Meaning with shared memory parallelism you add an additional source of error to your code. When using parallel execution policy, it is the programmer's responsibility to avoid
+\begin{itemize}
+\item data races
+\item race conditions
+\item deadlocks.
+\end{itemize} 
+Let us look into some code examples for these kind of errors. A data race\index{data race} exists when multithreaded (or otherwise parallel) code that would access a shared resource could do so in such a way as to cause unexpected results. Listing~\ref{code:data:race} shows an example for a data race for the variable \cpp{sum}. Since the parallel execution policy is used, multiple threads can access the variable \cpp{sum} at the same time which means that not all threads can write to the variable. Thus, the result is might not correct. There are two solutions to avoid the data race. First, the atomic library\link{https://en.cppreference.com/w/cpp/atomic/atomic}. The atomic library\footnote{\tiny\url{https://en.cppreference.com/w/cpp/atomic}} provides components for fine-grained atomic operations allowing for lockless concurrent programming. Each atomic operation is indivisible with regards to any other atomic operation that involves the same object. Atomic objects are free of data races. Listing~\ref{code:datarace:atomic} shows the solution using \cpp{std::atomic:<int>}\link{https://en.cppreference.com/w/cpp/atomic/atomic}. The second solution is shown in Listing~\ref{code:datarace:mutex}. Here, the \cpp{std::mutex} class is used to avoid the data race. The mutex class\link{https://en.cppreference.com/w/cpp/thread/mutex} is a synchronization primitive that can be used to protect shared data from being simultaneously accessed by multiple threads. In Line~4 a \cpp{std::mutex m;} is generated. In Line~8 the lock of the code is started by using \cpp{m.lock();} and in Line~10 the lock is released by using \cpp{m.unlock();}.
+
+\begin{exercise}
+Give a definition for \cpp{std::atomic} and \cpp{std::mutex} in your own words. 
+\end{exercise}
+
+Another source of error is the race condition\index{race condition} where a check of a shared variable within a parallel execution and another thread could change this variable before it is used. Listing~\ref{code:racecondition} shows the solution to avoid the race condition.  Imagine the code without the \cpp{std::mutex} and the implication to get a wrong result. In the code there is a check if \cpp{x} is equal to 5 and a special treatment of the computation in this case. Now in Line~4 it was true that \cpp{x} was equal to five and the thread enters the \cpp{if} branch. However, in between another thread could change the value of \cpp{x} and not \cpp{y = 5 *2} is computed. By using the mutex this situation is avoided.
+
+\begin{exercise}
+Explain a data race in your own words and explain why a \cpp{std::mutex} avoids the data race.
+\end{exercise}
+
+\begin{lstlisting}[language=c++,caption={Example code and Solution for a data race.\label{code:data:race}},float,floatplacement=tb]
+//Compute the sum of the array a in parallel
+int a[] = {0,1,2,3,4};
+int sum = 0;
+std::for_each(std::execution::par, 
+              std::begin(a), 
+              std::end(a), [&](int i) {
+  sum += a[i]; // Error: Data race
+});
+\end{lstlisting}
+
+
+\begin{lstlisting}[language=c++,caption={Solution to avoid the data race using \cpp{std::atomic}.\label{code:datarace:atomic}},float,floatplacement=tb]
+//Compute the sum of the array a in parallel
+int a[] = {0,1};
+std::atomic<int> sum{0};
+std::for_each(std::execution::par, 
+              std::begin(a), 
+              std::end(a), [&](int i) {
+  sum += a[i]; 
+});
+\end{lstlisting}
+
+\begin{lstlisting}[language=c++,caption={Solution to avoid the data race using \cpp{std::mutex}.\label{code:datarace:mutex}},float,floatplacement=tb]
+//Compute the sum of the array a in parallel
+int a[] = {0,1};
+int sum = 0;
+std::mutex m;
+std::for_each(std::execution::par, 
+              std::begin(a), 
+              std::end(a), [&](int i) {
+  m.lock();
+  sum += a[i];
+  m.unlock(); 
+});
+\end{lstlisting}
+
+
+\begin{lstlisting}[language=c++,caption={Example for the race condition.\label{code:racecondition}},float,floatplacement=tb]
+std::mutex m;
+
+m.lock();
+if (x == 5)  // Checking x
+{
+   // Different thread could change x 
+      
+   y = x * 2; // Using x
+}
+m.unlock();
+// Now it is sure that y will be 10
+\end{lstlisting}
+
+
+A deadlock\index{deadlock} describes a situation where two or more threads are blocked forever and waiting for each others. Following example taken from\link{https://docs.oracle.com/javase/tutorial/essential/concurrency/deadlock.html} explains a deadlock nicely. \\
+
+\textit{Alphonse and Gaston are friends, and great believers in courtesy. A strict rule of courtesy is that when you bow to a friend, you must remain bowed until your friend has a chance to return the bow. Unfortunately, this rule does not account for the possibility that two friends might bow to each other at the same time.}
+
+\begin{exercise}
+The implementation of this examples is available on GitHub\link{https://github.com/diehlpkteaching/ParallelComputationMathExamples/blob/master/chapter10/lecture6-deadlock.cpp.ipynb}. Play around with the example and try to understand why the code results in a deadlock. 
+\end{exercise}
+
+
+
+
+
+\chapter{Distributed memory}
 
 \part{Introduction: HPX}
 
@@ -674,6 +759,8 @@ Implement the $N$-body problem using the template code\link{https://github.com/d
 \item \href{https://www.youtube.com/watch?v=asGZTCR53KY&list=PL7vEgTL3FalY2eBxud1wsfz8OKvE9sd_z}{C++ Lecture 1 - The Standard Template Library}
 \item \href{https://www.youtube.com/watch?v=iU3wsiJ5mts}{C++ Lecture 2 - Template Programming }
 \item \href{https://www.youtube.com/watch?v=6PWUByLZO0g}{C++ Lecture 4 - Template Meta Programming}
+\item \href{https://www.youtube.com/watch?v=Vck6kzWjY88}{The C++17 Parallel Algorithms Library and
+Beyond}
 \end{itemize}
 
 
