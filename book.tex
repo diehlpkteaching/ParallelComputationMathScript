@@ -694,9 +694,31 @@ Before we look into different parallelism approaches, we look into the example h
 \label{fig:flow:chart:dot:seq}
 \end{figure}
 
-%The first parallelism approach is the pipeline parallelism\index{pipeline parallelism}. The pipeline parallelism is used in vector processors.
+The first parallelism approach is the pipeline parallelism\index{pipeline parallelism}~\cite{ramamoorthy1977pipeline}. The pipeline parallelism is used in vector processors and in execution pipelines in all general microprocessors. Let us look into some example of from the automotive industry. First, the body of the car is assembled. Second, workers assemble the chassis. Third, workers add the engine into the chassis. Next, the steering wheel is added and many more steps until the car is finally assembled. TO make this process efficient, the workers assembling the chassis do not wait until the last step is finalized before they start working on the next chassis. Side note this is similar to the assembly line introduced bu Henry Ford to enable mass production of cars~\cite{watts2009people}.\\
+
+Figure~\ref{fig:dataflow:pipeline} shows the data flow chart for the pipeline parallelism. In the first step, the values $x_1$ and $y_1$ are read from memory. In the second step the values are multiplied. In the last step the result of the multiplication is added to the variable $S$. However, the other threads do not idle until the result is computed and do a previous step if possible. Meaning if the multiplication at stage two is happening, another thread starts to get the next values. For more details, we refer to~\cite{quinn2003parallel}.
 
 
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}
+\draw (0,0) rectangle ++(0.75,0.75) node[pos=.5] {$+S$};
+\draw (1.5,0) rectangle ++(0.75,0.75) node[pos=.5] {$xy$}; 
+\draw (3.5,0) rectangle ++(2,0.75) node[pos=.5] {\text{get} $x_i$,$y_i$};
+
+\node[above] at (8,0.5*0.75) {$\mathbf{X} = \lbrace x_1,x_2,\ldots,x_n \rbrace$} ;
+\node[below] at (8,0.5*0.75) {$\mathbf{Y} = \lbrace y_1,y_2,\ldots,y_n \rbrace$} ;
+\node at (-1,0.5*0.75) {$S$} ;
+
+\draw[<-](-0.8,0.5*0.75) -- (0,0.5*0.75) ;
+\draw[<-](0.75,0.5*0.75) -- (1.5,0.5*0.75) ;
+\draw[<-](2.25,0.5*0.75) -- (3.5,0.5*0.75) ;
+\draw[<-](5.75,0.8*0.75) -- (6,0.8*0.75) ;
+\draw[<-](5.75,0.2*0.75) -- (6,0.2*0.75) ;
+\end{tikzpicture}
+\caption{Flow chart for the pipeline processing for the dot product.}
+\label{fig:dataflow:pipeline}
+\end{figure}
 %----------------------------------------------------------------------------------------
 \section{Caution: Data races and dead locks}
 %----------------------------------------------------------------------------------------
