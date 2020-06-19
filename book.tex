@@ -696,7 +696,7 @@ Before we look into different parallelism approaches, we look into the example h
 
 The first parallelism approach is the pipeline parallelism\index{pipeline parallelism}~\cite{ramamoorthy1977pipeline}. The pipeline parallelism is used in vector processors and in execution pipelines in all general microprocessors. Let us look into some example of from the automotive industry. First, the body of the car is assembled. Second, workers assemble the chassis. Third, workers add the engine into the chassis. Next, the steering wheel is added and many more steps until the car is finally assembled. TO make this process efficient, the workers assembling the chassis do not wait until the last step is finalized before they start working on the next chassis. Side note this is similar to the assembly line introduced bu Henry Ford to enable mass production of cars~\cite{watts2009people}.\\
 
-Figure~\ref{fig:dataflow:pipeline} shows the data flow chart for the pipeline parallelism. In the first step, the values $x_1$ and $y_1$ are read from memory. In the second step the values are multiplied. In the last step the result of the multiplication is added to the variable $S$. However, the other threads do not idle until the result is computed and do a previous step if possible. Meaning if the multiplication at stage two is happening, another thread starts to get the next values. For more details, we refer to~\cite{quinn2003parallel}.
+Figure~\ref{fig:dataflow:pipeline} shows the data flow chart for the pipeline parallelism. In the first step, the values $x_1$ and $y_1$ are read from memory. In the second step the values are multiplied. In the last step the result of the multiplication is added to the variable $S$. However, the other threads do not idle until the result is computed and do a previous step if possible. Meaning if the multiplication at stage two is happening, another thread starts to get the next values. For more details, we refer to~\cite{quinn2003parallel}. \\
 
 
 \begin{figure}[tb]
@@ -719,6 +719,68 @@ Figure~\ref{fig:dataflow:pipeline} shows the data flow chart for the pipeline pa
 \caption{Flow chart for the pipeline processing for the dot product.}
 \label{fig:dataflow:pipeline}
 \end{figure}
+
+The second parallelism approach is the Single instructions and multiple data (SIMD)\index{SIMD}\index{single instructions and multiple data}. SIMD is part of Flynn's taxonomy, a classification of computer architectures, proposed by Michael J. Flynn in 1966~\cite{flynn1972some,duncan1990survey}. Following aspects are relevant 
+\begin{itemize}
+\item All perform same operation at the same time
+\item But may perform different operations at different times
+\item Each operates on separate data
+\item Used in accelerators on microprocessors
+\item Scales as long as data scales.
+\end{itemize}
+\vspace{0.25cm}
+Figure~\ref{fig:reduction:tree:simd} shows the reduction tree for the dot product computation. For this parallelism approach all threads perform the same operation at the same time. In our case all available threads multiply two values at the first level. Second one of these threads add the partial results. Until not all elements are read from the vector these steps are repeated. The last step is to accumulate all partial results and the final result is available. For example previous CUDA architectures were designed this way and introducing branching had some effect on the performance. Newer CUDA architectures perform better here and these things are explained in following talk\link{https://youtu.be/5vr7ItjyIH8}.
+
+\begin{figure}[tb]
+\centering
+  \begin{tikzpicture}
+   \draw (0,0) rectangle ++(0.75,0.75) node[pos=.5] {$P_1$}; 
+   \draw (1.5,0) rectangle ++(0.75,0.75) node[pos=.5] {$P_2$}; 
+   \draw (3,0) rectangle ++(0.75,0.75) node[pos=.5] {$P_3$}; 
+   \draw (4.5,0) rectangle ++(0.75,0.75) node[pos=.5] {$P_4$}; 
+   
+   \draw (0.75,-2) rectangle ++(0.75,0.75) node[pos=.5] {$+$}; 
+   \draw (3.75,-2) rectangle ++(0.75,0.75) node[pos=.5] {$+$}; 
+   
+   \draw (2.25,-4) rectangle ++(0.75,0.75) node[pos=.5] {$+$}; 
+   
+   \draw[->] (0.75+0.5*0.75,-2) -- (2.25,-4+0.75) ;
+   \draw[->] (3.75+0.5*0.75,-2) -- (3,-4+0.75) ;
+   
+   \draw[->] (1.5+0.5*0.75,0) -- (1.5,-2+0.75) ;
+   \draw[->] (0.5*0.75,0) -- (0.75,-2+0.75) ; 
+   
+   \draw[->] (3+0.5*0.75,0) -- (3.75,-2+0.75) ;
+   \draw[->] (4.5+0.5*0.75,0) -- (4.5,-2+0.75) ; 
+   
+   \draw[->] (2.25+0.5*0.75,-4) -- (2.25+0.5*0.75,-4.5) ; 
+   
+   \draw[dashed] (0,-0.75) -- (5,-0.75) ;
+   \node[below,rotate=90] at (-.75,-2) {\small Reduction tree}; 
+   
+   \node at (0.5*0.75,1.5) {\tiny $X=\lbrace x_1,x_2 \rbrace$};
+   \node at (0.5*0.75,1.25) {\tiny $Y=\lbrace x_9,x_{10} \rbrace$};
+   \node at (1.5+0.5*0.75,1.5) {\tiny $X=\lbrace x_3,x_4 \rbrace$};
+   \node at (1.5+0.5*0.75,1.25) {\tiny $Y=\lbrace x_{11},x_{12} \rbrace$};
+   \node at (3.+0.5*0.75,1.5) {\tiny $X=\lbrace x_5,x_6 \rbrace$};
+   \node at (3.+0.5*0.75,1.25) {\tiny $Y=\lbrace x_{13},x_{14} \rbrace$}; 
+   \node at (4.5+0.5*0.75,1.5) {\tiny $X=\lbrace x_7,x_8 \rbrace$};
+   \node at (4.5+0.5*0.75,1.25) {\tiny $Y=\lbrace x_{15},x_{16} \rbrace$};
+   
+   \draw[->] (0.5*0.75,1.125) -- (0.5*0.75,0.75) ;
+   \draw[->] (1.5+0.5*0.75,1.125) -- (1.5+0.5*0.75,0.75) ;
+   \draw[->] (3.+0.5*0.75,1.125) -- (3.+0.5*0.75,0.75) ;
+   \draw[->] (4.5+0.5*0.75,1.125) -- (4.5+0.5*0.75,0.75) ;
+   \end{tikzpicture}
+   \caption{Reduction tree for the dot product using single instructions and multiple data.}
+   \label{fig:reduction:tree:simd}
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+\subsection*{Memory access}
+\index{memory access}
+%----------------------------------------------------------------------------------------
+
 %----------------------------------------------------------------------------------------
 \section{Caution: Data races and dead locks}
 %----------------------------------------------------------------------------------------
@@ -801,15 +863,21 @@ A deadlock\index{deadlock} describes a situation where two or more threads are b
 The implementation of this examples is available on GitHub\link{https://github.com/diehlpkteaching/ParallelComputationMathExamples/blob/master/chapter10/lecture6-deadlock.cpp.ipynb}. Play around with the example and try to understand why the code results in a deadlock. 
 \end{exercise}
 
+%----------------------------------------------------------------------------------------
+\chapter{Asynchronous programming}
+%----------------------------------------------------------------------------------------
 
 
-
-
+%----------------------------------------------------------------------------------------
 \chapter{Distributed memory}
+%----------------------------------------------------------------------------------------
 
-\part{Introduction: HPX}
 
+
+
+%----------------------------------------------------------------------------------------
 \chapter{HPX}
+%----------------------------------------------------------------------------------------
 
 \section{Introduction to HPX}
 
@@ -881,6 +949,7 @@ The implementation of this examples is available on GitHub\link{https://github.c
 \item \href{https://www.youtube.com/watch?v=6PWUByLZO0g}{C++ Lecture 4 - Template Meta Programming}
 \item \href{https://www.youtube.com/watch?v=Vck6kzWjY88}{The C++17 Parallel Algorithms Library and
 Beyond}
+\item \href{https://youtu.be/5vr7ItjyIH8}{Modern CUDA and C++}
 \end{itemize}
 
 
