@@ -577,7 +577,63 @@ Use the \cpp{struct} in Listing~\ref{code:struct} and make it a generic one by a
 
 %----------------------------------------------------------------------------------------
 \section{Lambda function}
+\index{function!lambda}
+\index{lambda function}
 %----------------------------------------------------------------------------------------
+In Section~\ref{sec:functions} function expression was introduced as \cpp{int compute(int a, int b);}. Here, the function has a name \cpp{compute} and this name is used to call the function. However, in some cases it can be neat to use a function exactly once, for example in the STL Algorithms, see Section~\ref{sec:stl:algorithms}. To use a function only one time the so-called lambda expression or lambda function\link{https://en.cppreference.com/w/cpp/language/lambda} is shown in Listing~\ref{code:lamda:definition}. Within the $[\ldots ]$ the capture clause of the parameters within the $(\ldots )$ are defined. Ans as for the function the code of the function is defined within $\{\dots \}$. Note that the \cpp{-> return-type}, \emph{e.g.}\ \cpp{-> int}, is somehow an optimal parameter and in most cases this parameter is evaluated by the compiler and only in few special cases the return type needs to be defined. Following capture clauses\link{https://en.cppreference.com/w/cpp/language/lambda\#Lambda_capture} are available:
+\begin{itemize}
+\item  \lstinline|[&]| : capture all external variable by reference
+\item  \lstinline|[=]| : capture all external variable by value
+\item  \lstinline|[a, &b]| : capture a by value and b by reference
+\end{itemize}
+For more details about the capture classes, we refer to the next section.\\
+
+Listing~\ref{code:lamda:example} sketches some practical example how to transform a function to a lambda expression. From Line~2--4 defines the function to print the element of the vector piece-wise to the standard output stream. In Line~5 the short form of a \cpp{for} loop is used to loop over all elements of the vector piece-wise. Note that \cpp{i} is not the index and it is the value of the vector at position \cpp{std::for_each} is handling. Since we use the function \cpp{void print(int i)} only once, a short form of this function is used in Line~8. 
+
+\begin{exercise}
+Try to understand the transformation of the function \cpp{void print(int i)} to the corresponding lambda function.
+\end{exercise}
+
+Listing~\ref{code:lamda:example} also shows some example to find the first number greater than $4$ in a vector using the \cpp{std::find_if}\link{https://en.cppreference.com/w/cpp/algorithm/find}. Many more algorithms are available in the \cpp{#include <algorithm>}\link{https://en.cppreference.com/w/cpp/algorithm}.
+
+\begin{lstlisting}[language=c++,caption={Example for lambda functions.
+\label{code:lamda:definition}},float,floatplacement=tb]
+[ capture clause ] (parameters) -> return-type  
+{   
+   //definition of method   
+} 
+\end{lstlisting}
+
+
+\begin{lstlisting}[language=c++,caption={Practical example for a lambda function.
+\label{code:lamda:example}},float,floatplacement=tb]
+// Print the values of the vector using a function
+void print(int i){
+std::cout << i << std::endl;
+}
+std::for_each(v.begin(), v.end(), print); 
+
+// Print the values of the vector using a function
+std::for_each(v.begin(),v.end(),
+	[](int i){std::cout<< i << std::endl;})
+	
+// Find the first number greater than 4 in a vector
+std::vector<int>:: iterator p = std::find_if(
+    v.begin(), 
+    	v.end(), 
+    	[](int i) 
+    { 
+        return i > 4; 
+    }); 
+std::cout << "First number greater than 4 is : " << *p << endl;
+\end{lstlisting}
+
+
+%----------------------------------------------------------------------------------------
+\section{Pointers}
+%----------------------------------------------------------------------------------------
+
+
 
 \newpage
 \theendnotes
