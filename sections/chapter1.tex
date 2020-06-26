@@ -579,6 +579,7 @@ Use the \cpp{struct} in Listing~\ref{code:struct} and make it a generic one by a
 \section{Lambda function}
 \index{function!lambda}
 \index{lambda function}
+\label{sec:lambda:function}
 %----------------------------------------------------------------------------------------
 In Section~\ref{sec:functions} function expression was introduced as \cpp{int compute(int a, int b);}. Here, the function has a name \cpp{compute} and this name is used to call the function. However, in some cases it can be neat to use a function exactly once, for example in the STL Algorithms, see Section~\ref{sec:stl:algorithms}. To use a function only one time the so-called lambda expression or lambda function\link{https://en.cppreference.com/w/cpp/language/lambda} is shown in Listing~\ref{code:lamda:definition}. Within the $[\ldots ]$ the capture clause of the parameters within the $(\ldots )$ are defined. Ans as for the function the code of the function is defined within $\{\dots \}$. Note that the \cpp{-> return-type}, \emph{e.g.}\ \cpp{-> int}, is somehow an optimal parameter and in most cases this parameter is evaluated by the compiler and only in few special cases the return type needs to be defined. Following capture clauses\link{https://en.cppreference.com/w/cpp/language/lambda\#Lambda_capture} are available:
 \begin{itemize}
