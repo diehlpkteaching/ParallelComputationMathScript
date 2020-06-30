@@ -46,6 +46,16 @@
 \tikzstyle{arrow} = [thick,->,>=stealth]
 \usepackage{pgfplots}
 
+\usepackage{tkz-graph}
+
+\tikzset{
+  LabelStyle/.style = { rectangle, rounded corners, draw,
+                        minimum width = 2em, fill = yellow!50,
+                        text = red, font = \bfseries },
+  VertexStyle/.append style = { inner sep=5pt,
+                                font = \Large\bfseries},
+  EdgeStyle/.append style = {->, bend left} }
+
 \newcommand\montecarlo[2]{
 \def\x{0}
 \def\y{0}

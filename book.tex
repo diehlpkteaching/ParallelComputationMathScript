@@ -107,13 +107,7 @@
 %----------------------------------------------------------------------------------------
 \chapter{Linear algebra}
 %----------------------------------------------------------------------------------------
-
-
-%Todo Add grapj examples
-
-
-
-Several highly optimized C++ linear algebra libraries~\cite{wang2013augem,eigenweb,rupp2016viennacl,sanderson2016armadillo} are available. However, the look into the Blaze library since this library has a HPX backend for parallel computations. 
+For the topic of linear algebra, we refer to~\cite{hefferonlinear,scheick1997linear}. We focus on vector and matrices and some operations on them, as we need them for example in the finite element method. Note that we look from the computer science perspective on matrices and vectors and focus how efficiently use existing libraries in our code. Several highly optimized C++ linear algebra libraries~\cite{wang2013augem,eigenweb,rupp2016viennacl,sanderson2016armadillo} are available. However, the look into the Blaze library since this library has a HPX backend for parallel computations. 
 
 
 %----------------------------------------------------------------------------------------
@@ -209,19 +203,222 @@ The inner product $\mathbf{u}_1 \times \mathbf{u}_2 $ is computed in Blaze using
 \end{figure}
 
 
-
-
 %----------------------------------------------------------------------------------------
 \subsection{Matrices}
-\index{Blaze!vector}
+\index{Blaze!matrix}
 %----------------------------------------------------------------------------------------
+A matrix $\mathbf{A}\in \mathbb{R}^{n,m}$ has $n$ rows and $m$ columns
+\begin{align}
+\mathbf{A} = \begin{pmatrix}
+a_{1,1} & \ldots & a_{1,m} \\
+\vdots & \ldots & \vdots \\
+a_{n,1} & \ldots & a_{n,m} 
+\end{pmatrix}
+\end{align} 
+and following matrix operations are defined:
+\begin{itemize}
+\item Scaling:
+\begin{align}
+ 2 \mathbf{A} = \begin{pmatrix}
+2a_{1,1} & \ldots & 2a_{1,m} \\
+\vdots & \ldots & \vdots \\
+2a_{n,1} & \ldots & 2a_{n,m} 
+\end{pmatrix} 
+\end{align}
+\item Addition:
+\begin{align}
+\mathbf{A} + \mathbf{B}  = \begin{pmatrix}
+a_{1,1} + b_{1,1}  & \ldots & a_{1,m} + b_{1,m} \\
+\vdots & \ldots & \vdots \\
+a_{n,1} + b_{n,1} & \ldots & a_{n,m} + b_{n,m} 
+\end{pmatrix}
+\end{align}
+\item Matrix vector multiplication
+\begin{align}
+\mathbf{A}  \mathbf{v}  = \begin{pmatrix}
+a_{1,1} * b_{1} + & \ldots & + a_{1,m} * b_{n} \\
+\vdots & \ldots & \vdots \\
+a_{n,1} * b_{1} + & \ldots & + a_{n,m} * b_{n} 
+\end{pmatrix}\text{.}
+\end{align}
+\end{itemize}
+let us look what kind of matrices are provided by Blaze and how to use them for calculations. Let us start with Blaze's matrix types\link{https://bitbucket.org/blaze-lib/blaze/wiki/Matrix\%20Types}, see Listing~\ref{code:blaze:matrix:types}. The first type is the \cpp{DynanmicMatrix<T>}\link{https://bitbucket.org/blaze-lib/blaze/wiki/Matrix\%20Types\#!dynamicmatrix} which is a arbitrary sized matrix with dynamically allocated elements of arbitrary type \cpp{T}. Note that Blaze is a template-based library and the template type is provided within the first braces. For more details for C++ templates, we refer to~\ref{sec:generic:programming}. In the second pair of braces, the dimension of the $n$ and $m$ are given. Note that the values are not initialized of this matrix which means that the values can have any value. For large matrices the \cpp{DynanmicMatrix<T>} matrix is the best option, especially if the dimensions are not known at compile time. If the matrix is small and the dimensions are known at compile time, a \cpp{blaze::StaticMatrix}\link{https://bitbucket.org/blaze-lib/blaze/wiki/Matrix\%20Types\#!staticmatrix} matrix should be used. In Line~7 we define the $3\times 4$ matrix, but do not allocate the memory yet and the matrix has zero rows and columns. Only after calling the constructor the memory is allocated. Note that the dimensions of the matrix are provided as template arguments in that case. All matrices are default row-major matrices and to switch to column-major matrices, the template argument \cpp{blaze::columnMajor} is available. The last matrix type is the \cpp{blaze::CompressedMatrix} which is used for sparse matrices\link{https://bitbucket.org/blaze-lib/blaze/wiki/Matrix\%20Types\#!sparse-matrices} with only few non-zero entries.\\
+
+These are the main types of matrices provided by the Blaze library. However, there are some special purpose matrices which are often needed available. One is the identity matrix \cpp{blaze::IdentityMatrix} with has ones on all diagonal entries and is zero everywhere else. To have a matrix with zero valued elements, the \cpp{blaze::ZeroMatrix} is used.
+ 
+\begin{lstlisting}[language=c++,caption={Blaze matrix types.\label{code:blaze:matrix:types}},float,floatplacement=tb]
+// Definition of a 3x4 matrix 
+// Values are not initialized
+blaze::DynamicMatrix<int> A( 3UL, 4UL );
+
+// Definition of a 3x4 matrix
+// with 0 rows and columns
+blaze::StaticMatrix<int,3UL,4UL> A;
+
+// Definition of column-major matrix
+// with 0 rows and columns
+blaze::DynamicMatrix<double,blaze::columnMajor> C;
+
+// Definition of a 3x4 integral row-major matrix
+blaze::CompressedMatrix<int> A( 3UL, 4UL );
+
+// Definition of a 3x3 identity matrix
+blaze::IdentityMatrix<int> A( 3UL );
+
+// Definition of a 3x5 zero matrix
+blaze::ZeroMatrix<int> A( 3UL, 5UL );
+\end{lstlisting}
+
+For all matrices the size of the matrix \cpp{size( A )}; returns the total amount of elements $(n \times m)$. The number of rows are obtained by \cpp{M2.rows();} and the number of columns are obtained by \cpp{M2.columns();}. All matrix operations\link{https://bitbucket.org/blaze-lib/blaze/wiki/Matrix\%20Operations} are applied as \cpp{abs( A );} which means the absolute value of all matrix elements is computed. Note that the elements of a Blaze matrix are accessed using different kind of parentheses \cpp{A(0,0) = 1;} sets the first element of the matrix to one.\\
+
+One often used task in linear algebra is decomposition\index{decomposition} of matrices\link{blaze}. Blaze implements following decomposition methods: Cholesky~\cite{cholesky2005resolution}, QR/RQ, and QL/LQ. Listing~\ref{code:blaze:decomposition} shows how to use LU~\cite{bunch1974triangular} decomposition method. Note that we do not cover this methods in this course, but it is an important feature you should know. For more details we refer for example to~\cite{press1992numerical}.
+
+\begin{lstlisting}[language=c++,caption={Matrix decomposition methods in Blaze\label{code:blaze:decomposition}},float,floatplacement=tb]
+blaze::DynamicMatrix<double,blaze::rowMajor> A;
+// ... Resizing and initialization
+
+blaze::DynamicMatrix<double,blaze::rowMajor> L, U, P;
+
+// LU decomposition of a row-major matrix
+lu( A, L, U, P );  
+
+assert( A == L * U * P );
+\end{lstlisting}
+
+Another important feature is the computation of Eigenvalues\index{eigenvalue} and Eigenvectors\index{eingenvector} which is shown in Listing~\ref{code:blaze:eigen}.  Note that we do not cover this methods in this course, but it is an important feature you should know. For more details we refer for example to~\cite{press1992numerical}. 
+
+\begin{lstlisting}[language=c++,caption={Matrix decomposition methods in Blaze\label{code:blaze:eigen}},float,floatplacement=tb]
+
+// The symmetric matrix A
+SymmetricMatrix< DynamicMatrix<double,rowMajor>> 
+    A( 5UL, 5UL );  
+// ... Initialization
+
+// The vector for the real eigenvalues
+DynamicVector<double,columnVector> w( 5UL );    
+// The matrix for the left eigenvectors   
+DynamicMatrix<double,rowMajor>     V( 5UL, 5UL );  
+
+eigen( A, w, V );
+\end{lstlisting}
 
 
 
+
+
+
+
+%----------------------------------------------------------------------------------------
+\subsubsection{Application}
+%----------------------------------------------------------------------------------------
+One application of matrices is communication between a group of people $P_1,\ldots,P_4$. Figure~\ref{fig:matrix:application:graph} shows the communication network of these four people as a directed graph. For example $P_1$ communications with $P_2$ and $P_4$. One question one can ask, is how long does it take to transfer a message from $P_3$ to $P_2$. To obtain this information, we can use a adjacency matrix~\cite{biggs1993algebraic} as in Equation~\eqref{eq:graph:matrix} where a matrix element $a_{1,2}=1$ means that there is an edge in the graph from $P_1$ to $P_2$. By doing this for all people in our group, we will get this matrix. This matrix will tell us that $P_1$ has contact with $P_2$ and $P_4$, $P_2$ with $P_3$ and so on.
+
+\begin{align}
+\mathbf{M} = \left\lbrace\begin{matrix}
+0 & 1 & 0 & 1 \\
+0 & 0 & 1 & 0 \\
+1 & 0 & 0 & 1 \\
+1 & 1 & 0 & 0
+\end{matrix} \right\rbrace
+\label{eq:graph:matrix}
+\end{align}
+
+To compute how knows the message after four cycles, we define
+\begin{center}
+$\mathbf{M}^4 = \mathbf{M} \cdot \mathbf{M} \cdot \mathbf{M} \cdot \mathbf{M} $,  
+\end{center}
+which means for $\mathbf{M}^n$, we have to do $n$ multiplications of $\mathbf{M}$. After the multiplications, we get following result
+\begin{align*}
+M^2 = \left\lbrace\begin{matrix}
+1 &  1 & 1 &  0 \\
+1 & 0 & 0  & 1 \\
+1 & 2 & 0 & 1 \\
+0 & 1 & 1 & 1
+\end{matrix} \right\rbrace
+\end{align*}
+and see that person $P_3$ can send some message to Person $P_2$ in two cycles. For more applications, we refer to~\cite{scheick1997linear}. 
+
+\begin{exercise}
+Transfer the matrix in Equation~\ref{eq:graph:matrix} into a Blaze matrix and try to reproduce the resulting matrix by multiplying the matrix four times.
+\end{exercise}
+
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}
+  \SetGraphUnit{3}
+  \Vertex{P1}
+  \WE(P1){P2}
+  \WE(P2){P3}
+  \WE(P3){P4}
+  %
+  \Edge(P1)(P2)
+  \Edge(P1)(P4)
+  \Edge(P2)(P3)
+  \Edge(P3)(P1)
+  \Edge(P3)(P4)
+  \Edge(P4)(P1)
+  \Edge(P4)(P2)
+\end{tikzpicture}
+\caption{Graph of the communication network.}
+\label{fig:matrix:application:graph}
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+\section{Compiling code using Blaze}
+%----------------------------------------------------------------------------------------
+To use Blaze, we have to first install the library on our system\link{https://bitbucket.org/blaze-lib/blaze/wiki/Configuration\%20and\%20Installation}. Listing~\ref{code:blaze:inst:cmake} shows how to install Blaze using CMake and Listing~\ref{code:blaze:inst:manually} how to install Blaze manually. Note that you should check if there is a newer version of Blaze available.
+
+\begin{minipage}{\linewidth}
+\begin{minipage}{0.45\linewidth}
+\begin{lstlisting}[language=bash,caption={Installing Blaze using CMake.\label{code:blaze:inst:cmake}}]
+tar -xvf blaze-3.6.tar.gz
+cd blaze-3.6
+cmake -DCMAKE_INSTALL_PREFIX=/home/patrick/blaze .
+make install
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\linewidth}
+\begin{lstlisting}[language=bash,,caption={Installing Blaze manually.\label{code:blaze:inst:manually}}]
+tar -xvf blaze-3.6.tar.gz
+cd blaze-3.6
+cp -r ./blaze /home/patrick/blaze
+\end{lstlisting}
+\end{minipage}
+\end{minipage}
+
+After installing Blaze, we can use preferable CMake, see Listing~\ref{code:blaze:compile:cmake}, or compile the code by hand, see Listing~\ref{code:blaze:compile:manually}. For more details about CMake, we refer to Section~\ref{sec:cmake}. Note that we have already installed Blaze on the server and there is no need to install Blaze on your own device.
+
+\begin{minipage}{\linewidth}
+\begin{minipage}{0.45\linewidth}
+\begin{lstlisting}[language=bash,caption={Compilation using CMake.\label{code:blaze:compile:cmake}}]
+find_package( blaze )
+if( blaze_FOUND )
+   add_library( blaze_target INTERFACE )
+   target_link_libraries( blaze_target 
+   	INTERFACE blaze::blaze )
+endif()
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\linewidth}
+\begin{lstlisting}[language=bash,,caption={Manually compilation.\label{code:blaze:compile:manually}}]
+g++ -I/home/diehlpk/blaze BlazeTest.cpp
+\end{lstlisting}
+\end{minipage}
+\end{minipage}
+
+Currently, we only have compiled Blaze for serial execution. To compile Blaze with C++ 11 threads, we have to add following arguments \bash{-std=c++11 -DBLAZE_USE_CPP_THREADS} to the compiler and export following environment variable \bash{export BLAZE_NUM_THREADS=4  // Unix systems}. For HPX parallelism, we have to add following arguments \bash{-DBLAZE_USE_HPX_THREADS} to the compiler and run \bash{./a.out --hpx:threads=4} to use four threads. Fore more details, we refer to~\link{https://bitbucket.org/blaze-lib/blaze/wiki/Shared\%20Memory\%20Parallelization}.
 
 %----------------------------------------------------------------------------------------
 \chapter{Solvers}
 %----------------------------------------------------------------------------------------
+
+
+
+\newpage
+\theendnotes
+
 
 %----------------------------------------------------------------------------------------
 \part{Numerical examples}
@@ -589,6 +786,11 @@ Implement the $N$-body problem using the template code\link{https://github.com/d
 \chapter{Peridynamics}
 \label{sec:pd}
 %----------------------------------------------------------------------------------------
+
+
+\newpage
+\theendnotes
+
 
 %----------------------------------------------------------------------------------------
 \part{Parallel and distributed computing}
@@ -1056,6 +1258,8 @@ int main(){
 %----------------------------------------------------------------------------------------
 
 
+\newpage
+\theendnotes
 
 
 %----------------------------------------------------------------------------------------
@@ -1068,6 +1272,10 @@ int main(){
 \section{Parallel algorithms}
 
 \section{Asynchronous programming}
+
+\newpage
+\theendnotes
+
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
