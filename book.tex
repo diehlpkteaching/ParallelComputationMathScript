@@ -271,7 +271,7 @@ blaze::ZeroMatrix<int> A( 3UL, 5UL );
 
 For all matrices the size of the matrix \cpp{size( A )}; returns the total amount of elements $(n \times m)$. The number of rows are obtained by \cpp{M2.rows();} and the number of columns are obtained by \cpp{M2.columns();}. All matrix operations\link{https://bitbucket.org/blaze-lib/blaze/wiki/Matrix\%20Operations} are applied as \cpp{abs( A );} which means the absolute value of all matrix elements is computed. Note that the elements of a Blaze matrix are accessed using different kind of parentheses \cpp{A(0,0) = 1;} sets the first element of the matrix to one.\\
 
-One often used task in linear algebra is decomposition\index{decomposition} of matrices\link{blaze}. Blaze implements following decomposition methods: Cholesky~\cite{cholesky2005resolution}, QR/RQ, and QL/LQ. Listing~\ref{code:blaze:decomposition} shows how to use LU~\cite{bunch1974triangular} decomposition method. Note that we do not cover this methods in this course, but it is an important feature you should know. For more details we refer for example to~\cite{press1992numerical}.
+One often used task in linear algebra is decomposition\index{decomposition} of matrices. Blaze implements following decomposition methods: Cholesky~\cite{cholesky2005resolution}, QR/RQ, and QL/LQ. Listing~\ref{code:blaze:decomposition} shows how to use LU~\cite{bunch1974triangular} decomposition method. Note that we do not cover this methods in this course, but it is an important feature you should know. For more details we refer for example to~\cite{press1992numerical}.
 
 \begin{lstlisting}[language=c++,caption={Matrix decomposition methods in Blaze\label{code:blaze:decomposition}},float,floatplacement=tb]
 blaze::DynamicMatrix<double,blaze::rowMajor> A;
@@ -432,7 +432,7 @@ x_2
 \end{align}
 We know from school how to solve the matrix using Gaussian elimination~\cite{brown1999contextual}\index{Gaussian elimination}. In Equation~\eqref{eq:gauss:1} the first line is multiplied by two and the second line by three to get the same factor in the first column. In Equation~\eqref{eq:gauss:2} we can subtract the first line from the second line to get a zero in the second line. In Equation~\eqref{eq:gauss:3} we now can get the value for $x_2$ because we know $2x_2=-28\rightarrow x_2=-2$. In Equation~\eqref{eq:gauss:4} the first line is multiplied by seven and the second line by two to get the same factor in the second column. In Equation~\eqref{eq:gauss:5} the second row is subtracted from the first one. In Equation~\eqref{eq:gauss:6} we now can get the value for $x_1$ because we know $42x_1=84\rightarrow x_2=2$. Which is the same solution as visual obtained in Figure~\ref{fig:example:interesction}.\\
 
-Note that one can implement the Gauss elimination, but the theoretical complexity of this algorithm is $\mathcal{O}(n^3)$ where $n$ is the number of unknowns. So this algorithm is feasible for thousands of unknown, but might not scale for millions of unknowns. In that case the so-called iterative methods are used. We will look into the Conjugate Gradien method in the next section. For more details about iterative methods\index{iterative methods} we refer to~\cite{olshanskii2014iterative}.
+Note that one can implement the Gauss elimination, but the theoretical complexity of this algorithm is $\mathcal{O}(n^3)$ where $n$ is the number of unknowns~\cite{farebrother1988linear}. So this algorithm is feasible for thousands of unknown, but might not scale for millions of unknowns. Fore more details about the complexity, we refer to~\cite{fang1997worst}. In that case the so-called iterative methods are used. We will look into the Conjugate Gradient method in the next section. For more details about iterative methods\index{iterative methods} we refer to~\cite{olshanskii2014iterative,briggs2000multigrid}.
 
 
 \begin{align}
@@ -559,6 +559,327 @@ x_2
 %----------------------------------------------------------------------------------------
 \section{Conjugate Gradient solver}
 %----------------------------------------------------------------------------------------
+For one examples of iterative solvers\index{iterative solvers}, we look into the most popular iterative method for solving large systems of linear equations. More details about iterative methods~\cite{olshanskii2014iterative,briggs2000multigrid}. The Conjugate Gradient (CG)\index{conjugate gradient} solver which was developed by Hestenes and Stiefel in 1952~\cite{hestenes1952methods}. The method solves linear equation systems with the form $\mathbf{A} \mathbf{x} = \mathbf{b}$. The matrix $\mathbf{A}$ has to be symmetric $\mathbf{A}^T = \mathbf{A}$ and positive-definite $\mathbf{x}^T \mathbf{A} \mathbf{x} > 0, \forall \mathbf{x}>0$. \\
+
+We use the problem showed in Figure~\ref{fig:example:interesction} and define the system $\mathbf{A} \mathbf{x} = \mathbf{b}$ as
+\begin{align*}
+\mathbf{A} = \begin{pmatrix}
+ 3 & 2 \\ 2 & 6 
+\end{pmatrix}, \mathbf{x}=\begin{pmatrix}
+x_1 \\ x_2  
+\end{pmatrix}, \text{ and }  \mathbf{b}=\begin{pmatrix}
+2 \\ -8  
+\end{pmatrix}\text{.}
+\end{align*}
+Since we know that solving that solving the matrix form can be expensive for large amounts of unknowns, the quadratic form, which is a function of the vector $\mathbf{x}$
+\begin{align}
+f(\mathbf{x}) = \frac{1}{2} \mathbf{x}^T A \mathbf{x} - b^T \mathbf{x} + c
+\end{align}
+can be minimized to find the solution for $\mathbf{x}$. Figure~\ref{fig:quadratic:plot} shows the plot of the quadratic form and Figure~\ref{fig:quadratic:contour} shows the contour plot of the quadratic form with the solution $(2,-2)$. To exemplify  the minimization to find the solution, we can place a golf ball at any position of the bowlish from of the quadratic form and the golf ball will roll to the solution, since the solution is the minimum of the quadratic form.\\
+
+\begin{figure}[tb]
+\begin{subfigure}{.75\textwidth}
+\hfill
+\begin{tikzpicture}
+\begin{axis}[ymin=-6,ymax=4,xmax=8,xmin=-4,zmin=0,zmax=160,xlabel=$x_1$,ylabel=$x_2$,zlabel={$f(\mathbf{x})$}]
+\addplot3[
+    surf,
+    colormap/cool,
+    %shader=interp,
+    %shader=flat,
+    samples=60] 
+    {x*(1.5*x+y)-2*x+y*(x+3*y)+8*y};
+\end{axis}
+\end{tikzpicture}
+\hfill
+\caption{Plot of the quadratic form $f(\mathbf{x})$ }
+\label{fig:quadratic:plot}
+\end{subfigure}
+\\
+\begin{subfigure}{.75\textwidth}
+\hfill
+\begin{tikzpicture}
+\begin{axis}[ymin=-6,ymax=4,xmax=6,xmin=-4,xlabel=$x_1$,ylabel=$x_2$]
+\addplot gnuplot[raw gnuplot,thick,mark=none]
+    {
+        unset surface;
+        set cntrparam levels auto 10;
+        set contour;
+        set yrange [-6:4];
+        splot [x=-4:6] x*(1.5*x+y)-2*x+y*(x+3*y)+8*y;
+    };
+\addplot[mark=*] coordinates {(2,-2)};
+\end{axis}
+\end{tikzpicture}
+\hfill
+\caption{Contour plot of the quadratic form $f(\mathbf{x})$}
+\label{fig:quadratic:contour}
+\end{subfigure}
+\caption{Plot of the quadratic form $f(\mathbf{x})$ (\subref{fig:quadratic:plot}) and contour plot of the quadratic form $f(\mathbf{x})$ (\subref{fig:quadratic:contour}).}
+\end{figure}
+
+Now we want to mimic the metaphor of the rolling golf ball in a numerical sense. Therefore, we chose an arbitrary point $\mathbf{x}_0$ on the quadratic form and intend to slide down to the bottom of the bowl shape of the quadratic form to find the solution. Thus, we need to find the direction which decreases most. To find these, we use the gradient of the quadratic form
+\begin{align}
+f'(\mathbf{x})=\begin{pmatrix}
+\frac{\partial }{\partial x_1} f(\mathbf{x}) \\
+\frac{\partial }{\partial x_2} f(\mathbf{x}) \\
+\vdots \\
+\frac{\partial }{\partial x_n} f(\mathbf{x})
+\end{pmatrix}\text{.}
+\end{align}
+Using the quadratic form, the gradient and applying some mathematics, one can show that the gradient reads as
+\begin{align}
+f'(\mathbf{x}) = \frac{1}{2} \mathbf{A}^T \mathbf{x} + \frac{1}{2} \mathbf{A} \mathbf{x}-\mathbf{b}
+\end{align}
+and for a symmetric matrix $\mathbf{A}$ the gradient reads as
+\begin{align}
+f'(\mathbf{x})= \mathbf{A}\mathbf{x}-\mathbf{b}\text{.}
+\end{align}
+Note that this course focus on the computer science and implementation aspects of the CG solver and for more details about the mathematics, we refer to~\cite{shewchuk1994introduction} where the very nice example for the introduction of the conjugate gradient method was adapted from. Figure~\ref{fig:gradient:field} plots the gradient field and one can see that the gradient at the solution $\mathbf{x}$ is zero. Thus, we can minimize the initial guess $\mathbf{x}_0$ such that the gradient $f'(x)=0$.\\
+
+\begin{exercise}
+To gain better understanding, we encourage you to follow the calculations in~\cite{shewchuk1994introduction} or even better try to do the altercations on your own and check them later in the reference.
+\end{exercise}
+
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}[scale=0.5]
+\foreach \x in {-4,...,6} {
+\foreach \y in {-6,...,4} {
+
+\pgfmathsetmacro\mx{0.01*(3*\x+2*\y-2)};
+\pgfmathsetmacro\my{0.01*(2*\x+6*\y+8)};
+
+%\def\l{{sqrt(\u+\v)}};
+%\node at (\x,\y) {\ml};
+\draw[->,azure] (\x,\y) -- (\x+\mx,\y+\my);
+}
+}
+
+\node[black] at (2,-2)  {\textcolor{black}{$\mathbf{x}$}};
+
+\draw[->,thin,gray] (0,-7) -- (0,5);
+\node[above] at (0,5) {\small $x_1$};
+\draw[->,thin,gray] (-5,0) -- (7,0);
+\node[above] at (7,0) {\small $x_2$};
+\end{tikzpicture}
+\caption{Plot of the gradient field  $f'(x)$ with the solution $\mathbf{x}$. }
+\label{fig:gradient:field}
+\end{figure}
+
+To implement the metaphor of the rolling golf ball, we use the method of the steepest decent\index{steepest decent method}. In this method, we chose an random initial guess $\mathbf{x}_0$ and slide down to the bottom of the quadratic form $f(\mathbf{x})$ by taking a series of steps $\mathbf{x}_1,\mathbf{x}_2,\ldots$. For each step we go to the direction which $f$ decreases most which is the opposite of $f'(\mathbf{x}_i)$ which is $-f'(\mathbf{x}_i)= \mathbf{b}-\mathbf{A}\mathbf{x}_i$.
+
+%----------------------------------------------------------------------------------------
+\subsubsection{Method of the steepest decent}
+%----------------------------------------------------------------------------------------
+Before, we look into the method, we have to define two terms, see Figure~\ref{fig:skecth:error:residual}. Assume we know the solution $\mathbf{x}$ and we have our initial guess $\mathbf{x}_0$ we can define the error $\mathbf{e} = \mathbf{x}_0 - \mathbf{x}$ or more general for the $i$-th iteration as  $\mathbf{e}_i = \mathbf{x}_i - \mathbf{x}$. The residual $\mathbf{r}_i = \mathbf{b}-\mathbf{A}\mathbf{x}_i=-f'(\mathbf{x_i})$ which defines how far we are form the correct value for the right-hand side $\mathbf{b}$. Remember the metaphor of the golf ball sliding down to the bottom of the bowlish shape. This means for us now that we have to go along the line $\mathbf{r}_0$ to get closer to the bottom. Since we do not have gravity guiding us to the bottom. we have to decide on how long we want to go along the line $\mathbf{r}_0$.\\
+
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}
+\begin{axis}[ymin=-6,ymax=4,xmax=6,xmin=-4,xlabel=$x_1$,ylabel=$x_2$]
+\addplot gnuplot[raw gnuplot,thick,mark=none]
+    {
+        unset surface;
+        set cntrparam levels auto 10;
+        set contour;
+        set yrange [-6:4];
+        splot [x=-4:6] x*(1.5*x+y)-2*x+y*(x+3*y)+8*y;
+    };
+\addplot[mark=*] coordinates {(2,-2)};
+\node[below] at (2,-2) {$\mathbf{x}$};
+\addplot[mark=*] coordinates {(-2,-2)};
+\node[below,black] at (-2,-2) {$\mathbf{x}_0$};
+\draw (2,-2) -- (-2,-2);
+\node[below] at (-0,-2) {$\mathbf{e}_0$};
+\draw (-2,-2) -- (8,12);
+\node[left] at (-0,1) {$\mathbf{r}_0$};
+\end{axis}
+\end{tikzpicture}
+\caption{Visualization of the error $\mathbf{e}$ and the residual $\mathbf{r}$. We have to determine how long we should go along the residual line within one iteration. }
+\label{fig:skecth:error:residual}
+\end{figure}
+
+So we have to find $\alpha$ for how long we go in the direction of the steepest decent $\mathbf{x}_1 = \mathbf{x}_0 + \alpha \mathbf{r}_0$. Figure~\ref{fig:plane:plot} visualized the plane defined by $\mathbf{x}_1 = \mathbf{x}_0 + \alpha \mathbf{r}_0$ and the quadratic form $f(\mathbf{x})$. Next, we look at the intersection of the two surfaces which is some parabola, see Figure~\ref{fig:plane:intersection}. Now, we have to find the minimum of the parabola $\frac{d}{d\alpha} f(\mathbf{x}_0 + \alpha \mathbf{r}_0) = 0$ to determine the optimal value for $\alpha$. Applying the chain rule results in $\frac{d}{d\alpha} f(\mathbf{x}_0 + \alpha \mathbf{r}_0)= f'(\mathbf{x}_0 + \alpha \mathbf{r}_0)^T \mathbf{r}_0$. This expression is zero if and only if the two vectors are orthogonal. We can do some calculations
+\begin{align}
+\mathbf{r}^T_1 \mathbf{r}_0 &= 0 \\
+(\mathbb{b}-\mathbf{A} \mathbf{x}_1)^T \mathbf{r}_0 & = 0 \\
+(\mathbb{b}-\mathbf{A} (\mathbf{x}_0 + \alpha \mathbf{r}_0))^T \mathbf{r}_0 & = 0 \\
+(\mathbf{b}- \mathbf{A} \mathbf{x}_0)^T \mathbf{r}_0 - \alpha(\mathbf{A}\mathbf{r}_0)^T \mathbf{r}_0 &= 0 \\
+(\mathbf{b}- \mathbf{A} \mathbf{x}_0)^T \mathbf{r}_0  &= \alpha(\mathbf{A}\mathbf{r}_0)^T \mathbf{r}_0 \\
+\mathbf{r}^T_0 \mathbf{r}_0 &= \alpha \mathbf{r}^T_0 (\mathbf{A}\mathbf{r}_0) \\
+\alpha &= \frac{\mathbf{r}^T_0 \mathbf{r}_0}{\mathbf{r}^T_0 \mathbf{A}\mathbf{r}_0}
+\end{align}
+to compute $\alpha$. Note that this course focus on the computer science and implementation aspects of the CG solver and for more details about the mathematics, we refer to~\cite{shewchuk1994introduction} where the very nice example for the introduction of the conjugate gradient method was adapted from. Figure~\ref{fig:previous:step} shows the first iteration and how long to go along the the residual line to the next guess of the solution $\mathbf{x}_1$ and we clearly see that the gradient is to $\mathbf{x}_0$.\\
+
+\begin{exercise}
+To gain better understanding, we encourage you to follow the calculations in~\cite{shewchuk1994introduction} or even better try to do the altercations on your own and check them later in the reference.
+\end{exercise}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{axis}[ymin=-6,ymax=4,xmax=6,xmin=-4,xlabel=$x_1$,ylabel=$x_2$]
+\addplot gnuplot[raw gnuplot,thick,mark=none]
+    {
+        unset surface;
+        set cntrparam levels auto 10;
+        set contour;
+        set yrange [-6:4];
+        splot [x=-4:6] x*(1.5*x+y)-2*x+y*(x+3*y)+8*y;
+    };
+\addplot[mark=*] coordinates {(2,-2)};
+\node[below] at (2,-2) {$\mathbf{x}$};
+\addplot[mark=*] coordinates {(-2,-2)};
+\node[below] at (-2,-2) {$\mathbf{x}_0$};
+\addplot[mark=*] coordinates {(0.08,-0.61333)};
+\draw (-2,-2) -- (0.08,-0.61333);
+\node[below] at (0.08,-0.61333) {$\mathbf{x}_1$};
+\draw[->] (0.08,-0.61333) -- (0.1*-2.98666667, 0.1*4.48); 
+%\node[left] at (-0,1) {$\mathbf{r}_0$};
+\end{axis}
+\end{tikzpicture}
+\caption{first iteration and how long to go along the the residual line to the next guess of the solution $\mathbf{x}_1$ and we clearly see that the gradient is to $\mathbf{x}_0$.}
+\label{fig:previous:step}
+\end{figure}
+
+\begin{figure}[tb]
+\begin{subfigure}{.75\textwidth}
+\hfill
+\begin{tikzpicture}
+\begin{axis}[ymin=-6,ymax=4,xmax=8,xmin=-4,zmin=0,zmax=160,xlabel=$x_1$,ylabel=$x_2$,zlabel=$x_3$,view={53}{338}]
+\addplot3[
+    surf,
+    colormap/cool,
+    %shader=interp,
+    %shader=flat,
+    samples=60] 
+    {x*(1.5*x+y)-2*x+y*(x+3*y)+8*y};
+    \addplot3[
+    domain=-4:10,
+    samples = 60,
+    samples y=0,
+]
+({-2+12*x},
+{-2+8*x},
+{x});
+\addplot3[
+    surf,
+    colormap/cool,
+    %shader=interp,
+    %shader=flat,
+    samples=60] 
+    {x*(1.5*x+y)-2*x+y*(x+3*y)+8*y};
+    \addplot3[
+    domain=-4:10,
+    samples = 60,
+    samples y=0,
+]
+({-2+12*x},
+{-2+8*x},
+{25+x});
+\end{axis}
+\end{tikzpicture}
+\hfill
+\caption{Plot of the quadratic form $f(\mathbf{x})$ and the area of the line search $\mathbf{x}_1 = \mathbf{x}_0 + \alpha \mathbf{r}_0$ }
+\label{fig:plane:plot}
+\end{subfigure}
+\\
+\begin{subfigure}{.75\textwidth}
+\hfill
+\begin{tikzpicture}
+\begin{axis}[xmin=-0.5,xmax=1,xlabel=$\alpha$,ylabel=$f(\mathbf{x}_0 + \alpha \mathbf{r}_0)$,axis lines = middle, grid= both]
+\addplot[samples=100]{(-2+12*x)*(1.5*(-2+12*x)+(-2+8*x))-2*(-2+12*x)+(-2+8*x)*((-2+12*x)+3*(-2+8*x))+8*(-2+8*x)};
+\end{axis}
+\end{tikzpicture}
+\hfill
+\caption{Contour plot of the quadratic form $f(\mathbf{x})$}
+\label{fig:plane:intersection}
+\end{subfigure}
+\caption{Plot of the two surfaces (\subref{fig:plane:plot}) and resulting parabola of the intersection of these two surfaces (\subref{fig:plane:intersection}).}
+\end{figure}
+
+Now, we extend this example to the algorithm to iterate to the solution of the linear equation system. Figure~\ref{fig:algorithm:cg} shows the flow chart of the conjugate gradient solver. First, we have to check if the residual is close to the tolerance $\epsilon$, if so, we guessed $\mathbf{x}_0$ close enough to the solution. If not, the residual $\mathbf{r}_i$ is evaluated. Next, we compute $\alpha_i$ and the new guess $\mathbf{x}_{i+1}$. Now, we check if the residual with respect to $\mathbf{x}_{i+1}$ is close enough to the tolerance, if so, we return the solution. If not, we proceed with the next iteration. Figure~\ref{fig:line:search} shows the first five iterations of the CG algorithm with the initial guess $\mathbf{x_0}=(-2,-2)^T$ and the solution $\mathbf{x}_5=(1.93832964, -2.)^T$. Fore more details on iterative solver, we refer to~\cite{barrett1994templates}.
+
+\begin{figure}[tb]
+    \centering
+	\begin{tikzpicture}[node distance=1.125cm, scale=0.75, transform shape]
+	\node (start) [startstop] {Start}; 
+	\node (n0) [process, below of=start] { $\mathbf{r}_0 = \mathbf{b} - \mathbf{A} \mathbf{x}_0$};
+	\node (dec1) [decision, below of=n0 , yshift=-1.cm] { $\vert\mathbf{r}_0\vert < \epsilon$ };
+	\node (n1) [process, right of=dec1, xshift=3.cm] { return $\mathbf{x}_0$};
+	\node (stop) [startstop, right of=n1, xshift=4.cm] {Finished}; 
+	\node (n2) [process, below of=dec1, yshift=-1.cm] { $\mathbf{r}_i = \mathbf{b} - \mathbf{A} \mathbf{x}_i$ };
+	\node (n3) [process, below of=n2, yshift=-1.cm] { $\alpha_i = \frac{\mathbf{r}^T_0 \mathbf{r}_0}{\mathbf{r}^T_0 \mathbf{A}\mathbf{r}_0}$ };
+	\node (n4) [process, below of=n3, yshift=-1.cm] { $\mathbf{x}_{i+1} = \mathbf{x}_i \alpha_i \mathbf{r}_i$ };
+	\node (dec2) [decision, below of=n4 , yshift=-1.cm] {  $\mathbf{r}_i < \epsilon$ };
+	\node (n5) [process, right of=dec2, xshift=3.cm] { return $\mathbf{x}_i$};
+	\node (n6) [process, left of=dec2, xshift=-3.cm] { $i++$};
+	%lines
+	\draw [->] (start) -- (n0);
+	\draw [->] (n0) -- (dec1);
+	\draw [->] (n1) -- (stop);
+	\draw [->] (dec1) -- node[anchor=north] {yes} (n1); 
+	\draw [->] (dec1) -- node[anchor=west] {no}  (n2);
+	\draw [->] (n2) -- (n3);
+	\draw [->] (n3) -- (n4);
+	\draw [->] (n4) -- (dec2);
+	\draw [->] (dec2) -- node[anchor=north] {yes} (n5); 
+	\draw [->] (n5) -- ++(5.25,0) -- (stop);
+	\draw [->] (dec2) -- node[anchor=north] {no}  (n6);
+	\draw [->] (n6) -- ++(0,6.5) -- (n2);
+	\end{tikzpicture}
+	\caption{Flow chart for the Conjugate Gradient method to solve $\mathbf{M}\mathbf{x}=\mathbf{b}$.}
+	\label{fig:algorithm:cg}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{axis}[ymin=-6,ymax=4,xmax=6,xmin=-4,xlabel=$x_1$,ylabel=$x_2$]
+\addplot gnuplot[raw gnuplot,thick,mark=none]
+    {
+        unset surface;
+        set cntrparam levels auto 10;
+        set contour;
+        set yrange [-6:4];
+        splot [x=-4:6] x*(1.5*x+y)-2*x+y*(x+3*y)+8*y;
+    };
+\addplot[mark=*] coordinates {(2,-2)};
+\node[above] at (2,-2) {$\mathbf{x}$};
+\addplot[mark=*] coordinates {(-2,-2)};
+\node[below] at (-2,-2) {$\mathbf{x}_0$};
+\addplot[mark=*] coordinates {(0.08,-0.61333)};
+\draw (-2,-2) -- (0.08,-0.61333);
+\node[below] at (0.08,-0.61333) {$\mathbf{x}_1$};
+\addplot[mark=*] coordinates {(1.00444444, -2.)};
+\draw (0.08,-0.61333) -- (1.00444444, -2.);
+\node[below] at (1.00444444, -2.) {$\mathbf{x}_2$};
+\addplot[mark=*] coordinates {(1.52213333, -1.65487407)};
+\draw (1.00444444, -2.) -- (1.52213333, -1.65487407);
+\node[above] at (1.52213333, -1.65487407) {$\mathbf{x}_3$};
+\addplot[mark=*] coordinates {(1.75221728, -2.)};
+\draw (1.52213333, -1.65487407) -- (1.75221728, -2.);
+\node[below] at (1.75221728, -2.) {$\mathbf{x}_4$};
+\draw (1.75221728, -2.) -- (1.8810643 , -1.91410199);
+\draw (1.8810643 , -1.91410199) -- (1.93832964, -2.);
+\end{axis}
+\end{tikzpicture}
+\caption{Visualization of the line search for the first five iterations of the Conjugate Gradient algorithm with the solution $\mathbf{x}_5=(1.93832964, -2.)^T$.}
+\label{fig:line:search}
+\end{figure}
+
+\begin{exercise}
+Implement the conjugate gradient algorithm using Blaze library. This code produces a matrix $\mathbf{A}$ and a vector $\mathbf{b}$, such that the vector $\mathbf{x}$ is the solution for  $\mathbf{A} \mathbf{x} = \mathbf{b}$
+\begin{lstlisting}[language=C++]
+ for(int i=0; i<N; ++i) {
+        A(i,i) = 2.0;
+        b[i] = 1.0*(1+i);
+        x[i] += x[i-1];
+    }
+\end{lstlisting}
+You can use the matrix $\mathbf{A}$ and the vector $\mathbf{b}$ as the input of your CG implementation and compare your solution with the vector $\mathbf{x}$ to validate your code. You should not use this vector as the input of the CG algorithm, since your code might stop at step (2) already.
+\end{exercise}
 
 
 \newpage
