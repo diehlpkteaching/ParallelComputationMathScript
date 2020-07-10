@@ -413,7 +413,152 @@ Currently, we only have compiled Blaze for serial execution. To compile Blaze wi
 %----------------------------------------------------------------------------------------
 \chapter{Solvers}
 %----------------------------------------------------------------------------------------
+Another important task in applied mathematics is to solve linear equations systems. Before we dig into the numerical and implementation details, we look into one example we know from our school lessons in mathematics. Figure~\ref{fig:example:interesction} plots the two functions $f_1(x_1)=-\sfrac{3}{2}x_1+1$ and  $f_2(x_1)=-\sfrac{2}{6}x_1-\sfrac{8}{6}$. From a visual perspective one can see that the intersection of these two functions is at $(2,-2)$. However, for more complex functions or more degree of freedoms the visual approach can get cumbersome. Another approach is to formulate the corresponding linear equations systems and solve it to get the intersections. For the linear equation system, we want to have the both functions in the form $3x_1+2x_2=2$ and $2X_1+6x_2=-8$ which are just a different way to write $f_1(x_1)$ and $f_2(x_1)$. Now we want to define a matrix $\mathbf{M}$ and the right-hand side $\mathbf{b}$ to find the solution $\mathbf{x}$ as $\mathbf{M}\mathbf{x}=\mathbf{b}$. Using the second form the function representation, we get 
+\begin{align}
+\mathbf{M}\mathbf{x}&=\mathbf{b} \\
+\left(\begin{matrix}
+3 & 2 \\
+2 & 6 \\
+\end{matrix}\right)
+\left(\begin{matrix}
+x_1 \\
+x_2
+\end{matrix}\right)
+&=\left(
+\begin{matrix}
+2 \\
+-8
+\end{matrix}\right)\text{.}
+\end{align}
+We know from school how to solve the matrix using Gaussian elimination~\cite{brown1999contextual}\index{Gaussian elimination}. In Equation~\eqref{eq:gauss:1} the first line is multiplied by two and the second line by three to get the same factor in the first column. In Equation~\eqref{eq:gauss:2} we can subtract the first line from the second line to get a zero in the second line. In Equation~\eqref{eq:gauss:3} we now can get the value for $x_2$ because we know $2x_2=-28\rightarrow x_2=-2$. In Equation~\eqref{eq:gauss:4} the first line is multiplied by seven and the second line by two to get the same factor in the second column. In Equation~\eqref{eq:gauss:5} the second row is subtracted from the first one. In Equation~\eqref{eq:gauss:6} we now can get the value for $x_1$ because we know $42x_1=84\rightarrow x_2=2$. Which is the same solution as visual obtained in Figure~\ref{fig:example:interesction}.\\
 
+Note that one can implement the Gauss elimination, but the theoretical complexity of this algorithm is $\mathcal{O}(n^3)$ where $n$ is the number of unknowns. So this algorithm is feasible for thousands of unknown, but might not scale for millions of unknowns. In that case the so-called iterative methods are used. We will look into the Conjugate Gradien method in the next section. For more details about iterative methods\index{iterative methods} we refer to~\cite{olshanskii2014iterative}.
+
+
+\begin{align}
+\left(\begin{matrix}
+3 & 2 \\
+2 & 6 \\
+\end{matrix}\right)
+\left(\begin{matrix}
+x_1 \\
+x_2
+\end{matrix}\right)
+&=\left(
+\begin{matrix}
+2 \\
+-8
+\end{matrix}\right)
+\quad \left|\begin{matrix}
+\cdot 2 \\
+\cdot 3
+\end{matrix}\right. \label{eq:gauss:1}\\
+\left(\begin{matrix}
+6 & 4 \\
+6 & 18 \\
+\end{matrix}\right)
+\left(\begin{matrix}
+x_1 \\
+x_2
+\end{matrix}\right)
+&=\left(
+\begin{matrix}
+4 \\
+-24
+\end{matrix}\right)
+\quad\left|\begin{matrix}
+ \\
+- R1 \\
+\end{matrix}\right. \label{eq:gauss:2} \\
+\left(\begin{matrix}
+6 & 4 \\
+0 & 14 \\
+\end{matrix}\right)
+\left(\begin{matrix}
+x_1 \\
+x_2
+\end{matrix}\right)
+&=\left(
+\begin{matrix}
+4 \\
+-28
+\end{matrix}\right) 
+\quad \left|\begin{matrix}
+ \\
+\rightarrow x_2 = -2
+\end{matrix}\right. \label{eq:gauss:3} \\
+\left(\begin{matrix}
+6 & 4 \\
+0 & 14 \\
+\end{matrix}\right)
+\left(\begin{matrix}
+x_1 \\
+x_2
+\end{matrix}\right)
+&=\left(
+\begin{matrix}
+4 \\
+-28
+\end{matrix}\right) 
+\quad \left|\begin{matrix}
+\cdot 7 \\
+\cdot 2
+\end{matrix}\right. \label{eq:gauss:4} \\
+\left(\begin{matrix}
+42 & 28 \\
+0 & 28 \\
+\end{matrix}\right)
+\left(\begin{matrix}
+x_1 \\
+x_2
+\end{matrix}\right)
+&=\left(
+\begin{matrix}
+28 \\
+-56
+\end{matrix}\right) 
+\quad \left|\begin{matrix}
+-R2 \\
+ \\
+\end{matrix}\right. \label{eq:gauss:5} 
+\\
+\left(\begin{matrix}
+42 & 0 \\
+0 & 28 \\
+\end{matrix}\right)
+\left(\begin{matrix}
+x_1 \\
+x_2
+\end{matrix}\right)
+&=\left(
+\begin{matrix}
+42 \\
+-56
+\end{matrix}\right) 
+\quad \left|\begin{matrix}
+\rightarrow x_1 = 2 \\
+\\
+\end{matrix}\right. \label{eq:gauss:6} 
+\end{align}
+
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}
+\begin{axis}[grid=both,ymin=-6,ymax=4,xmax=8,xmin=-4,
+               minor tick num=1,axis lines = middle,xlabel=$x_1$,ylabel=$x_2$]
+\addplot [domain=-4:6, samples=101]{-1.5*x+1} node[pos=0.425] (endofplotsquare) {};
+\node [right] at (endofplotsquare) {$3x_1+2x_2=2$};
+\addplot [domain=-4:6, samples=101]{-(1/3)*x-(8/6)} node[pos=0.675] (endofplotsquare2) {};
+\node [right] at (endofplotsquare2) {$2x_1+6x_2=-8$};
+\end{axis}
+\end{tikzpicture}
+\caption{Plots of the function $f_1$ and $f_2$ to visually obtain the intersection of the the two lines.}
+\label{fig:example:interesction}
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+\section{Conjugate Gradient solver}
+%----------------------------------------------------------------------------------------
 
 
 \newpage
@@ -776,16 +921,16 @@ Implement the $N$-body problem using the template code\link{https://github.com/d
 \label{fig:nbody:finitedifference}
 \end{figure}
 
+%----------------------------------------------------------------------------------------
+\chapter{Peridynamics}
+\label{sec:pd}
+%----------------------------------------------------------------------------------------
 
 
 %----------------------------------------------------------------------------------------
 \chapter{One-dimensional heat equation}
 %----------------------------------------------------------------------------------------
 
-%----------------------------------------------------------------------------------------
-\chapter{Peridynamics}
-\label{sec:pd}
-%----------------------------------------------------------------------------------------
 
 
 \newpage
