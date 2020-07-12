@@ -799,7 +799,7 @@ To gain better understanding, we encourage you to follow the calculations in~\ci
 \caption{Plot of the two surfaces (\subref{fig:plane:plot}) and resulting parabola of the intersection of these two surfaces (\subref{fig:plane:intersection}).}
 \end{figure}
 
-Now, we extend this example to the algorithm to iterate to the solution of the linear equation system. Figure~\ref{fig:algorithm:cg} shows the flow chart of the conjugate gradient solver. First, we have to check if the residual is close to the tolerance $\epsilon$, if so, we guessed $\mathbf{x}_0$ close enough to the solution. If not, the residual $\mathbf{r}_i$ is evaluated. Next, we compute $\alpha_i$ and the new guess $\mathbf{x}_{i+1}$. Now, we check if the residual with respect to $\mathbf{x}_{i+1}$ is close enough to the tolerance, if so, we return the solution. If not, we proceed with the next iteration. Figure~\ref{fig:line:search} shows the first five iterations of the CG algorithm with the initial guess $\mathbf{x_0}=(-2,-2)^T$ and the solution $\mathbf{x}_5=(1.93832964, -2.)^T$. Fore more details on iterative solver, we refer to~\cite{barrett1994templates}.
+Now, we extend this example to the algorithm to iterate to the solution of the linear equation system. Figure~\ref{fig:algorithm:cg} shows the flow chart of the conjugate gradient solver. First, we have to check if the residual is close to the tolerance $\epsilon$, if so, we guessed $\mathbf{x}_0$ close enough to the solution. If not, the residual $\mathbf{r}_i$ is evaluated. Next, we compute $\alpha_i$ and the new guess $\mathbf{x}_{i+1}$. Now, we check if the residual with respect to $\mathbf{x}_{i+1}$ is close enough to the tolerance, if so, we return the solution. If not, we proceed with the next iteration. Algorithm~\ref{alg:cg} shows the pseudo code for the CG method. Here more implementation details as in the flow chart are provided. Figure~\ref{fig:line:search} shows the first five iterations of the CG algorithm with the initial guess $\mathbf{x_0}=(-2,-2)^T$ and the solution $\mathbf{x}_5=(1.93832964, -2.)^T$. Fore more details on iterative solver, we refer to~\cite{barrett1994templates}.
 
 \begin{figure}[tb]
     \centering
@@ -832,6 +832,45 @@ Now, we extend this example to the algorithm to iterate to the solution of the l
 	\caption{Flow chart for the Conjugate Gradient method to solve $\mathbf{M}\mathbf{x}=\mathbf{b}$.}
 	\label{fig:algorithm:cg}
 \end{figure}
+
+\begin{algorithm}
+\begin{algorithmic}
+\State $\mathbf{r_0} = \mathbf{b} - \mathbf{A} \mathbf{x}_0$
+\If {$\mathbf{r}_0< \epsilon$}
+    \Return $\mathbf{x}_0$
+\EndIf
+\State $\mathbf{p}_0=\mathbf{r}_0$
+\State $k=0$
+\While{true} 
+\State $\alpha_k = \frac{\mathbf{r}_k^T\mathbf{r}_k}{\mathbf{p}_k^T\mathbf{A}\mathbf{p}_k}$
+\State $ \mathbf{x}_{k+1} = \mathbf{x}_k + \alpha_k \mathbf{p}_k$
+\State $ \mathbf{r}_{k+1} = \mathbf{r}_k - \alpha_k \mathbf{p}_k$
+\If { $\mathbf{r}_{k+1}< \epsilon$}
+   \State exit loop
+\EndIf
+\State $\beta_k = \frac{\mathbf{r}_{k+1}^T\mathbf{r}_{k+1}}{\mathbf{r}_k^T\mathbf{r}_k}$
+\State $\mathbf{p}_{k+1}=\mathbf{r}_{k+1} + \beta_k \mathbf{p}_k$
+\State $k=k+1$
+\EndWhile
+\State return $\mathbf{x}_{k+1}$
+\end{algorithmic}
+\caption{Implementation of the Conjugate Gradient method with some additions where the factor $\beta$ is computed.}
+\label{alg:cg}
+\end{algorithm}
+
+%\item $\mathbf{r_0} = \mathbf{b} - \mathbf{A} \mathbf{x}_0$
+%\item If $\mathbf{r}_0< \epsilon$ return  $\mathbf{x}_0$
+%\item $\mathbf{p}_0=\mathbf{r}_0$
+%\item $k=0$
+%\item $\alpha_k = \frac{\mathbf{r}_k^T\mathbf{r}_k}{\mathbf{p}_k^T\mathbf{A}\mathbf{p}_k}$
+%\item $ \mathbf{x}_{k+1} = \mathbf{x}_k + \alpha_k \mathbf{p}_k$
+%\item $ \mathbf{r}_{k+1} = \mathbf{r}_k - \alpha_k \mathbf{p}_k$
+%\item If $\mathbf{r}_{k+1}< \epsilon$ exit loop
+%\item $\beta_k = \frac{\mathbf{r}_{k+1}^T\mathbf{r}_{k+1}}{\mathbf{r}_k^T\mathbf{r}_k}$
+%\item $\mathbf{p}_{k+1}=\mathbf{r}_{k+1} + \beta_k \mathbf{p}_k$
+%\item $k=k+1$
+%\item go to (e)
+%return $\mathbf{x}_{k+1}$
 
 \begin{figure}
 \centering
@@ -869,6 +908,7 @@ Now, we extend this example to the algorithm to iterate to the solution of the l
 \label{fig:line:search}
 \end{figure}
 
+\newpage
 \begin{exercise}
 Implement the conjugate gradient algorithm using Blaze library. This code produces a matrix $\mathbf{A}$ and a vector $\mathbf{b}$, such that the vector $\mathbf{x}$ is the solution for  $\mathbf{A} \mathbf{x} = \mathbf{b}$
 \begin{lstlisting}[language=C++]
