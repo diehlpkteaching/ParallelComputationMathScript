@@ -14,10 +14,11 @@ since this book gives an excellent pragmatic overview with a lot of examples. Fo
 %----------------------------------------------------------------------------------------
 \section{History of C and C++}
 %----------------------------------------------------------------------------------------
-The development of the programming language \texttt{C} started in 1972 as an improvement of the \texttt{B}\link{https://en.wikipedia.org/wiki/B_(programming_language)} language~\cite{ritchie1993development}. In 1978 the book \textit{The C Programming Language}~\cite{kernighan2006c} which was the informal specification of the \texttt{C} language. However, a zoo of \texttt{C} compiler was around which were not standardized yet. The American National Standards Institute (ANSI) started to standardized the \texttt{C} standard based on the Unix implementation of \texttt{C}. This was the foundation of the 1988 POSIX\link{https://en.wikipedia.org/wiki/POSIX} standard in 1988. One year later, the \texttt{C} standard was published as ANSI X3.159-1989 "Programming Language C". More common names for this version are ANSI C or C89. The International Organization of Standardization (ISO) adopted the ANSI C specification and published it as ISO/IEC 9899:1990 which is called C90. Note that C90 and C89 are referring to the same standard. This standard was revised in the 1990s and published as ISO/IEC 9899:1999 in 1999 which is the C99 standard. In 2007 the C11 standard was published and in 2018 the C18 standard.\\
+The development of the programming language \texttt{C} started in 1972 as an improvement of the \texttt{B}\link{https://en.wikipedia.org/wiki/B_(programming_language)} language~\cite{ritchie1993development}. In 1978 the book \textit{The C Programming Language}~\cite{kernighan2006c} which was the informal specification of the \texttt{C} language. However, a zoo of \texttt{C} compiler was around which were not standardized yet. The American National Standards Institute (ANSI) started to standardized the \texttt{C} standard based on the Unix implementation of \texttt{C}. This was the foundation of the 1988 POSIX\link{https://en.wikipedia.org/wiki/POSIX} standard in 1988. One year later, the \texttt{C} standard was published as ANSI X3.159-1989 "Programming Language C". More common names for this version are ANSI C or C89. The International Organization of Standardization (ISO) adopted the ANSI C specification and published it as ISO/IEC 9899:1990 which is called C90. Note that C90 and C89 are referring to the same s
+
+tandard. This standard was revised in the 1990s and published as ISO/IEC 9899:1999 in 1999 which is the C99 standard. In 2007 the C11 standard was published and in 2018 the C18 standard.\\
 
 Concurrently, in 1979 Bajarne Stroustrup, the god father of \texttt{C++}, started the "C with classes"\link{http://www.stroustrup.com/bs_faq.html\#invention} which later becomes \texttt{C++}. Stroustrup added classes, derived classes, inlining, and default arguments to the \texttt{C} compiler~\cite{stroustrup1996history}. Note that the name \texttt{C++} means the increment of \texttt{C} using the increment operator \cpp{++}. The \texttt{C++} Programming Language, but not as an official standard was released in 1985~\cite{stroustrup2000c++}. In 1989, C++98~\cite{koenig1998standard}, in 1999 C++ 2.0, in 2003 C++03~\cite{c++2003iso}, in 2011 C++11~\cite{c++2011iso}, and in 2014 C++14~\cite{c++2014iso}. The latest standard is C++17~\cite{smith2017iso} and the upcoming one is C++20.
-
 
 %----------------------------------------------------------------------------------------
 \section{Getting started with C++}
@@ -840,7 +841,61 @@ For example the complexity for inserting or removing an element in a vector is $
 
 %----------------------------------------------------------------------------------------
 \subsection{Array}
+\index{array}
+\index{STL!array}
 %----------------------------------------------------------------------------------------
+Another container is the \cpp{std::array} and it is provided by the \cpp{#include <array>} header\link{https://en.cppreference.com/w/cpp/container/array}. Note that the array keyword is also available as a language feature\link{https://en.cppreference.com/w/cpp/language/array}. The major difference is that the number of elements must be known at compile time and can not grow or shrink dynamically. Listing~\ref{code:array:language} shows the usage of the array as the language feature. In Line~2 the size of the array is defined using \cpp{size_t} type since the size of the array is always positive. In Line~5  the array with the name \cpp{array} is defined using \cpp{[size]} to specify its size and we use the keyword \cpp{double} to specify the type of the elements. In this case we have a array of five \cpp{double} values which are not initialized. In Line~8 the values of the array are initialized from one to five using \cpp{\{1,2,3,4,5\}}. Lines~11--14 show how use a \cpp{for} loop to overwrite the values assigned in Line~8 and print them to the standard output stream. In Line~17 we use the dereference operator \cpp{*} to access the first element of the array which is equivalent to \cpp{array[0]} to put the value $42$ at the first position.\\
+
+After looking into the usage of the array provided by as language feature, we look into the container version. The basic concepts are similar, but the container version can be used within the algorithms of the STL library which is sometimes a neat feature. Listing~\ref{container} shows the usage of the container version. In Line~7 the array is initialized very similar as for the language version, but since the \cpp{std::array} is provided by the C++ Standard Template Library the template specialization \cpp{<int,3>} is needed, where the first argument defines the data type and the second one the length of the array. In Line~11 the array is sorted using the \cpp{sort} method which we used to sort a \cpp{std::vector} or \cpp{std::list}. Note that is is only possible with the container version. Another nice feature is the range-based \cpp{for} loop in Lines~14--15.
+
+
+\begin{lstlisting}[language=C++,caption={Usage of arrays using the language keyword.\label{code:array:language}},float,floatplacement=tb]
+//Define the length
+size_t size = 6;
+
+//Generate a double array of size 6
+double array[size];
+
+//Initializing 
+double array = {1,2,3,4,5};
+
+//Access all elements
+for(size_t i = 0; i < size ; i++){
+        array[i] = i*2;
+        std::cout << array[i] << std::endl;
+    }
+
+//Access the first element
+*array = 42;
+std::cout << array[0] << std::endl;
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=C++,caption={Usage of arrays as containers.\label{code:array:container}},float,floatplacement=tb]
+#include <algorithm>
+#include <array>
+
+int main()
+{
+
+// generate and initialize the array
+std::array<int, 3> array = {1, 2, 3};
+
+// Sort the array
+std::sort(array.begin(), array.end());
+
+// Use the range-based loop to print the elements
+for(const auto& s: array)
+	std::cout << s << ' ';
+
+return 0;
+}
+\end{lstlisting}
+
+
+
+
+
 
 
 %----------------------------------------------------------------------------------------
