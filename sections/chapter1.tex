@@ -633,10 +633,114 @@ std::cout << "First number greater than 4 is : " << *p << endl;
 
 %----------------------------------------------------------------------------------------
 \section{Pointers}
+\index{pointers}
 %----------------------------------------------------------------------------------------
+Imagine following conversation:
+\begin{flushleft}
+\textbf{Person A:} Would you teach a toddler how to eat with a butcher's knife?
+\end{flushleft}
+\begin{flushright}
+\textbf{Person B:} No!
+\end{flushright}
+\begin{flushleft}
+\textbf{Person A:} So stop mentioning pointers to people barely
+starting with C++.
+\end{flushleft}
+Therefore, the book does not talk much about pointers, because in most cases, you do not need pointers to implement mathematical algorithms. If you need them, you should carefully check your implementation and see if you can avoid them. However, the introduce the basics so you know about pointers and can use them if you really need them.\\
+
+A pointer $p$ is a value that represents the address of an object. Every object $x$ has a distinct unique address to a part of the computer's memory. Listing~\ref{code:pointer:introduction} gives some example. In Line 2 the object \cpp{int x} is generated in the computer's memory and the value \cpp{42} is stored. In Line~5 the address to the memory where the object \cpp{x} is stored is store in \cpp{int* p} by using the so--called \cpp{&} address operator\index{operator!address}\index{address operator}. In Line~8 we get the vlaue \cpp{42} stored at the address \cpp{p} by using the so-called deference operator\index{operator!dereference}\index{dereference operator}. In Line~11 the value \cpp{42} of the object \cpp{x} is printed. In Line~12 we use the pointer \cpp{p} to the object \cpp{x} to set a new value \cpp{43}. In Line~13, we print the object \cpp{x} again and we will see the new vlaue \cpp{43} without accessing the object \cpp{x} directly.\\
+
+\begin{lstlisting}[language=c++,caption={Introduction to pointers to objects.
+\label{code:pointer:introduction}},float,floatplacement=tb]
+// Initialize
+int x = 42;
+
+// Get the pointer to the object x
+int* p = &x;
+
+// Get the object the pointer is pointing to
+int tmp = *p;
+
+// Using pointers to manipulate objects
+std::cout << x << std::endl;
+*p = 43;
+std::cout << x << std::endl;
+
+\end{lstlisting}
+
+In the first example, we used a pointer to a single object. In the second example, we will use a pointer to an array of objects, see Listing~\ref{code:pointer:array}. In Line~1 a pointer to the \cpp{array} is obtained. Using the dereference operator on the pointer gives us access to the first element of the array, see Line~2. With the so-called pointer arithmetic\index{pointer arithmetic} we can access the second and third element of the error by adding one or two the pointer before we use the dereference operator. In Line~13 we compute the distance between two pointers which is the length of the array in this case. Note that \lstinline|ptrdiff_t|\link{https://en.cppreference.com/w/cpp/types/ptrdiff_t} is a signed type because the distance can be negative.\\
 
 
+\begin{lstlisting}[language=c++,caption={Introduction to pointers to range of objects.
+\label{code:pointer:array}},float,floatplacement=tb]
+int* array = new int[3];
+*array = 1;
+*(array + 1) = 2;
+*(array + 2) = 3;
 
+// Accessing the first element
+int first = *array;
+
+// Accessing the second element
+int second = *(array + 1);
+
+// Getting the distance between two pointers
+ptrdiff_t dist = array+2 - array;
+\end{lstlisting}
+
+In the last example, we look into pointers to function, the so-called function pointers. In Listing~\ref{code:pointer:function} shows how to generate function pointers to the function \cpp{square}. In Line~7 the first possibility to generate a function pointer to the \cpp{square} function. The first \cpp{int} stands for the return type of the function and the second \cpp{int} for the function's argument. In Line~2 the left-hand side is the same, but on the right-hand side we use the address operator. In Lines~112--12 the function is called using its function pointer. Note that each of two lines to get the pointer or call the function are equivalent. 
+
+
+\begin{lstlisting}[language=c++,caption={Example for function pointers.
+\label{code:pointer:function}},float,floatplacement=tb]
+int square(int a)
+{
+return a * a;
+}
+
+// Generating a function pointer
+int (*fp)(int) = square; //We need the (int) for
+int (*fp2)(int) = &square; // the return type
+
+// Calling the function using its pointer
+std::cout << (*fp)(5);
+std::cout << fp2(5);
+
+\end{lstlisting}
+
+%----------------------------------------------------------------------------------------
+\subsection*{Memory management}
+%----------------------------------------------------------------------------------------
+From the Spider-Man comics and the movies, we all know the sentence
+\begin{center}
+With great power there must also come great responsibility
+\end{center}
+and this can be referenced for the usage of pointers as well. In C++ we have two kind of memory management:
+\vspace{0.25cm}
+\begin{enumerate}
+\item \textbf{Automatic memory management}\\
+This is what happens using the C++ standard library and the C++ STL. The system is allocation the memory for use, e.g. if we generate some array \cpp{double int[8]} or one of the containers. If the array goes out of scope which means it is not used anymore, the system deallocates the used memory.
+\item \textbf{Dynamic memory management}\\
+If we use a pointer, the user has to allocate and clear the memory for each generated object. The programmer allocates the memory with the \lstinline|new|\link{https://en.cppreference.com/w/cpp/language/new} keyword
+and deallocates the memory with the the \lstinline|delete|\link{https://en.cppreference.com/w/cpp/language/delete} keyword.
+\end{enumerate}
+\vspace{0.25cm}
+Listing~\ref{code:memory:management} shows some examples for dynamic memory management. In Line~2 the memory for one single integer value is allocated. In Line~5 the memory is deallocated which means the memory at this address is free again. In Line~8 the memory for five integer values is allocated. Note that here we have to add \cpp{[]} to the \cpp{delete} keyword.
+
+\begin{lstlisting}[language=c++,caption={Example for dynamic memory management.
+\label{code:memory:management}},float,floatplacement=tb]
+// Allocate the memory for one single integer value
+int* p = new int(42);
+
+// Deallocate the memory
+delete p;
+
+// Allocate the memory for five integer values
+int* p = new int[5];
+
+// Deallocate the memory
+delete[] p;
+\end{lstlisting}
 \newpage
 \theendnotes
 
