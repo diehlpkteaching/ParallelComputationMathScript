@@ -98,20 +98,20 @@
 %	CHAPTER 1
 %----------------------------------------------------------------------------------------
 
-\include{sections/chapter1}
+%\include{sections/chapter1}
 
 %----------------------------------------------------------------------------------------
 \part{Linear algebra and solvers}
 %----------------------------------------------------------------------------------------
 
-\include{sections/chapter2}
+%\include{sections/chapter2}
 
 %----------------------------------------------------------------------------------------
 \part{Numerical examples}
 \label{part:numerical:examples}
 %----------------------------------------------------------------------------------------
 
-\include{sections/chapter3}
+%\include{sections/chapter3}
 
 %----------------------------------------------------------------------------------------
 \part{Parallel and distributed computing}
@@ -597,15 +597,61 @@ int main(){
 \newpage
 \theendnotes
 
-
+%----------------------------------------------------------------------------------------
 \chapter*{Jupyter notebooks and GitHub classroom}
 \addcontentsline{toc}{chapter}{\textcolor{azure}{Jupyter notebooks and GitHub classroom}}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \section*{Jupyter notebooks}
+%----------------------------------------------------------------------------------------
 
-
+%----------------------------------------------------------------------------------------
 \section*{GitHub classroom}
+%----------------------------------------------------------------------------------------
 
+We use GitHub classroom\link{https://classroom.github.com} to submit the assignments. In this section, we go through the steps to submit the code to GitHub using git\link{https://git-scm.com/}. For a brief overview of the most common git commands, we refer to this cheat sheet\link{https://education.github.com/git-cheat-sheet-education.pdf} and for more details to~\cite{silverman2013git,laster2016professional}. The first step to submit the assignments is to get your GitHub\link{https://github.com/} account. We recommend to use a user name reflecting your name. If you want to use your local computer to submit the assignments, you have to install git on your computer to follow the following instructions. Note that git is installed on the course's web server, so we recommend to submit from there. Open a terminal on the course's web server and type \bash{git config --global user.name Surname Name} to set your Surname and Name, so one can see who submitted the assignment. Optional you can set your e-mail address using \bash{git config --global user.email you@provider.com}. \\
+
+
+If you do not want to enter your password every time to use git, you can generate a ssh key\link{https://www.ssh.com/ssh/key/} as shown in Listing~\ref{git:ssh:key}. We use the command \bash{ssh-keygen} to generate the public and private key. It is common practice that the ssh-key is related to your e-mail address. We save the private key as \texttt{~/.ssh/id-rsa-github} and the public key as \texttt{~/.ssh/id-rsa-github.pub}. To avoid entering the password each time we do a commit to the assignment, we type \bash{ssh-add ~/.ssh/id-rsa-github} to add the key to our key ring. Note that you have to add the content of your public key to GitHub by clicking on Profile -> SSH keys and GPG keys -> New SSH key. \\
+
+\begin{lstlisting}[language=bash,caption={Setting up a ssh key\label{git:ssh:key}},float,floatplacement=tb]
+ssh-keygen -t rsa -C "you@provider.com"
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/diehlpk/.ssh/id-rsa): ~/.ssh/id-rsa-github
+ssh-add ~/.ssh/id-rsa-github
+\end{lstlisting}
+
+
+For each assignment, you will get an e-mail and should click on the link there, see Figure~\ref{fig::github:invitation}, and accept the assignment, see Figure~\ref{fig::github:assignment}. After accepting the assignment you see a link which will be used to submit your assignment. Listing~\ref{git:push} shows how to submit your code to this assignment. Note that you will get a new invitation for each assignment. First, you use \bash{git clone} to clone the repository and after that you change the directory using the command \bash{cd}. For each file, you like to submit you run the command \bash{git add}. Note that you have to do this only once. Using the command \bash{git commit -a} you commit all files and with the command \bash{git push} you send them to the server, so the instructor can see and grade them.
+
+
+\begin{figure}[bt]
+\begin{subfigure}{.75\textwidth}
+  \centering
+\includegraphics[width=\textwidth]{images/2019-05-17-github-assingment}
+\caption{Invitation for the assignment on GitHub.}
+\label{fig::github:invitation}
+\end{subfigure}
+
+\begin{subfigure}{.75\textwidth}
+  \centering
+\includegraphics[width=\textwidth]{images/2019-05-17-github-assingment}
+\caption{Confirmation of the acceptance and the link to submit your assignment.}
+\label{fig::github:assignment}
+\end{subfigure}
+\caption{Accepting assignments on GitHub classroom.}
+\end{figure}
+
+\begin{lstlisting}[language=bash,caption={Setting up a ssh key\label{git:push}},float,floatplacement=tb]
+git clone https://github.com/diehlpkteaching/test-diehlpk.git
+cd test-diehlpk
+touch exercise.cpp
+git add exercise.cpp
+# Work on your exercise
+git commit -a
+git push
+\end{lstlisting}
 
 
 %----------------------------------------------------------------------------------------
