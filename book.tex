@@ -588,14 +588,77 @@ int main(){
 \label{sec:hpx}
 %----------------------------------------------------------------------------------------
 
-\section{Introduction to HPX}
+%----------------------------------------------------------------------------------------
+\chapter{Introduction to HPX}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \section{Parallel algorithms}
+%----------------------------------------------------------------------------------------
 
+%----------------------------------------------------------------------------------------
 \section{Asynchronous programming}
+%----------------------------------------------------------------------------------------
+HPX provides the same features as the C++ language for asynchronous programming, see Chapter~\ref{sec:async:coding} for more details. In this section, we show how to use HPX's function instead of \cpp{std::future} and \cpp{std::async}, since HPX provides more flexibility here. As a disclaimer this is really easy, since we can use the code of the previous example and just replace the name space \cpp{std} with the name space \cpp{hpx}. Listing~\ref{code:hpx:future} shows an example of the example for computing the square number of a asynchronously. In Line~2 the header \cpp{#include <hpx/incldue/lcos.hpp>} is needed to use \cpp{hpx::future} and \cpp{hpx::async}\link{https://stellar-group.github.io/hpx/docs/sphinx/latest/html/examples/fibonacci_local.html?highlight=async}. In Line~12 the function \cpp{square} is called asynchronously using \cpp{hpx::async(square,10)}. Note that the first argument is the name of the function and the second one the function argument. The function call return a \cpp{hpx::future<int>} since the return type of the function is \cpp{int}. To access the result of the function, if the computation has finished the function \cpp{.get()} is used. Note that the only difference here is not to include the header \cpp{#include <future>} and use \cpp{hpx::future} instead of \cpp{std::future} and same for \cpp{hpx:async} instead of \cpp{std::async}. Thus, it is really easy to switch between HPX and C++ for asynchronous programming.
+
+\begin{lstlisting}[language=c++,caption={Asynchronous computation of the square number using HPX.\label{code:hpx:future}},float,floatplacement=tb]
+#include <hpx/hpx_init.hpp>
+#include <hpx/incldue/lcos.hpp>
+#include <iostream>
+
+int square(int a)
+{ 
+    return a*a; 
+}
+
+int main()
+{
+    hpx::future<int> f1 = hpx::async(square,10); 
+    
+    std::cout << f1.get() << std::endl;
+    
+    return EXIT_SUCCESS;
+}
+
+\end{lstlisting}
+
+\begin{exercise}
+Write the program in Listing~\ref{code:async:taylor} using \cpp{hpx::future} and \cpp{hpx::async}.
+\end{exercise}
+
+The benefit of using HPX is that more features for the synchronization of future is provided. In Listing~\ref{code:hpx:future:sync} some of these functionality is shown. In Line~1 a \cpp{std::vector} holding the \cpp{hpx::future<int>} is declared. In Lines~2--3 two futures of the two asynchronous function class are pushed to the vector. In Line~6 the expression \cpp{hpx::when_all} is used to make a barrier which waits until all computations of the asynchronous launched functions are ready. By calling \cpp{.then()} we specify what is done if all futures are ready. To do so, we provide a lambda function, see Section~\ref{sec:lambda:function}, which has a future with the \cpp{std::vector} of futures as its argument. In Line~7 we use the function \cpp{.get()} and this future to get the \cpp{std::vector} of futures. In line~7 and Line~8, we print the results as usual. Following synchronization options\link{https://stellar-group.github.io/hpx/docs/sphinx/latest/html/terminology.html\#term-lco} are available:
+\begin{itemize}
+\item \cpp{hpx::when_all} \\
+It \textit{AND}-composes all the given futures and returns a new future containing all the given futures.
+\item \cpp{hpx::when_any} \\
+It \textit{OR}-composes all the given futures and returns a new future containing all the given futures.
+\item \cpp{hpx::when_each} \\
+It \textit{AND}-composes all the given futures and returns a new future containing all futures being ready.
+\item \cpp{hpx::when_some} \\
+It \textit{AND}-composes all the given futures and returns a new future object representing the same list of futures after n of them finished.
+\end{itemize}
+
+
+
+\begin{lstlisting}[language=c++,caption={Advanced synchronization of futures using HPX.\label{code:hpx:future:sync}},float,floatplacement=tb]
+std::vector<hpx::future<int>> futures;
+
+futures.push_back(hpx::async(square,10);
+futures.push_back(hpx::async(square,100);
+
+hpx::when_all(futures).then([](auto&& f){
+ auto futures = f.get();
+ std::cout << futures[0].get() 
+ 	<< " and " << futures[1].get();
+});
+\end{lstlisting}
 
 \newpage
 \theendnotes
+
+%----------------------------------------------------------------------------------------
+\part{Appendix}
+%----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
 \chapter*{Jupyter notebooks and GitHub classroom}
@@ -627,6 +690,7 @@ For each assignment, you will get an e-mail and should click on the link there, 
 
 
 \begin{figure}[bt]
+\centering
 \begin{subfigure}{.75\textwidth}
   \centering
 \includegraphics[width=\textwidth]{images/2019-05-17-github-assingment}
@@ -652,6 +716,9 @@ git add exercise.cpp
 git commit -a
 git push
 \end{lstlisting}
+
+\newpage
+\theendnotes
 
 
 %----------------------------------------------------------------------------------------
