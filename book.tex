@@ -468,6 +468,9 @@ The implementation of this examples is available on GitHub\link{https://github.c
 %----------------------------------------------------------------------------------------
 \chapter{Asynchronous programming}
 \label{sec:async:coding}
+\index{future}
+\index{async}
+\index{C++!asynchronous programming}
 %----------------------------------------------------------------------------------------
 A different concept for shared memory parallelism is asynchronous programming~\cite{williams2012c++}. Before we look into asynchronous programming, we look again into the concept of serial programming. Figure~\ref{fig:async:dependencygraph} shows the dependency graph for one computation and one can see that we can compute $P$ and $X$ independent and only $H$ depends on both of them. Listing~\ref{code:serial:dependency} shows the serial computation of the dependency graph. Each line of code is executed line by line Each time a function is called the code waits until the function finishes. Thus, we can not compute $P$ and $X$ independently, even if the data is independent. 
 
@@ -594,12 +597,91 @@ int main(){
 
 %----------------------------------------------------------------------------------------
 \section{Parallel algorithms}
+\index{algorithms!parallel}
+\index{parallel algorithms}
+\index{HPX!parallel algorithms}
 %----------------------------------------------------------------------------------------
+In Section~\ref{sec:stl:parallel:algorithms} we looked at the experimental parallel algorithms provided by the C++ STL. HPX provides the parallel algorithms as well and the API is identical and we just need to replace the \cpp{std} name space with \cpp{hpx} name space. Recall the example in Listing~\ref{code:parallel:algorithms} and now we implement the same example using HPX's parallel algorithms. Listing~\ref{code:hpx:parallel:reduce} shows how to compute the sum of the elements in the vector \cpp{values} parallel. Note that solely had to replace \cpp{std::execution::par} by HPX's name space which is a little bit different and reads as \cpp{hpx::parallel::execution::par}. The same for \cpp{std::reduce} and this name space reads as \cpp{hpx::parallel::v1::reduce}\link{https://hpx-docs.stellar-group.org/latest/html/libs/algorithms/api.html?highlight=reduce\#\_CPPv3N3hpx8parallel2v16reduceERR8ExPolicy8FwdIterB8FwdIterE1TRR1F}. Until now the API is equal to the one of the C++ STL. Now, we look into the additional features provided by HPX. First, we look into the additional features for execution policies\index{HPX!execution policies}. In Line~16 we specify a dynamic chunk size \cpp{dynamic_chunk_size} and pass this execution policy to the execution policy using \cpp{.with(scs)}. Following execution parameters are provided:
+\vspace{0.25cm}
+\begin{itemize}
+\item \lstinline|hpx::parallel::execution::static_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=static\_chunk\_size\#\_CPPv3N3hpx8parallel9execution17static\_chunk\_sizeE} \\
+Loop iterations are divided into pieces of a given size and then assigned to threads.
+\item \lstinline|hpx::parallel::execution::auto_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=auto\_chunk\_size\#\_CPPv3N3hpx8parallel9execution15auto\_chunk\_sizeE} \\
+Pieces are determined based on the first 1\% of the total loop iterations. 
+\item \lstinline|hpx::parallel::execution::dynamic_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=dynamic\_chunk\_size\#\_CPPv3N3hpx8parallel9execution18dynamic\_chunk\_sizeE} \\
+Dynamically scheduled among the cores and if one core finished it gets dynamically assigned a new chunk.
+\end{itemize}
+Another possibility is to use machine learning techniques for choosing the chunk size. For more details, we refer to~\cite{shirzad2019scheduling}. Second, in HPX once can obtain a future from a parallel for loop and us it for synchronization. In Line~23 of Listing~\ref{code:hpx:parallel:reduce} shows how to obtain a future with the result of the reduce operation by adding the expression \cpp{hpx::parallel::execution::task} as an argument to the execution policy. Now we can use the parallel for loops and combined them with the future for asynchronous programming. Note that currently these features are only available yet in HPX. Third, HPX provides range-based for loops\link{https://hpx-docs.stellar-group.org/latest/html/manual/writing_single_node_hpx_applications.html?highlight=parallel\_for\_loop} which is neat for iteration over the elements of a vector using the index and not the vector element itself. Listing~\ref{code:hpx:parallel:range:loop} shows how to use a range-based parallel for loop to print the vector's element to the standard output stream.  The second function argument is the first value of the vector, the third one the vector's length, and the fourth argument is a Lambda function, see Section~\ref{sec:lambda:function}. The first argument of the Lambda function is the index of the the vector to be processed in the range of \cpp{0} and \cpp{values.size()}.
 
 
+\begin{lstlisting}[language=c++,caption={Parallel algorithms (reduce) using HPX.\label{code:hpx:parallel:reduce}},float,floatplacement=tb]
+#include <hpx/hpx_init.hpp>
+#include<hpx/include/parallel_reduce.hpp>
+
+int main()
+{
+
+std::vector<double> values = {1,2,3,4,5,6,7,8,9};
+
+// HPX parallel algorithms
+std::cout<< hpx::parallel::v1::reduce(hpx::parallel::execution::par,
+	values.begin(),
+	values.end(),
+	0);
+	
+// HPX parallel algorithms using execution policies
+hpx::parallel::execution::dynamic_chunk_size scs(10);
+std::cout<< hpx::parallel::v1::reduce(hpx::parallel::execution::par.with(cs),
+	values.begin(),
+	values.end(),
+	0);
+	
+// HPX parallel algorithms returning a future
+auto f = hpx::parallel::v1::reduce(
+	hpx::parallel::execution::par(hpx::parallel::execution::task),
+	values.begin(),
+	values.end(),
+	0);
+
+std::cout<< f.get();
+  
+return EXIT_SUCCESS;
+}
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=c++,caption={Parallel range-based for loops using HPX.\label{code:hpx:parallel:range:loop}},float,floatplacement=tb]
+#include <hpx/hpx_init.hpp>
+#include<vector>
+#include<iostream>
+#include<hpx/include/parallel_for_loop.hpp>
+
+int main()
+{
+
+std::vector<double> values = {1,2,3,4,5,6,7,8,9};
+
+hpx::parallel::for_loop(
+	hpx::parallel::execution::par, 
+	0, 
+	values.size();
+	[](boost::uint64_t i)
+		{
+		std::cout<< values[i] << std::endl;
+		}
+	);
+
+  
+return EXIT_SUCCESS;
+}
+
+\end{lstlisting}
 
 %----------------------------------------------------------------------------------------
 \section{Asynchronous programming}
+\index{future}
+\index{async}
+\index{HPX!asynchronous programming}
 %----------------------------------------------------------------------------------------
 HPX provides the same features as the C++ language for asynchronous programming, see Chapter~\ref{sec:async:coding} for more details. In this section, we show how to use HPX's function instead of \cpp{std::future} and \cpp{std::async}, since HPX provides more flexibility here. As a disclaimer this is really easy, since we can use the code of the previous example and just replace the name space \cpp{std} with the name space \cpp{hpx}. Listing~\ref{code:hpx:future} shows an example of the example for computing the square number of a asynchronously. In Line~2 the header \cpp{#include <hpx/incldue/lcos.hpp>} is needed to use \cpp{hpx::future} and \cpp{hpx::async}\link{https://stellar-group.github.io/hpx/docs/sphinx/latest/html/examples/fibonacci_local.html?highlight=async}. In Line~12 the function \cpp{square} is called asynchronously using \cpp{hpx::async(square,10)}. Note that the first argument is the name of the function and the second one the function argument. The function call return a \cpp{hpx::future<int>} since the return type of the function is \cpp{int}. To access the result of the function, if the computation has finished the function \cpp{.get()} is used. Note that the only difference here is not to include the header \cpp{#include <future>} and use \cpp{hpx::future} instead of \cpp{std::future} and same for \cpp{hpx:async} instead of \cpp{std::async}. Thus, it is really easy to switch between HPX and C++ for asynchronous programming.
 
@@ -743,6 +825,12 @@ git push
 \section*{Books}
 \addcontentsline{toc}{section}{Books}
 \printbibliography[heading=bibempty,type=book]
+
+%------------------------------------------------
+
+\section*{In proceedings}
+\addcontentsline{toc}{section}{In proceedings}
+\printbibliography[heading=bibempty,type=inproceedings]
 
 
 
