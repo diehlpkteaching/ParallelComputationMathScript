@@ -495,8 +495,7 @@ With $K$ is the bulk modulus and $K_Ic$ is the critical stress intensity factor.
 \caption[Sketch of the pair-wise linear valued force function $f$ with the stiffness constant $c$ as slope and the critical bond stretch $s_c$.]{Sketch of the pair-wise linear valued force function $f$ with the stiffness constant \textcolor{azure}{$c$} as slope and the critical bond stretch \textcolor{azure}{$s_c$}.}
 \label{fig::force::sketch::critical}
 \end{subfigure}
-\caption{}
-% This example was adapted from https://tex.stackexchange.com/questions/244488/monte-carlo-method-drawing
+\caption{Linear elastic pair-wise force~(\subref{fig::force::sketch}) and the pair-wise force function with the notation of damage~(\subref{fig::force::sketch::critical})}. 
 \end{figure}
 
 %----------------------------------------------------------------------------------------
@@ -560,9 +559,217 @@ to compute the actual displacement $x(t,X):= x(t-1,X) + u(t,X)$. Note that for t
 \section{Algorithm}
 %----------------------------------------------------------------------------------------
 
+
+
 %----------------------------------------------------------------------------------------
 \chapter{One-dimensional heat equation}
 %----------------------------------------------------------------------------------------
+For the example for distributed computing, we look into the one-dimensional heat equation. The heat equation reads as
+\begin{align}
+\frac{\partial u}{\partial t} = \alpha \left( \frac{\partial^2 u }{\partial x^2} + \frac{\partial^2 u}{\partial y^2} + \frac{\partial^2 u}{\partial z^2} \right)
+\label{eq:heat:full}
+\end{align}
+where $\alpha$ is the diffusivity of the material. The heat equation computes the flow of heat in a homogeneous and isotropic medium. For more details about the mathematics and physics of the heat equation, we refer to~\cite{cannon1984one}. For the distributed computing example, we look into the easiest case which is the one-dimensional heat equation. We assume a one-dimensional bar of length $L$ and Eqiation~\ref{eq:heat:full} reads as
+\begin{align}
+\frac{\partial u}{\partial t} = \alpha \frac{\partial^2 u}{\partial x^2}, \quad 0 \leq x \leq L, t >0.
+\label{eq:heat:discrete}
+\end{align}
+To solve this one-dimensional heat equation, boundary conditions are required
+\vspace{0.25cm}
+\begin{itemize}
+\item $u(0,t) = u_0$ 
+\item $u(L,t) = u_L$
+\item $u(x,0) = f_0(x)$.
+\end{itemize}
+\vspace{0.25cm}
+First, a value at the beginning of the bar and at the end of the bar are given which are constant over time. For all other positions within the bar we apply an arbitrary value at time $t$ equal zero. However, to solve the heat equation from the numerical perspective, we have to discretize the equation in space and time. For the discretization in space a so-called discrete mesh 
+\begin{align*}
+x_i = (i-1) h, \quad i=1,2,\ldots,N
+\end{align*}
+where $N$ is the total number of nodes and h is given by $h=\sfrac{L}{N-1}$, see Figure~\ref{fig:heat:discrete:mesh}. The next step is to the discretization in time. Therefore, the approximation of the the second derivative $\sfrac{\partial^2 u}{\partial x^2}$ in Equation~\ref{eq:heat:discrete} using a central difference scheme. The first derivation reads as
+\begin{align*}
+\frac{\partial u}{\partial x} \approx \frac{u_{i+1}-u_{i}}{2h}
+\end{align*}
+and the second derivation reads as
+\begin{align*}
+\frac{\partial u}{\partial x^2} \approx \frac{u_{i-1}-2u_{i}+u_{i+1}}{2h}\text{.}
+\end{align*}
+Meaning we can approximate the second derivation at position $x_i$ using the left neighbor $x_{i-1}$ and the right neighbor $x_{i+1}$. Note that we do not have the left neighbor at $x_0$ and the right neighbor at $x_L$. Here, some special treatment is needed to compute the approximation of the derivation. To avoid this special treatment, we assume that we have a ring instead of a bar in our example. For more details about the finite difference method, we refer to~\cite{strikwerda2004finite,leveque2007finite}.
+\begin{figure}[tb]
+\center
+\begin{tikzpicture}
+\draw(0,0) -- (6,0) -- (6,0.5) -- (0,0.5) -- cycle;
+\node[below] at (0,0) {$0$};
+\node[below] at (6,0) {$L$};
+\foreach \i in {1,...,5}{
+	\draw (\i,0) --(\i,0.5);	
+}
+\foreach \i in {1,...,6}{
+	\node at (-0.5+\i,0.25) {$x_\i$};	
+}
+\draw (0,0.5) -- (0,0.75);
+\draw (1,0.5) -- (1,0.75);
+\draw[<->] (0,0.7) -- (1,0.7);
+\node[above] at (0.5,0.75) {$h$};
+\end{tikzpicture}
+\caption{Discretization in space using a so--called discrete mesh for the one-dimensional heat equation.}
+\label{fig:heat:discrete:mesh}
+\end{figure}
+Now, we combine the discretiztion on time and space, see Figure~\ref{fig:heat:time:space}, to compute the heat transfer for the next time step. At time $t=0$ we have applied the boundary conditions on the \textcolor{azure}{blue} squares. At time $t_i$ we compute the new value for the node $x_4$ at time $t_{i+1}$ using its neighbors's values at time $t_i$ using the central difference scheme. 
+
+\begin{figure}[tb]
+\center
+\begin{tikzpicture}
+
+\foreach \j in {1,...,5}{
+\foreach \i in {1,...,6}{
+	\node at (\i,\j) {\pgfuseplotmark{square*}};
+}
+}
+\foreach \i in {1,...,6}{
+	\node[color=azure] at (\i,0) {\pgfuseplotmark{square*}};
+}
+\foreach \i in {1,...,6}{
+	\node[below] at (\i,-0.1) {$x_\i$};	
+}
+
+\draw[thick,->] (-1,0) -- (-.5,0);
+\draw[thick,->] (-1,0) -- (-1,0.5);
+\node[right] at (-0.5,0) {$x$};
+\node[above] at (-1,0.5) {$t$};
+
+\node[left] at (0.75,2) {$t_{i-1}$};
+\node[left] at (0.75,3) {$t_{i}$};
+\node[left] at (0.75,4) {$t_{i+1}$};
+
+\node[below] at (1,-0.75) {$0$};
+\node[below] at (6,-0.75) {$L$};
+
+\draw (4,4) -- (4,3);
+\draw (4,4) -- (3,3);
+\draw (4,4) -- (5,3);
+\end{tikzpicture}
+\caption{Scheme for the discretization in space and time. At time $t=0$ the boundary conditions are applied at the \textcolor{azure}{squares}. We use the central difference scheme to compute the new values at time $t_{i+1}$ using the values from the previous time step. The central difference scheme is shown for the discrete mesh node $x_4$.}
+\label{fig:heat:time:space}
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+\section{Serial implementation details}
+%----------------------------------------------------------------------------------------
+First, a function \cpp{heat} which implements the central difference scheme in Equation~\ref{eq:heat:discrete}, see Lines~10--13 in Listing~\ref{code:heat:central:difference}. Note that for simplicity we renamed $\alpha$ to $k$. We use the keyword \cpp{static} in front of the \cpp{return} type \cpp{double}. We will discuss later why we need to use the \cpp{static} keyword. The next step is to look into the data structure (partition) to store the heat values. For the serial implementation the partition is defined as \cpp{typedef double partition;} since we store one \cpp{double} value per discrete mesh node. For storing all heat values per discrete mesh node a \cpp{typedef std::vector<partition> space;} is declared. For the central difference scheme we need the heat values from the previous time step to compute the heat values for the current time step. So we need to have to \cpp{space} objects for both time steps, see Line~19 in Listing~\ref{code:heat:central:difference}. In Line~20--12 the size of the vector is set to the number of discrete mesh nodes $nx$. Since we have a nested vector \cpp{U[t][i]} the first index is the time step $t$ and the second one the index \cpp{i}. Thus to set the boundary conditions in Line~24--25 the first argument is zero for $t=0$ and we iterate over all discrete mesh nodes. \\
+
+Since we have the initial setup, we can iterate over the time steps using the \cpp{for} loop in Line~28. Something tricky happens in Line~30--31 to swap the \cpp{space} for the current time step and the previous time step. Figure~\ref{fig:heat:swap} shows how to swap the \cpp{space} for each time step. For the initial time $t=0$ the space \cpp{U[0]} holds the current heat values and the space \cpp{U[1]} holds the heat values for the next time step $t=1$. To compute the heat values for the time step $t=2$ the space \cpp{U[0]} is reused to store the next heat values. For swapping the spaces, we use \cpp{t \% 2} to get the current space and \cpp{(t+1) \% 2} to get the space for the new heat values. Since we assume a ring, the computation of the first and last elements need a special treatment and all other points are computed the same. The complete source code for the serial example is available here\link{https://github.com/STEllAR-GROUP/hpx/blob/master/examples/1d_stencil/1d_stencil_1.cpp}. Choosing following boundary conditions 
+\begin{align*}
+u(x,0) = f(i,0), \text{ with } f(0,i)=i \text{ for } i=1,2,\ldots,N
+\end{align*}
+and a heat transfer coefficient $k$ = 0.5, time step size $dt$ = 1., grid spacing $h$ = 1., and time steps $nt$ = 45 results in the initial conditions, See Figure~\ref{fig::heat::initial}, and the solution, see Figure~\ref{fig::heat:solution}.
+
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}
+
+\foreach \i in {1,...,9}{
+	\node[color=black] at (\i,1.5) {\pgfuseplotmark{square*}};
+}
+
+\foreach \i in {1,...,9}{
+	\node[color=black] at (\i,0.75) {\pgfuseplotmark{square*}};
+}
+
+
+\foreach \i in {1,...,9}{
+	\node[color=black] at (\i,0) {\pgfuseplotmark{square*}};
+}
+\foreach \i in {1,...,9}{
+	\node[below] at (\i,-0.1) {$x_\i$};	
+}
+
+\node[left] at  (0.5,0) {U[0]};
+\node[left] at  (0.5,0.75) {U[1]};
+\node[left] at  (0.5,1.5) {U[0]};
+
+\node[right] at  (9.5,0) {t=0};
+\node[right] at  (9.5,0.75) {t=1};
+\node[right] at  (9.5,1.5) {t=2};
+
+\draw (3,0) -- (4,0.75);
+\draw (4,0) -- (4,0.75);
+\draw (5,0) -- (4,0.75);
+
+\draw (3,0.75) -- (4,1.5);
+\draw (4,0.75) -- (4,1.5);
+\draw (5,0.75) -- (4,1.5);
+\end{tikzpicture}
+\caption{Sketch for swapping the partition to reuse the partition vectors to compute the new time step.}
+\label{fig:heat:swap}
+\end{figure}
+
+
+\begin{figure}[bt]
+\begin{subfigure}{.45\textwidth}
+\centering
+\includegraphics[width=\linewidth]{./images/initial_conditons.pdf}
+\caption{Discrete nodes colored with their initial heat value prescribed by the boundary conditions.}
+\label{fig::heat::initial}
+\end{subfigure}
+\hfill
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{./images/solution.pdf}
+\caption{Discrete nodes colored with final heat value at the final time $t=45$. }
+\label{fig::heat:solution}
+\end{subfigure}
+\caption{The initial heat values prescribed by the boundary conditions~(\subref{fig::heat::initial}) and the final solution after 45 time steps~(\subref{fig::heat:solution}).}
+\end{figure}
+
+
+\begin{lstlisting}[language=c++,caption={Serial implementation of the one-dimensional heat equation \label{code:heat:central:difference}},float,floatplacement=tb]
+struct stepper
+{
+    // Our partition type
+    typedef double partition;
+
+    // Our data for one time step
+    typedef std::vector<partition> space;
+
+    // Our operator
+    static double heat(double left, double middle, double right)
+    {
+        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
+    }
+
+    // do all the work on 'nx' data points for 'nt' time steps
+    space do_work(std::size_t nx, std::size_t nt)
+    {
+        // U[t][i] is the state of position i at time t.
+        std::vector<space> U(2);
+        for (space& s : U)
+            s.resize(nx);
+
+        // Initial conditions: f(0, i) = i
+        for (std::size_t i = 0; i != nx; ++i)
+            U[0][i] = double(i);
+
+        // Actual time step loop
+        for (std::size_t t = 0; t != nt; ++t)
+        {
+            space const& current = U[t % 2];
+            space& next = U[(t + 1) % 2];
+
+            next[0] = heat(current[nx-1], current[0], current[1]);
+
+            for (std::size_t i = 1; i != nx-1; ++i)
+                next[i] = heat(current[i-1], current[i], current[i+1]);
+
+            next[nx-1] = heat(current[nx-2], current[nx-1], current[0]);
+        }
+
+        // Return the solution at time-step 'nt'.
+        return U[nt % 2];
+    }
+};
+\end{lstlisting} 
+
 
 
 
