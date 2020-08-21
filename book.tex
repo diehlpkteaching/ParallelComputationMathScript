@@ -816,8 +816,9 @@ The first feature is the keyword \cpp{hpx::make_ready_future}\link{https://hpx-d
 
 Second, since we use futures for the \cpp{partition}, but the function to evaluate the central difference \cpp{heat(double left, double middle, double right)} takes \cpp{double} values as arguments. We either have to change the function to take futures as its arguments and call the \cpp{.get()} function inside. To avoid these two things, HPX provides the so-called unwrapping of a function with the keyword \cpp{hpx::util::unwrapping}\index{HPX!unwrapping}. In Line~24 of Listing~\ref{code:hpx:future:ready} the function \cpp{heat} is unwrapped and the function \cpp{Op} takes futures as its arguments. So In Line~37 of the \cpp{hpx::launch::async} we can pass the \cpp{current} elements which are of the type \cpp{hpx::shared_future<double>} to a function which assumes \cpp{double values}.\\
 
-Third, HPX has the keyword \cpp{hpx::dataflow}\index{HPX!dataflow} to use unwrapping for the combination of \cpp{hpx::when_all} and \cpp{.then}. Imagine you have a vector \cpp{std::vector<hpx::lcos::future<int>> futures;} and pass it to \cpp{hpx::when_all(futures).then([](auto&& f)\{\});} the vector \cpp{futures} will be wrapped in the future \cpp{auto&& f}. SO if we want to access the elements of the vector we have to call \cpp{f.get()}. An easier approach is to use \cpp{hpx::dataflow} as it is done in Line~36 in Listing~\ref{code:hpx:future:ready}. The first argument is \cpp{hpx::launch::async} to launch asynchronous and a future is returned. Another possibility is to use \cpp{hpx::launch::sync} to launch synchronous. The second argument is the unwrapped function of the \cpp{heat} function, see Line~24. The last three remaining arguments are the futures with the values for the central difference scheme evaluation. Before we can return the current solution, we have to call \cpp{hpx::when_all} to synchronous all futures of the current solution.
+Third, HPX has the keyword \cpp{hpx::dataflow}\index{HPX!dataflow} to use unwrapping for the combination of \cpp{hpx::when_all} and \cpp{.then}. Imagine you have a vector \cpp{std::vector<hpx::lcos::future<int>> futures;} and pass it to \cpp{hpx::when_all(futures).then([](auto&& f)\{\});} the vector \cpp{futures} will be wrapped in the future \cpp{auto&& f}. SO if we want to access the elements of the vector we have to call \cpp{f.get()}. An easier approach is to use \cpp{hpx::dataflow} as it is done in Line~36 in Listing~\ref{code:hpx:future:ready}. The first argument is \cpp{hpx::launch::async} to launch asynchronous and a future is returned. Another possibility is to use \cpp{hpx::launch::sync} to launch synchronous. The second argument is the unwrapped function of the \cpp{heat} function, see Line~24. The last three remaining arguments are the futures with the values for the central difference scheme evaluation. Before we can return the current solution, we have to call \cpp{hpx::when_all} to synchronous all futures of the current solution.\\
 
+Figure~\ref{fig::stencil:benchmark:1} shows the execution time of the serial vs the asynchronous implementation for 1 CPU. We clearly see that the execution time even for one CPU is lower. Figure~\ref{fig::stencil:benchmark:2} shows the execution time for various amount of CPUs for the asynchronous implementation. Here, we can see that for enough grid points the we get some benefit for adding more CPUs which means we have to have enough work to keep the CPUs busy. To obtain better results, we have to extend the code to control its granularity.
 
 \begin{lstlisting}[language=c++,caption={Futurized version of the one-dimensional heat equation.\label{code:hpx:future:ready}},float,floatplacement=tb]
 struct stepper
@@ -867,6 +868,43 @@ struct stepper
     }
 };
 \end{lstlisting}
+
+
+\begin{figure}[btp]
+\centering
+\begin{subfigure}{.4\textwidth}
+\begin{tikzpicture}
+\selectcolormodel{gray}
+\begin{axis}[xlabel=Grid points,ylabel=Execution time, grid=both,title=1 CPU]
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_serial.dat};
+\addlegendentry{Serial}
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_1.dat};
+\addlegendentry{Futurization}
+\end{axis} 
+\end{tikzpicture}
+\caption{Serial vs asynchronous execution}
+\label{fig::stencil:benchmark:1}
+\end{subfigure}
+
+\begin{subfigure}{.4\textwidth}
+\begin{tikzpicture}
+\selectcolormodel{gray}
+\begin{axis}[xlabel=Grid points,ylabel=Execution time, grid=both,title= Stencil 2,legend pos=north west]
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_1.dat};
+\addlegendentry{1 CPU}
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_2.dat};
+\addlegendentry{2 CPU}
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_4.dat};
+\addlegendentry{4 CPU}
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_6.dat};
+\addlegendentry{6 CPU}
+\end{axis}
+\end{tikzpicture}
+\caption{Execution time for various number of CPUs for the asynchronous implementation}
+\label{fig::stencil:benchmark:2}
+\end{subfigure}
+\caption{Comparison of the serial vs asynchronous execution~(\subref{fig::stencil:benchmark:1}) and speed-up for various amount of CPUs~(\subref{fig::stencil:benchmark:2}).}
+\end{figure}
 
 \newpage
 \theendnotes
