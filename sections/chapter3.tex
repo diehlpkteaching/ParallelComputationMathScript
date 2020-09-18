@@ -770,7 +770,147 @@ struct stepper
 };
 \end{lstlisting} 
 
+%----------------------------------------------------------------------------------------
+\subsection{Adding grain size control}
+%----------------------------------------------------------------------------------------
+In Figure~\ref{fig:hpx:stencil:scaling1} we have seen that we got some speedup with the asynchronous implementation discussed in Section~\ref{sec:hpx:advanced:sync}. However, in same cases the granularity (the amount of work) for each core was too small, since we always used one grid point wrapped in a future. Now, we want to extend the code to use partitions of grid nodes, see Figure~\ref{}. In this example we have a grid with nine nodes and we split them into three partitions, which means that each core has to compute the new values for three elements instead of for one element. The first, thing we need to do is to update the \cpp{struct participation}, see Listing~\ref{code:heat:garain:size}. In Line~4 a \cpp{std::vector<double>} is added to store the partition. In Line~8 a constructor is added to initialize the vector \cpp{data_(size)} with the provided \cpp{size_t size}. In Line~12 a second constructor is added to fill the partition with the initial values and the boundary values. Since the partition vector is declared as \cpp{private}, we use operator overloading in Line~21 and Line~25 to access the elements of the partition. For more details about operation overloading, see Section~\ref{sec:operator:overloading}. In Line~29 a function to obtain the partition size is added. \\
 
+For the swapping scheme between the time steps for the computation of the temperature, see Figure~\ref{fig:heat:swap}, some small notification is applied as well. Figure~\ref{heat:swapping:partition} shows the principle of the swapping scheme using partitions. The fundamental principle is the same and we have the two space \cpp{U} to swap between the current time step and the future time step. However, with introducing the partitions, we have the two spaces per partition. These modifications are shown in Listing~\ref{code:heat:grain:size:stepper}. In Line~4 the \cpp{partition} is now of the type \cpp{partition_data}, see Listing~\ref{code:heat:garain:size}. In Line~10, each of the space vectors's size is set to the amount of partitions \cpp{np}. In Line~14, we access the space vector \cpp{U[0]} for the first time step and with \cpp{U[0][i]} each partition is accessed. We call the constructor for each partition and assign the initial values and boundary conditions. The full code is available on GitHub\link{https://github.com/STEllAR-GROUP/hpx/blob/master/examples/1d_stencil/1d_stencil_3.cpp}.
+
+
+\begin{figure}[tp]
+\centering
+\begin{tikzpicture}
+
+\foreach \i in {1,...,9}{
+	\node at (\i,0) {\pgfuseplotmark{square*}};
+}
+\foreach \i in {1,...,9}{
+	\node[below] at (\i,-0.1) {$x_\i$};	
+}
+
+\draw (1,-.6) -- (1,-1);
+\draw (3.5,-.6) -- (3.5,-1);
+\draw (6.5,-.6) -- (6.5,-1);
+\draw (9,-.6) -- (9,-1);
+\node[below] at (2.5,-1) {$n_1$};	
+\node[below] at (5,-1) {$n_2$};	
+\node[below] at (8,-1) {$n_3$};	
+\end{tikzpicture}
+\caption{Splitting the one-dimensional grid with nine grid nodes $(x_1,\ldots,x_9)$ into three partitions $(n_1,n_2,n3)$ to control the grain size.}
+\end{figure}
+
+
+
+\begin{lstlisting}[language=c++,caption={Serial implementation of the one-dimensional heat equation with grain size control. \label{code:heat:garain:size}},float,floatplacement=tbp]
+struct partition_data
+{
+
+
+private:
+    std::vector<double> data_;
+
+public:
+
+// Constructor
+partition_data(std::size_t size = 0)
+      : data_(size)
+    {}
+
+partition_data(std::size_t size, double int_value)
+      : data_(size)
+    {
+        double base_value = 
+              double(int_value * size);
+        for (std::size_t i = 0; i != size; ++i)
+            data_[i] = base_value + double(i);
+    }
+
+//Operator overloading 
+double& operator[](std::size_t idx) { 
+     return data_[idx]; 
+  }
+    
+double operator[](std::size_t idx) const { 
+       return data_[idx]; 
+    }
+
+// Util
+std::size_t size() const { 
+       return data_.size(); 
+    }
+};
+\end{lstlisting}
+
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}
+
+\foreach \j in {0,...,1}{
+
+
+\foreach \i in {1,...,4}{
+	\node at (\j*5+\i,1.5) {\pgfuseplotmark{square*}};
+}
+
+\foreach \i in {1,...,4}{
+	\node at (\j*5+\i,0.75) {\pgfuseplotmark{square*}};
+}
+
+
+\foreach \i in {1,...,4}{
+	\node at (\j*5+\i,0) {\pgfuseplotmark{square*}};
+}
+\foreach \i in {1,...,4}{
+	\node[below] at (\j*5+\i,-0.1) {$x_\i$};	
+}
+
+\node[left] at  (\j*5+0.5,0) {\small U[0][\j]};
+\node[left] at  (\j*5+0.5,0.75) {\small U[1][\j]};
+\node[left] at  (\j*5+0.5,1.5) {\small U[0][\j]};
+
+\draw (\j*5+2,0) -- (\j*5+3,0.75);
+\draw (\j*5+3,0) -- (\j*5+3,0.75);
+\draw (\j*5+4,0) -- (\j*5+3,0.75);
+
+\draw (\j*5+2,0.75) -- (\j*5+3,1.5);
+\draw (\j*5+3,0.75) -- (\j*5+3,1.5);
+\draw (\j*5+4,0.75) -- (\j*5+3,1.5);
+
+} 
+
+\node[right] at  (9.5,0) {t=1};
+\node[right] at  (9.5,0.75) {t=2};
+\node[right] at  (9.5,1.5) {t=3};
+
+\end{tikzpicture}
+\caption{Swapping between the partitions using the two spaces \cpp{U}. Note that each partition $n$ has his dedicated spaces, however, the fundamental principle stays the same.}
+\label{heat:swapping:partition}
+\end{figure}
+
+
+
+\begin{lstlisting}[language=c++,caption={Serial implementation of the one-dimensional heat equation with grain size control. \label{code:heat:grain:size:stepper}},float,floatplacement=tbp]
+class stepper
+{
+    // Our data for one time step
+    typedef partition_data partition;
+    typedef std::vector<partition> space;
+    
+    std::vector<space> U(2);
+    for (space& s: U)
+        // np is the number of partitions
+        s.resize(np);
+        
+    // Initial conditions: f(0, i) = i
+    for (std::size_t i = 0; i != np; ++i)
+        U[0][i] = partition_data(nx, double(i));
+        
+    // Return the solution at time-step 'nt'.
+    return U[nt % 2];
+    
+}
+\end{lstlisting}
 
 
 \newpage
