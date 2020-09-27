@@ -500,7 +500,7 @@ auto H = compute(P,X);
 \end{minipage}
 \vspace{0.25cm}
 
-To executed lines asynchronously the C++ language provides the \cpp{std::async}\link{https://en.cppreference.com/w/cpp/thread/async}\index{async}\index{C++!async} expression provided by the \cpp{#include <future>}. Listing~\ref{code:serial:dependency} shows the asynchronous implementation of the dependency graph in Figure~\ref{fig:async:dependencygraph}. Line~2 shows the usage of \cpp{std::async} for the function \cpp{compute}. The first argument is the name of the function or a lambda expression, see Section~\ref{sec:lambda:function}. Because we used \cpp{std::async} this line of code is executed in the background on a different thread and the next line of code is executed, even if the result of the computation is not ready yet. Therefore, \cpp{std::async} return a \cpp{std::future<int>}\link{https://en.cppreference.com/w/cpp/thread/future}\index{future}\index{C++!future} object provided by the \cpp{#include <future>} header which is a template and contains the return type of the function which is in this example the \cpp{int} data type. In Line~4, the computation of $X$ is started on another thread. Such that both computations happens at the same time. In Line~7--9 the results of the asynchronous function call are gathered, since these are needed to compute $H$. With the \cpp{.get()} function a barrier is introduced and the line of codes waits until the computation is ready. In our case, we can wait since we need the two results to compute the last one. Meaning that Line~8 is only executed if the computation in Line~2 has finished. Following synchronization features are available:
+To executed lines asynchronously the C++ language provides the \cpp{std::async}\link{https://en.cppreference.com/w/cpp/thread/async}\index{async}\index{C++!async} expression provided by the \cpp{#include <future>}. Listing~\ref{code:async:dependency} shows the asynchronous implementation of the dependency graph in Figure~\ref{fig:async:dependencygraph}. Line~2 shows the usage of \cpp{std::async} for the function \cpp{compute}. The first argument is the name of the function or a lambda expression, see Section~\ref{sec:lambda:function}. Because we used \cpp{std::async} this line of code is executed in the background on a different thread and the next line of code is executed, even if the result of the computation is not ready yet. Therefore, \cpp{std::async} return a \cpp{std::future<int>}\link{https://en.cppreference.com/w/cpp/thread/future}\index{future}\index{C++!future} object provided by the \cpp{#include <future>} header which is a template and contains the return type of the function which is in this example the \cpp{int} data type. In Line~4, the computation of $X$ is started on another thread. Such that both computations happens at the same time. In Line~7--9 the results of the asynchronous function call are gathered, since these are needed to compute $H$. With the \cpp{.get()} function a barrier is introduced and the line of codes waits until the computation is ready. In our case, we can wait since we need the two results to compute the last one. Meaning that Line~8 is only executed if the computation in Line~2 has finished. Following synchronization features are available:
 \begin{itemize}
 \item \lstinline|.get()| returns the result of the functions and wait until the computation finished
 \item \lstinline|.wait()|\link{https://en.cppreference.com/w/cpp/thread/future/wait} waits until the computation finished
@@ -508,7 +508,7 @@ To executed lines asynchronously the C++ language provides the \cpp{std::async}\
 \item \lstinline|.wait_until(std::chrono::seconds(1))|\link{https://en.cppreference.com/w/cpp/thread/future/wait_until} waits for a result to become available. It blocks until specified timeout time has been reached or the result becomes available, whichever comes first. 
 \end{itemize}
 
-\begin{lstlisting}[language=c++,caption={Asynchronous execution of the dependency graph.\label{code:serial:dependency}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Asynchronous execution of the dependency graph.\label{code:async:dependency}},float,floatplacement=tb]
 // Compute P
 std::future<int> f1 = std::async(compute);
 // Compute X
@@ -537,7 +537,7 @@ One approach to parallize the above function using two threads is:
 \end{enumerate}
 To distribute $n$ into slices, we need to write the sum in Equation~\eqref{eq:sin:taylor} as
 \begin{align}
-\sum\limits_{n=begin}^end (-1)^{n-1} \frac{x^{2n}}{(2n)!} \text{.}
+\sum\limits_{n=begin}^{end} (-1)^{n-1} \frac{x^{2n}}{(2n)!} \text{.}
 \end{align}
 Listing~\ref{code:async:taylor} shows how to implement the function to splice the computation of the Taylor series, see Line~5--14. In Line~18--19 the two splices $\sfrac{n}{2}$ are launched from $0$ up to $49$ on the first thread and from $50$ up to $99$ on the second thread. In Line~22 the result is gathered and finally the accumulated result is evaluated. For more details, we refer to following talk\link{https://www.youtube.com/watch?v=js-e8xAMd1s}.
 
