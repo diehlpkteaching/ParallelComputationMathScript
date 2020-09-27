@@ -280,7 +280,7 @@ Figure~\ref{fig:nbody:algorithm} shows the three steps for the $N$-body simulati
 \draw (-3.75,-4) rectangle (2,-3) node[pos=.5] {Collect statiscal information};
 \draw[->] (2,-3.5) -- (3,-3.5) -- (3,0.5) -- (2,0.5);
 \end{tikzpicture}
-\caption{The three steps of the algorithm for the $N$-body simulation. First, the forces for all objects are computed using Equation~\ref{eq:nbody:motion}. Second, the updated positions are computed using Equation~\ref{eq:position:update} and Equation~\ref{eq:position:update}. Third, the statistical information is evaluated.  }
+\caption{The three steps of the algorithm for the $N$-body simulation. First, the forces for all objects are computed using Equation~\ref{eq:nbody:motion}. Second, the updated positions are computed using Equation~\ref{eq:position:update} and Equation~\ref{eq:position:update2}. Third, the statistical information is evaluated.  }
 \label{fig:nbody:algorithm}
 \end{figure}
 
@@ -317,7 +317,7 @@ from Equation~\ref{eq:law:first} we get $\mathbf{a}_i=\sfrac{\mathbf{F}_i}{m_i}$
 \end{align}
 using Equation~\eqref{eq:acc} and the fact that the finite difference approximation of the acceleration is equal to $\sfrac{\mathbf{F}_i}{m_i}$. Finally, the updated position is computed as
 \begin{align}
-\mathbf{r}_i(t_{k+1}) = \mathbf{r}_{t_k} + \Delta t \mathbf{v}_i(t_k)  \label{eq:position:update}
+\mathbf{r}_i(t_{k+1}) = \mathbf{r}_{t_k} + \Delta t \mathbf{v}_i(t_k)  \label{eq:position:update2}
 \end{align} 
 using Equation~\eqref{eq:vel}. Note that we used easy methods to update the positions and more sophisticated methods, \emph{e.g.}\ Crank--Nicolson method~\cite{crank1947practical}, are available
 
