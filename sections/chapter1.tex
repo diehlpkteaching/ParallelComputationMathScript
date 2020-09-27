@@ -742,6 +742,33 @@ int* p = new int[5];
 // Deallocate the memory
 delete[] p;
 \end{lstlisting}
+
+
+%----------------------------------------------------------------------------------------
+\section{Moving data}
+%----------------------------------------------------------------------------------------
+In some cases, if we pass a value to some function, we like to avoid to copy the data and instead we like to \cpp{std::move}\link{https://en.cppreference.com/w/cpp/utility/move} the data. Let us look into the example in Listing~\ref{code:move} to explain what we mean by moving a value. In Line~4 we add the string \cpp{hello} to the vector using the \cpp{push_back} method. However, by passing the string \cpp{hello} a copy of the string is passed to the function. Depending on the object size, the copying takes some time. However, if we print the content of the string \cpp{hello} by using the copy, the value of the string will be \cpp{"Hello"}. If, we want to avoid the copying, one can use the \cpp{std::move} function in Line~9. However, if we print the content of the sting \cpp{hello}, the empty string will be printed. This happens since we moved the data (in that case the content \cpp{"Hello"}) to the \cpp{std::vector<std::string>}. So, if we print the content of \cpp{v[i]}, we will see again the content \cpp{"Hello"} again, since we moved the content. Note that you have to be aware of undefined states after moving. For example \cpp{v.clear()} is a valid state since there is no precondition. However, \cpp{v.back()} could result in a undefined behavior, since the size of the string is zero.
+
+
+\begin{lstlisting}[language=c++,caption={Example for the usage of \cpp{std::move} to move data.
+\label{code:move}},float,floatplacement=tb]
+std::string hello = "Hello";
+std::vector<std::string>v;
+
+// Add the string hello to the end of the vector
+v.push_back(hello);
+std::cout << "After copying the string, its content is: " << hello << std::endl;
+
+//Move the data and avoid the copying
+v.push_back(std::move(hello));
+std::cout << "After moving the string, its content is: " << hello << std::endl;
+
+//Printing the moved content
+std::cout << "After moving the string, its content is: " << v[1] << std::endl;
+
+\end{lstlisting}
+
+
 \newpage
 \theendnotes
 

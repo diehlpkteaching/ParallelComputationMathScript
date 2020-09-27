@@ -385,6 +385,7 @@ The first memory access scheme is uniform memory access (UMA), see Figure~ref{fi
 
 %----------------------------------------------------------------------------------------
 \section{Caution: Data races and dead locks}
+\label{sec:deadlocks}
 %----------------------------------------------------------------------------------------
 Remember with great power comes great responsibility! Meaning with shared memory parallelism you add an additional source of error to your code. When using parallel execution policy, it is the programmer's responsibility to avoid
 \begin{itemize}
@@ -907,6 +908,32 @@ struct stepper
 \caption{Comparison of the serial vs asynchronous execution~(\subref{fig::stencil:benchmark:1}) and speed-up for various amount of CPUs~(\subref{fig::stencil:benchmark:2}).}
 \label{fig:hpx:stencil:scaling1}
 \end{figure}
+
+%----------------------------------------------------------------------------------------
+\section{Semaphores}
+\index{semaphores}
+%----------------------------------------------------------------------------------------
+In Section~\ref{sec:deadlocks} the \cpp{std::mutex}, which is tied to one thread and only one thread can lock or unlock the mutex. Now the look into a semaphore and here any thread can access the ownership on a semaphore. Note that the C++ standard does not define semaphores and they are only available suing HPX. The concept of semaphores was introduced by E. Dijkstra~\cite{dijkstra1962over} and more details are available here~\cite{downey2008little}. Before we look into the source code, we will focus on one example. \\
+
+Imagine a public library lending books with no late fee. The library has 5 copies of the Hitckhiker's Guide to the Galaxy~\cite{adams2017ultimate}. So the first five people can borrow these copies and keep them for an infinite amount of time, since there are no late fees. Now, if person number six wants to borrow one copy, this person has to wait until one of the five borrowers return one copy. So the library assigns one of the copies to this person, but if none is waiting the copy just goes back to the shelf until one asks for it. \\
+
+This example can be explained in C++ using a semaphore. A semaphore has two variables. First, a \cpp{maximum count} which is from the example the total amount of copies. Second, a \cpp{current count} which relates to the amount of currently borrowed copies. Now, we have the the so-called \textcolor{azure}{P-Operation} and \textcolor{azure}{V-Operation}. The \textcolor{azure}{P-Operation} is done using the \cpp{wait} function. Here the variable \cpp{current count} is decreased. If the count is $\geq$ zero then the decrement just happens and the function will return. If the count is zero the function will wait until one other thread called the \lstinline|signal| function. This is refereed to as \textcolor{azure}{P-Operation}\index{P-Operation}. If the \lstinline|signal| function is called, the current count is increased. If the count was zero before you called \lstinline|signal| function and another thread was blocked in \lstinline|wait| then that thread will be executed. If multiple threads are waiting, only one will be executed and the reaming ones have to wait for another increment of the counter. This is refereed to as \textcolor{azure}{V-Operation}\index{V-Operation}. Listing~\ref{code:hpx:semaphore} shows the usage of the semaphore in HPX. In Line~2 the semaphore is generated an the maximal count is passed as argument \cpp{nd}. In Line~5 the ownership of thread \cpp{t} is released using the P-Operation (\cpp{signal} function). In Line~8 the thread \cpp{t} obtains the ownership using the V-Operation (\cpp{wait} function).
+
+
+\begin{lstlisting}[language=c++,caption={HPX's semaphores.\label{code:hpx:semaphore}},float,floatplacement=tb]
+// Generate a semaphore with maximal count nd
+hpx::lcos::local::sliding_semaphore sem(nd);
+
+// Release ownership for t
+sem.signal(t);
+
+// Obtain ownership for t
+sem.wait(t);
+\end{lstlisting}
+
+
+
+
 
 \newpage
 \theendnotes
