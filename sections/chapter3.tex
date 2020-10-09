@@ -504,6 +504,7 @@ With $K$ is the bulk modulus and $K_Ic$ is the critical stress intensity factor.
 To discretize the peridynamic equation of motion~\eqref{eq::chapter2:01}, the so-called EMU nodal discretization (EMU ND)~\cite{parks2008implementing} is used. All material points $X$ are placed at the nodes $\mathbf{X}:=\lbrace X_i \in \mathbb{R}^3\vert i=1,\ldots,n\rbrace$ of a regular grid in the reference configuration $\Omega_0$, see Figure~\ref{fig:emu}. We assume that the  discrete nodal spacing $\dx$ between $X_i$ and $X_j$ is defined as $\dx = \Vert X_j - X_i \Vert$ and is constant in all directions. For all material points at the nodes $\mathbf{X}:=\lbrace X_i \in \mathbb{R}^3\vert i=1,\ldots,n\rbrace$ a surrounding volume $\mathbf{V}:=\lbrace\ \mathbf{V}_i \in \mathbb{R}\vert i=1,\ldots,n\rbrace$ is assumed. These volumes are non overlapping $\mathbf{V}_i \cap \mathbf{V}_j = \emptyset$ and recover the volume of the volume of the reference configuration $\sum_{i=1}^n \mathbf{V}_i = \mathbf{V}_{\Omega_0}$. Using this assumptions the integral sign in the peridynamic equation of motion is replaced by a sum and reads as
 \begin{align}
 \rho(X_i)a(t,X_i)&=\sum\limits_{X_j\in B_\delta(X_i)}  f\left(t,x(t,X_j)-x(t,X_i), X_j-X_i\right)d\mathbf{V}_j + b(t,X_i) \text{.}
+\label{eq:discrete:pd}
 \end{align}
 The discrete interaction zone $B_\delta(X_i)$ of $X_i$ is given by $B_\delta(X_i):=\lbrace X_j \vert \,\vert\vert X_j-X_i\vert\vert \leq \delta\rbrace$ which means that all the materials point within the circle in Figure~\ref{fig:emu} exchange pair-wise forces with the discrete material point $X_i$.\\
 
@@ -511,6 +512,7 @@ From the computational aspects, we have to store the discrete interaction zone $
 $u(t,X)$ to compute the pair-wise force $f\left(t,x(t,X_j)-x(t,X_i), X_j-X_i\right)$. We use a central difference scheme 
 \begin{align}
 u(t+1,X) =  2 u(t,X) - u(t-1,X) + \Delta t^2 \left(\sum\limits_{X_j\in B_\delta(X_i)} f(t,X_i,X_j)+b(t,X)\right)
+\label{eq:pd:displacement}
 \end{align}
 to compute the actual displacement $x(t,X):= x(t-1,X) + u(t,X)$. Note that for the first time step, we assume $x(t-1,X_i)=X_i$ and $u(t-1,X_i)=u(t-1,X_i)=0$ as the initial values.
 
@@ -558,7 +560,43 @@ to compute the actual displacement $x(t,X):= x(t-1,X) + u(t,X)$. Note that for t
 %----------------------------------------------------------------------------------------
 \section{Algorithm}
 %----------------------------------------------------------------------------------------
+Figure~\ref{fig:algorithm:peri} shows the flow chart for the peridynamic simulation. The first step is to read the input file to obtain the material and discretization properties. Next, the discrete neighborhood for each of the nodes in computed and the neighbors are stored in a nested vector \cpp{std::vector<std::vector<size_t>>}. After these steps, the computation is started using a loop. Note that in the first computation the pair-wise forces $F$ are zero, since no external force $b$ was applied. In the next step, the external force $b$ is applied and the acceleration $a$ is computed. Note by adding the external force to the nodes, the acceleration of the nodes is not zero anymore. Now, the displacement $u$ is computed and the positions are updated. Last, the time step and time is updated.
 
+
+
+
+\begin{figure}[tb]
+    \centering
+	\begin{tikzpicture}[node distance=1.125cm, scale=0.75, transform shape]
+	\node (start) [startstop] {Start}; 
+	\node (n0) [process, below of=start,yshift=-.5cm] {Read the input files};
+	\node (n1) [process, below of=n0,yshift=-.5cm] {Compute the neighborhoods $B_\delta$~\eqref{eq:discrete:pd}};
+	\node (dec1) [decision, below of=n1 , yshift=-1.cm] { $t_n < T$};
+	\node (stop) [startstop, right of=dec1, xshift=3.cm] {Finished}; 
+	\node (n4) [process, below of=dec1,yshift=-1.cm] {Compute the pair-wise force $f$~\eqref{eq:discrete:pd}};
+	\node (n5) [process, below of=n4,yshift=-0.25cm] {Add external force $b$};
+	\node (n6) [process, below of=n5,yshift=-0.25cm] {Compute the accerleration $a$~\eqref{eq:discrete:pd}};
+	\node (n7) [process, below of=n6,yshift=-0.25cm] {Compute the displacement $u$~\eqref{eq:pd:displacement}};
+	\node (n8) [process, below of=n7,yshift=-0.25cm] {Update the positions};
+	\node (n9) [process, below of=n8,yshift=-0.25cm] { Update the time step $t_n = t_n + 1$};
+	\node (n10) [process, below of=n9,yshift=-0.25cm] { Update the time $t=\Delta t * t_n$};
+	%lines
+	\draw [->] (start) -- (n0);
+	\draw [->] (n0) -- (n1);
+	\draw [->] (n1) -- (dec1);
+	\draw [->] (dec1) -- node[anchor=north] {yes} (stop);
+	\draw [->] (dec1) -- node[anchor=west] {no} (n4);
+	\draw [->] (n4) -- (n5);	
+	\draw [->] (n5) -- (n6);	
+	\draw [->] (n6) -- (n7);	
+	\draw [->] (n7) -- (n8);	
+	\draw [->] (n8) -- (n9);	
+	\draw [->] (n9) -- (n10);	
+	\draw [->] (n10.west) -- ++(-3.0,0) -- ++(0,10.425) -- ++(4.25,0);
+	\end{tikzpicture}
+	\caption{Flow chart for the Peridynamic simulation.}
+	\label{fig:algorithm:peri}
+\end{figure}
 
 
 %----------------------------------------------------------------------------------------
