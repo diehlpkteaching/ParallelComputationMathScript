@@ -196,35 +196,35 @@ Implement the Algorithm in Figure~\ref{fig:algorithm:monte} using the random num
 \index{$N$-body problems}
 \label{sec:nbody}
 %----------------------------------------------------------------------------------------
-The $N$-body problem is the physics problem of predicting the individual motions of members of a group of celestial objects interacting with each other gravitationally. We want to predict the interactive forces and the motion of all celestial bodies in all future times. We assume that we know their orbital properties, \emph{e.g.}\ the initial positions, velocity, and time.\\
+The $N$-body problem is the physics problem of predicting the individual motions of members of a group of celestial objects interacting with each other gravitationally. We want to predict the interactive forces and the motion of all celestial bodies at all future times. We assume that we know their orbital properties, \emph{e.g.}\ the initial positions, velocity, and time.\\
 
-Before we look into the $N$-body problem, let us step back and look into the two-body problem. Let us look at two gravitational bodies with the masses $m_i$ and $m_j$ and their positions $\mathbf{r}_i,\mathbf{r}_j\in\mathbb{R}^3$. To define the equation of motion, we have to look in the following definitions:
+Before we look into the $N$-body problem, let us step back and look at the two-body problem. Let us look at two gravitational bodies with the masses $m_i$ and $m_j$ and the positions $\mathbf{r}_i,\mathbf{r}_j\in\mathbb{R}^3$. To define the equation of motion, we refer to the following definitions:
 \vspace{0.25cm}
 \begin{enumerate}
 \item \textbf{The Law of Gravitation}: \\
 The force of $m_i$ acting on $m_j$ is 
 \begin{align}
-\mathbf{F}_{ij}= G m_i m_j \frac{\mathbf{r}_j-\mathbf{r}_2}{\vert \mathbf{r}_1-\mathbf{r}_i \vert^3}\text{,}
+\mathbf{F}_{ij}= G m_i m_j \frac{\mathbf{r}_j-\mathbf{r}_2}{\vert \mathbf{r}_1-\mathbf{r}_i \vert^3} (See Figure~\ref{fig:nbody:motion})
 \end{align}
-see Figure~\ref{fig:nbody:motion}. The universal constant of gravitation $G$ was estimated as $6.67408\cdot 10^{-11}m^3kg^{-1}s^{-2}$ in 2014~\cite{mohr2016codata}.
+The universal constant of gravitation $G$ was estimated as $6.67408\cdot 10^{-11}m^3kg^{-1}s^{-2}$ in 2014~\cite{mohr2016codata}.
 \item \textbf{Velocity and acceleration}: 
 \begin{enumerate}
-\item The velocity of $m_i$ reads as
+\item The velocity of $m_i$ is
 \begin{align}
 \mathbf{v}_i = \frac{d \mathbf{r}_i}{dt} \label{eq:nbody:vel}
 \end{align}
-\item The acceleration of $m_i$ reads as
+\item The acceleration of $m_i$ is
 \begin{align}
 \mathbf{a}_i = \frac{d \mathbf{v}_i}{dt} \label{eq:nbody:acc}
 \end{align}
 \end{enumerate}
-For more details about vector and basic vector operations, we refer to Section~\ref{sec:linalg:vectors}.
+For more details about vectors and basic vector operations, we refer to Section~\ref{sec:linalg:vectors}.
 \item \textbf{The second Law of Mechanics}:  (Force is equal to mass times acceleration) 
 \begin{align}
 \mathbf{F}= m \mathbf{a} \label{eq:law:first}
 \end{align}
 \end{enumerate}
-With these three definitions, we can derive the equation of motion for the first body as follows
+With these three definitions, we can derive the equation of motion for the first body as follows:
 \begin{align}
 \mathbf{F}_{ij}&=G m_i m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\vert \mathbf{r}_j-\mathbf{r}_i \vert^3} \label{eq:nbody:motion1} \\
 m_i \mathbf{a}_i &= G m_i m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\vert \mathbf{r}_i-\mathbf{r}_j \vert^3} \label{eq:nbody:motion2} \\
@@ -232,7 +232,7 @@ m_i \mathbf{a}_i &= G m_i m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\vert \mathbf{r}_
 \frac{d^2 \mathbf{r}_i}{dt^2} & = G m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\vert \mathbf{r}_j-\mathbf{r}_i \vert^3}
 \label{eq:nbody:motion4}
 \end{align}
-To get from Equation~\eqref{eq:nbody:motion1} to Equation~\eqref{eq:nbody:motion2}, we substitute $\mathbf{F}_{ij}$ by $m_i \mathbf{a}_i$ using Equation~\ref{eq:law:first}.  From Equation~\eqref{eq:nbody:motion2} to Equation~\eqref{eq:nbody:motion3}, we divide by $m_i$ and substitute $\mathbf{a}_i$ by Equation~\ref{eq:nbody:acc}. From Equation~\eqref{eq:nbody:motion3} to Equation~\eqref{eq:nbody:motion4}, we substitute Equation~\ref{eq:nbody:vel}. Note that we used Newton's law of universal gravitation~\cite{newton1833philosophiae}.\\
+To get from Equation~\eqref{eq:nbody:motion1} to Equation~\eqref{eq:nbody:motion2}, we substitute $\mathbf{F}_{ij}$ with $m_i \mathbf{a}_i$ using Equation~\ref{eq:law:first}.  From Equation~\eqref{eq:nbody:motion2} to Equation~\eqref{eq:nbody:motion3}, we divide by $m_i$ and replace $\mathbf{a}_i$ according to Equation~\ref{eq:nbody:acc}. From Equation~\eqref{eq:nbody:motion3} to Equation~\eqref{eq:nbody:motion4}, we substitute Equation~\ref{eq:nbody:vel}. Note that we used Newton's law of universal gravitation~\cite{newton1833philosophiae}.\\
 
 
 \begin{figure}[tb]
@@ -263,13 +263,13 @@ These are the laws of conservation for the $N$-body problem:
 \item Energy: T-U=h with \\
 $ T = \frac{1}{2} \sum\limits_{i=1}^n m_i \mathbf{v}_i \circ \mathbf{v}_i  , U= \sum\limits_{i=1}^n \sum\limits_{j=1}^n G \frac{m_i m_j}{\vert\mathbf{r}_i - \mathbf{r}_j\vert} $
 \end{enumerate}
-Note that these laws are just shown for completeness. For more details about the theory and the derivations, we refer to~\cite{aarseth2008cambridge,aarseth2003gravitational}. This book focuses on the implementation details and just provides the basics to implement the $N$-body problem with C++.
+These laws are just shown for completeness. For more details about the theory and the derivations, we refer to~\cite{aarseth2008cambridge,aarseth2003gravitational}. This text focuses on the implementation details of the $N$-body problem withb C++.
 
 
 %----------------------------------------------------------------------------------------
 \section{Algorithm}
 %----------------------------------------------------------------------------------------
-Figure~\ref{fig:nbody:algorithm} shows the three steps for the $N$-body simulation. In this section, we focus on the implementation details of the first two steps. Equation~\ref{eq:nbody:motion} shows how to compute the force for one celestial object. Recall, that the $\sum$ translate to a \cpp{for} loop as we discussed in Section~\ref{sec:iteration:statements}. To compute the forces of all bodies, the so-called nested \cpp{for} loop or direct sum is utilized. Listing~\ref{code:directsum} shows the concept of the direct sum which is robust, accurate, and completely general. However, the computational costs per body are $\mathcal{O}(n)$ and the computational costs for all bodies are $\mathcal{O}(n^2)$. The symbol $\mathcal{O}$ is the so-called Big O notation which is used for algorithms to describe how their run time or space space requirements grow as the input size grows. In our case the computational costs per body increase linear, since we have to compute the force $n-1$ times for all particles. The Big O notation $\mathcal{O}(n)$ means that the total amount of computational costs in less or equal $n$. These symbols are defined in the Bachmann–Landau notation\index{Bachmann–Landau notation}~\cite{bachmann1894analytische,landau2000handbuch,knuth1997art}. For all bodies the computational cost increases two the power of two since we have to compute the forces $n-1$ times for all all $n$ bodies. For small amount of celestial objects the direct sum is feasible, however, for larger amounts the tree-based codes or the Barnes-Hut method~\cite{barnes1986hierarchical} reduce the computational costs to $\mathcal{O}(n\log(n))$. \\
+Figure~\ref{fig:nbody:algorithm} shows the three steps for the $N$-body simulation. In this section we focus on the implementation details of the first two steps. Equation~\ref{eq:nbody:motion} shows how to compute the force for one celestial object. Recall, that the $\sum$ translates to a \cpp{for} loop as we discussed in Section~\ref{sec:iteration:statements}. To compute the forces of all bodies, the so-called nested \cpp{for} loop or direct sum is used. Listing~\ref{code:directsum} shows the concept of the direct sum which is robust, accurate, and completely general. The computational costs per body are $\mathcal{O}(n)$ and the computational costs for all bodies are $\mathcal{O}(n^2)$. The symbol $\mathcal{O}$ is the so-called "Big O" notation, which we use to describe algorithm run time or space requirement growth as the input size grows. In our case the computational cost per body increases linearly, since we have to compute the force $n-1$ times for all particles. The Big O notation $\mathcal{O}(n)$ means that the total computational cost for n computations is less than or equal to $n$. These symbols are defined in the Bachmann–Landau notation\index{Bachmann–Landau notation}~\cite{bachmann1894analytische,landau2000handbuch,knuth1997art}. For all bodies the computational cost increases to the power of two since we have to compute the forces $n-1$ times for all $n$ bodies. The direct sum is feasible for a small number of celestial objects, but for larger numbers the tree-based codes or the Barnes-Hut method~\cite{barnes1986hierarchical} reduce the computational costs to $\mathcal{O}(n\log(n))$. \\
 
 \begin{figure}[tb]
 \centering
@@ -286,14 +286,14 @@ Figure~\ref{fig:nbody:algorithm} shows the three steps for the $N$-body simulati
 \end{figure}
 
 
-\begin{lstlisting}[language=c++,caption={Example for the so-called direct sum\index{direct sum}.\label{code:directsum}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Example for the direct sum\index{direct sum}.\label{code:directsum}},float,floatplacement=tb]
 for(size_t i = 0; i < bodies.size(); i++)
 	for(size_t j = 0; j < bodies.size(); j++)
 		if ( i != j )
 			//Compute forces
 \end{lstlisting}
 
-For the second step of the algorithm, we need to update the positions for the evolution of the system over the time $T$. For the discretization in time, we define following quantities:
+For the second step of the algorithm, we need to update the positions for the evolution of the system over the time $T$. For the discretization in time, we define the following quantities:
 \begin{itemize}
 \item $\Delta t$ the uniform time step size
 \item $t_0$ the beginning of the evolution
@@ -304,7 +304,7 @@ Next, we need to compute the derivatives to obtain the velocity and the accelera
 \begin{align}
 u'(x) \approx \frac{u(x+h)-u(x)}{h}
 \end{align}
-which is the s-called finite difference method. Figure~\ref{fig:nbody:finitedifference} sketches the principle of the finite difference method. For a sufficient small enough $h$, we can approximate the derivation at the coordinate $x$. For example choosing $h=1$ and $x=3$, we get $u'(x)=\sfrac{(4-3)}{1}=1$ which confirms with $u'(x)=1$ using the analytic derivation of $u(x)$. Now we can use Euler method to compute the updated positions at time $t_{k+1}$. First, we approximate the velocity using the finite difference scheme
+which is the finite difference method. Figure~\ref{fig:nbody:finitedifference} sketches the principle of the finite difference method. For a sufficiently small $h$, we can approximate the derivation at the coordinate $x$. For example: Choosing $h=1$ and $x=3$, we get $u'(x)=\sfrac{(4-3)}{1}=1$ which aligns with $u'(x)=1$ using the analytic derivation of $u(x)$. Now we can use the Euler method to compute the updated positions at time $t_{k+1}$. First we approximate the velocity using the finite difference scheme
 \begin{align}
 \mathbf{v}_i(t_k) = \frac{d\mathbf{r}_i}{dt} \approx \frac{\mathbf{r}_i(t_{k+1})-\mathbf{r}_i(t_k)}{\Delta t}\label{eq:vel}\text{.}
 \end{align}
@@ -320,10 +320,10 @@ using Equation~\eqref{eq:acc} and the fact that the finite difference approximat
 \begin{align}
 \mathbf{r}_i(t_{k+1}) = \mathbf{r}_{t_k} + \Delta t \mathbf{v}_i(t_k)  \label{eq:position:update2}
 \end{align} 
-using Equation~\eqref{eq:vel}. Note that we used easy methods to update the positions and more sophisticated methods, \emph{e.g.}\ Crank--Nicolson method~\cite{crank1947practical}, are available
+using Equation~\eqref{eq:vel}. Note that we used easy methods to update the positions, but more sophisticated methods, \emph{e.g.}\ Crank--Nicolson method~\cite{crank1947practical}, are available
 
 \begin{exercise}
-Look into the equations in this section and try to derive the Equation~\ref{eq:position:update} and Equation~\ref{eq:position:update} on your own.
+Look at the equations in this section and try to derive the Equation~\ref{eq:position:update} and Equation~\ref{eq:position:update} on your own.
 \end{exercise}
 
 \begin{exercise}
@@ -346,7 +346,7 @@ Implement the $N$-body problem using the template code\link{https://github.com/d
 \addplot[cadetgrey,  mark=none] coordinates{(3.5,3)} node[midway,below] {$h$};
 \end{axis}
 \end{tikzpicture}
-\caption{The principle of the finite difference method. For a sufficient small enough $h$, we can approximate the derivation at the coordinate $x$. For example choosing $h=1$ and $x=3$, we get $u'(x)=\sfrac{(4-3)}{1}=1$ which confirms with $u'(x)=1$ using the analytic derivation of $u(x)$. Now we can use Euler method to compute the updated positions at time $t_{k+1}$.}
+\caption{The principle of the finite difference method. For a sufficiently small $h$, we can approximate the derivation at the coordinate $x$. For example: Choosing $h=1$ and $x=3$, we get $u'(x)=\sfrac{(4-3)}{1}=1$ which aligns with $u'(x)=1$ using the analytic derivation of $u(x)$. Now we can use the Euler method to compute the updated positions at time $t_{k+1}$.}
 \label{fig:nbody:finitedifference}
 \end{figure}
 
