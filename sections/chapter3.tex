@@ -1,3 +1,20 @@
+%Book
+%Copyright (C) 2019  Patrick Diehl
+%			   2020  Christoph Larson
+%
+%This program is free software: you can redistribute it and/or modify
+%it under the terms of the GNU General Public License as published by
+%the Free Software Foundation, either version 3 of the License, or
+%(at your option) any later version.
+
+%This program is distributed in the hope that it will be useful,
+%but WITHOUT ANY WARRANTY; without even the implied warranty of
+%MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%GNU General Public License for more details.
+
+%You should have received a copy of the GNU General Public License
+%along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 %----------------------------------------------------------------------------------------
 \chapter{Monte-Carlo methods}
 \label{sec:monte:carlo}
@@ -36,7 +53,7 @@ Let us look into the computational aspects of the Monte Carlo methods. Independe
   \caption{Sketch of the geometry used within the Monte Carlo method to estimate the value of $\pi$.}
   \label{fig:monte}
 \end{figure}
-To understand these four steps, we will compute the value of $\pi$ using a Monte Carlo method. Figure~\ref{fig:monte} sketches the first two ingredients: a unit square and a circle. First, a unit square is defined as $1 \times 1$, which means it has a side length of 1. The area $A_s$ is therefore also $1. Second, the circle with radius $r=\sfrac{1}{2}$ is drawn at the center of the unit square. The area of the circle is $A_c=\pi r^2$. Using the radius $r=\sfrac{1}{2}$ the area is $A_c=\pi(\sfrac{1}{2})^2=\sfrac{\pi}{4}$. Now, since we have defined the area of the circle and the square, we can use them to estimate the value of $\pi$:
+To understand these four steps, we will compute the value of $\pi$ using a Monte Carlo method. Figure~\ref{fig:monte} sketches the first two ingredients: a unit square and a circle. First, a unit square is defined as $1 \times 1$, which means it has a side length of 1. The area $A_s$ is therefore also 1. Second, the circle with radius $r=\sfrac{1}{2}$ is drawn at the center of the unit square. The area of the circle is $A_c=\pi r^2$. Using the radius $r=\sfrac{1}{2}$ the area is $A_c=\pi(\sfrac{1}{2})^2=\sfrac{\pi}{4}$. Now, since we have defined the area of the circle and the square, we can use them to estimate the value of $\pi$:
 \begin{align}
 A_c &= \sfrac{\pi}{4} \notag\\
 \pi &= 4 A_c \notag\\
