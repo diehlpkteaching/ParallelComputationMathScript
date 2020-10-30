@@ -3,15 +3,15 @@
 \label{sec:monte:carlo}
 \index{Monte Carlo Method}
 %----------------------------------------------------------------------------------------
-Monte Carlo methods are computational algorithms which rely on repeated random sampling to obtain numerical results. The principle is to use randomness to solve the problem because it is difficult or impossible to utilize other approaches. A fun fact is that when the Monte Carlo Method was developed in the 1940s by Ulam and von Neumann they called the method Monte Carlo which refers to the Monte Carlo Casino in Monaco where Ulam's uncle gambled. Today Monte Carlo methods are widely used in following three problem classes:
+Monte Carlo methods are computational algorithms which rely on repeated random sampling to obtain numerical results. The principle is to use randomness to solve the problem because it is difficult or impossible to use other approaches. When this method was developed in the 1940s by Ulam and von Neumann they called the method "Monte Carlo" in reference to the Monte Carlo Casino in Monaco where Ulam's uncle gambled. Today Monte Carlo methods are widely used in the following three problem classes:
 \begin{itemize}
 \item Optimization,
 \item Numerical integration, and
 \item Probability distributions.
 \end{itemize}
-For the importance of the method we refer to~\cite{kroese2014monte} and for more details about Monte Carlo Methods, we refer to~\cite{shonkwiler2009explorations}.\\
+For the importance of the method we refer to~\cite{kroese2014monte}, and for more details about Monte Carlo Methods we refer to~\cite{shonkwiler2009explorations}.\\
 
-Let us look into the computational aspects of the Monte Carlo methods. Independent on the problem class a general pattern is observed
+Let us look into the computational aspects of the Monte Carlo methods. Independent of the problem class, a general pattern is observed:
 \begin{enumerate}
 \item Define the input parameters,
 \item Randomly chose input parameters,
@@ -33,29 +33,29 @@ Let us look into the computational aspects of the Monte Carlo methods. Independe
 \node[left] at (-0.35,1) {\small $1$};
 \end{tikzpicture}
   \end{center}
-  \caption{Sketch of the geometry used within the Monte Carlo method to estimate the number $\pi$.}
+  \caption{Sketch of the geometry used within the Monte Carlo method to estimate the value of $\pi$.}
   \label{fig:monte}
 \end{figure}
-To understand these for steps, we will compute the value of $\pi$ using a Monte Carlo method. Note that this example is just for educational purposes. Figure~\ref{fig:monte} sketches the two ingredient a unit square and a circle needed to estimate $\pi$. First, a unit square $1 \times 1$ which means both sides have the length of one is drawn. The area $A_s$ is one, since we have a unit square. Second, a circle with the radius of $r=\sfrac{1}{2}$ is drawn at the center of the unit square. The area of the circle is $A_c=\pi r^2$. Using the radius $r=\sfrac{1}{2}$ the area is $A_c=\pi(\sfrac{1}{2})^2=\sfrac{\pi}{4}$. Now, since we have defined the area of the circle and the square, we can use them to estimate the value of $\pi$ by
+To understand these four steps, we will compute the value of $\pi$ using a Monte Carlo method. Figure~\ref{fig:monte} sketches the first two ingredients: a unit square and a circle. First, a unit square is defined as $1 \times 1$, which means it has a side length of 1. The area $A_s$ is therefore also $1. Second, the circle with radius $r=\sfrac{1}{2}$ is drawn at the center of the unit square. The area of the circle is $A_c=\pi r^2$. Using the radius $r=\sfrac{1}{2}$ the area is $A_c=\pi(\sfrac{1}{2})^2=\sfrac{\pi}{4}$. Now, since we have defined the area of the circle and the square, we can use them to estimate the value of $\pi$:
 \begin{align}
 A_c &= \sfrac{\pi}{4} \notag\\
 \pi &= 4 A_c \notag\\
 \pi &= 4 \sfrac{A_c}{A_s}\text{.}
 \end{align}
-Note that the going from the first equation to the second one is just a multiplication by four. Going from the second line to the third line, we use the fact that the area of the square is one. \\
+Note that the operation on the first equation is a multiplication by four. Going from the second line to the third line, we use the fact that the area of the square is one. \\
 
-Now, we can estimate $\pi$ by the general pattern described above
+Now, we can estimate $\pi$ by the general pattern described above.
 \begin{itemize}
 \item \textbf{Define the input parameters}: \\ A coordinate  $(x,y)\in\mathbb{R}$ in the domain of the unit square $[0,1]\times [0,1]$
-\item\textbf{ Randomly chose input parameters}:\\ We randomly draw values for $x$ and $y$ in the range of $[0,1]$ for $N$ times
+\item\textbf{ Randomly chose input parameters}:\\ We randomly draw $N$ values for $x$ and $y$ in the range of $[0,1]$
 \item \textbf{Do deterministic computations on the inputs}:  \\
-we have to validate if the coordinate $(x,y)$ is inside the circle or not by do the computation $x^2+y^2\leq 1$. If the coordinate is inside the circle we increment $N_C$.
+We must validate if the coordinate $(x,y)$ is inside the circle or not with the inequality $x^2+y^2\leq 1$. If the coordinate is within the circle, we increment $N_C$.
 \item \textbf{Aggregate the results}: \\
 We compute $\pi\approx \sfrac{4N_c}{N}$
 \end{itemize}
 \vspace{0.25cm}
 
-Figure~\ref{fig:algorithm:monte} shows the flow chart of the algorithm for estimating $\pi$ using the Monte Carlo method. First, the decision if the current draw of the random number is less than the total amount of random numbers $N$. If we have not draw enough random numbers, we have to guess to two random numbers $x$ and $y$, see Section~\ref{sec:random:numbers} for how to generate random numbers in C++. Next, we have to check if the drawn coordinate $(x,y)$ is within the circle and update the number of points within the circle $N_c$. We have to repeat this tasks until $i>N$. If we have drawn enough random number, we can compute $\pi\approx\sfrac{4N_c}{N}$ and finish the program.\\
+Figure~\ref{fig:algorithm:monte} shows the flow chart of the algorithm for estimating $\pi$ using the Monte Carlo method. First, the decision if the current draw of the random number is less than the desired total amount of random numbers $N$. If we have not yet drawn enough random numbers, we have to guess two random numbers $x$ and $y$ (see Section~\ref{sec:random:numbers} for how to generate random numbers in C++). Next, we have to check if the drawn coordinate $(x,y)$ is within the circle. If so, we increment the count of the number of points that have landed within the circle $N_c$. We have to repeat these steps until $i>N$. Once we have drawn enough random numbers, we can compute $\pi\approx\sfrac{4N_c}{N}$ and finish the program.\\
 
 \begin{figure}[tb]
     \centering
@@ -86,7 +86,7 @@ Figure~\ref{fig:algorithm:monte} shows the flow chart of the algorithm for estim
 	\label{fig:algorithm:monte}
 \end{figure}
 
-Next, we can ask the question what is a good choice for $N$ to get a good approximation of $pi$. Figure~\ref{fig:monte:carlo:samples} shows the distribution of the point inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers. One can see that a certain amount of random numbers is needed to have enough samples inside and outside of the circle. Figure~\ref{fig:monte:carlo} shows the absolute error in percent for various amount of random numbers. One can see that with thousand random numbers the accuracy is quite reasonable. 
+Next,let us ask the question, "What is a good choice for $N$ to get a good approximation of $pi$?" Figure~\ref{fig:monte:carlo:samples} shows the distribution of the point inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers. One can see that a certain amount of random numbers is needed to have enough samples inside and outside of the circle. Figure~\ref{fig:monte:carlo} shows the absolute error in percent for various amounts of random numbers. One can see that with a thousand random numbers the accuracy is quite reasonable. 
 
 
 \begin{figure}[bt]
@@ -157,7 +157,7 @@ Next, we can ask the question what is a good choice for $N$ to get a good approx
   \caption{$N=1000$}
   \label{fig:sub-second}
 \end{subfigure}
-\caption{Distribution of the point inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers.}
+\caption{Distribution of the points inside the circle (\textcolor{amaranth}{red}) and outside of the circle (\textcolor{azure}{blue}) for $N=10$, $N=100$, and $N=1000$ random numbers.}
 \label{fig:monte:carlo:samples}
 % This example was adapted from https://tex.stackexchange.com/questions/244488/monte-carlo-method-drawing
 \end{figure}
@@ -178,7 +178,7 @@ Next, we can ask the question what is a good choice for $N$ to get a good approx
 \montecarlo{1000}{3}
 \end{axis}
 \end{tikzpicture}
-\caption{The absolute error in percent for various amount of random numbers. One can see that with thousand random numbers the accuracy is quite reasonable. }
+\caption{The absolute error for various amounts of random numbers. One can see that with a thousand random numbers the accuracy is quite reasonable. }
 \label{fig:monte:carlo}
 \end{figure}
 
@@ -196,35 +196,35 @@ Implement the Algorithm in Figure~\ref{fig:algorithm:monte} using the random num
 \index{$N$-body problems}
 \label{sec:nbody}
 %----------------------------------------------------------------------------------------
-The $N$-body problem is the physically problem of predicting the individual motions of a group of celestial objects interacting with each others gravitationally. In laymen terms we want to predict the interactive forces and the motion of all celestial bodies in all future times. We assume that the know their orbital properties, \emph{e.g.}\ the initial positions, velocity, and time.\\
+The $N$-body problem is the physics problem of predicting the individual motions of members of a group of celestial objects interacting with each other gravitationally. We want to predict the interactive forces and the motion of all celestial bodies at all future times. We assume that we know their orbital properties, \emph{e.g.}\ the initial positions, velocity, and time.\\
 
-Before we look into the $N$-body problem, we stepping back and look into the two-body problem. Let us look at two gravitational bodies with the massed $m_i$ and $m_j$ and their positions $\mathbf{r}_i,\mathbf{r}_j\in\mathbb{R}^3$. To define the equation of motion, we have to look in the following definitions:
+Before we look into the $N$-body problem, let us step back and look at the two-body problem. Let us look at two gravitational bodies with the masses $m_i$ and $m_j$ and the positions $\mathbf{r}_i,\mathbf{r}_j\in\mathbb{R}^3$. To define the equation of motion, we refer to the following definitions:
 \vspace{0.25cm}
 \begin{enumerate}
 \item \textbf{The Law of Gravitation}: \\
 The force of $m_i$ acting on $m_j$ is 
 \begin{align}
-\mathbf{F}_{ij}= G m_i m_j \frac{\mathbf{r}_j-\mathbf{r}_2}{\vert \mathbf{r}_1-\mathbf{r}_i \vert^3}\text{,}
+\mathbf{F}_{ij}= G m_i m_j \frac{\mathbf{r}_j-\mathbf{r}_2}{\vert \mathbf{r}_1-\mathbf{r}_i \vert^3} (See Figure~\ref{fig:nbody:motion})
 \end{align}
-see Figure~\ref{fig:nbody:motion}. The universal constant of gravitation $G$ was estimated as $6.67408\cdot 10^{-11}m^3kg^{-1}s^{-2}$ in 2014~\cite{mohr2016codata}.
+The universal constant of gravitation $G$ was estimated as $6.67408\cdot 10^{-11}m^3kg^{-1}s^{-2}$ in 2014~\cite{mohr2016codata}.
 \item \textbf{Velocity and acceleration}: 
 \begin{enumerate}
-\item The velocity of $m_i$ reads as
+\item The velocity of $m_i$ is
 \begin{align}
 \mathbf{v}_i = \frac{d \mathbf{r}_i}{dt} \label{eq:nbody:vel}
 \end{align}
-\item The acceleration of $m_i$ reads as
+\item The acceleration of $m_i$ is
 \begin{align}
 \mathbf{a}_i = \frac{d \mathbf{v}_i}{dt} \label{eq:nbody:acc}
 \end{align}
 \end{enumerate}
-For more details about vector and basic vector operations, we refer to Section~\ref{sec:linalg:vectors}.
-\item \textbf{The second Law of Mechanics}:  (Force is equal mass times acceleration) 
+For more details about vectors and basic vector operations, we refer to Section~\ref{sec:linalg:vectors}.
+\item \textbf{The second Law of Mechanics}:  (Force is equal to mass times acceleration) 
 \begin{align}
 \mathbf{F}= m \mathbf{a} \label{eq:law:first}
 \end{align}
 \end{enumerate}
-With these three definitions, we can derive the equation of motion for the first body as follows
+With these three definitions, we can derive the equation of motion for the first body as follows:
 \begin{align}
 \mathbf{F}_{ij}&=G m_i m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\vert \mathbf{r}_j-\mathbf{r}_i \vert^3} \label{eq:nbody:motion1} \\
 m_i \mathbf{a}_i &= G m_i m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\vert \mathbf{r}_i-\mathbf{r}_j \vert^3} \label{eq:nbody:motion2} \\
@@ -232,7 +232,7 @@ m_i \mathbf{a}_i &= G m_i m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\vert \mathbf{r}_
 \frac{d^2 \mathbf{r}_i}{dt^2} & = G m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\vert \mathbf{r}_j-\mathbf{r}_i \vert^3}
 \label{eq:nbody:motion4}
 \end{align}
-To get from Equation~\eqref{eq:nbody:motion1} to Equation~\eqref{eq:nbody:motion2}, we substitute $\mathbf{F}_{ij}$ by $m_i \mathbf{a}_i$ using Equation~\ref{eq:law:first}.  From Equation~\eqref{eq:nbody:motion2} to Equation~\eqref{eq:nbody:motion3}, we divide by $m_i$ and substitute $\mathbf{a}_i$ by Equation~\ref{eq:nbody:acc}. From Equation~\eqref{eq:nbody:motion3} to From Equation~\eqref{eq:nbody:motion4}, we substitute Equation~\ref{eq:nbody:vel}. Note that we used Newton's law of universal gravitation~\cite{newton1833philosophiae}.\\
+To get from Equation~\eqref{eq:nbody:motion1} to Equation~\eqref{eq:nbody:motion2}, we substitute $\mathbf{F}_{ij}$ with $m_i \mathbf{a}_i$ using Equation~\ref{eq:law:first}.  From Equation~\eqref{eq:nbody:motion2} to Equation~\eqref{eq:nbody:motion3}, we divide by $m_i$ and replace $\mathbf{a}_i$ according to Equation~\ref{eq:nbody:acc}. From Equation~\eqref{eq:nbody:motion3} to Equation~\eqref{eq:nbody:motion4}, we substitute Equation~\ref{eq:nbody:vel}. Note that we used Newton's law of universal gravitation~\cite{newton1833philosophiae}.\\
 
 
 \begin{figure}[tb]
@@ -251,7 +251,7 @@ To get from Equation~\eqref{eq:nbody:motion1} to Equation~\eqref{eq:nbody:motion
 \label{fig:nbody:motion}
 \end{figure}
 
-Now, we formulate the problem for $n$ bodies assuming that the force at one body is equal to the sum over all bodies, except the body itself
+Now we formulate the problem for $n$ bodies, assuming that the force at one body is equal to the sum over all bodies, excepting itself.
 \begin{align}
 \mathbf{F}_i = \sum\limits_{j=1,i\neq j}^n \mathbf{F}_{ij} = \sum\limits_{j=1,,i\neq j}^n G  m_j \frac{\mathbf{r}_j - \mathbf{r}_i}{\vert \mathbf{r}_j - \mathbf{r}_i\vert^3} \text{.} \label{eq:nbody:motion}
 \end{align}
@@ -263,12 +263,13 @@ These are the laws of conservation for the $N$-body problem:
 \item Energy: T-U=h with \\
 $ T = \frac{1}{2} \sum\limits_{i=1}^n m_i \mathbf{v}_i \circ \mathbf{v}_i  , U= \sum\limits_{i=1}^n \sum\limits_{j=1}^n G \frac{m_i m_j}{\vert\mathbf{r}_i - \mathbf{r}_j\vert} $
 \end{enumerate}
-Note that these laws are just shown for completeness. For more details about the theory and the derivations, we refer to~\cite{aarseth2008cambridge,aarseth2003gravitational}. This book focuses on the implementation details and just provides the basics to implement the $N$-body problem within C++.
+These laws are just shown for completeness. For more details about the theory and the derivations, we refer to~\cite{aarseth2008cambridge,aarseth2003gravitational}. This text focuses on the implementation details of the $N$-body problem withb C++.
+
 
 %----------------------------------------------------------------------------------------
 \section{Algorithm}
 %----------------------------------------------------------------------------------------
-Figure~\ref{fig:nbody:algorithm} shows the three steps for the $N$-body simulation. In this section, we focus on the implementation details of the first two steps. Equation~\ref{eq:nbody:motion} shows how to compute the force for one celestial object. Recall, that the $\sum$ translate to a \cpp{for} loop as we discussed in Section~\ref{sec:iteration:statements}. To compute the forces of all bodies, the so-called nested \cpp{for} loop or direct sum is utilized. Listing~\ref{code:directsum} shows the concept of the direct sum which is robust, accurate, and completely general. However, the computational costs per body are $\mathcal{O}(n)$ and the computational costs for all bodies are $\mathcal{O}(n^2)$. The symbol $\mathcal{O}$ is the so-called Big O notation which is used for algorithms to describe how their run time or space space requirements grow as the input size grows. In our case the computational costs per body increase linear, since we have to compute the force $n-1$ times for all particles. The Big O notation $\mathcal{O}(n)$ means that the total amount of computational costs in less or equal $n$. These symbols are defined in the Bachmann–Landau notation\index{Bachmann–Landau notation}~\cite{bachmann1894analytische,landau2000handbuch,knuth1997art}. For all bodies the computational cost increases two the power of two since we have to compute the forces $n-1$ times for all all $n$ bodies. For small amount of celestial objects the direct sum is feasible, however, for larger amounts the tree-based codes or the Barnes-Hut method~\cite{barnes1986hierarchical} reduce the computational costs to $\mathcal{O}(n\log(n))$. \\
+Figure~\ref{fig:nbody:algorithm} shows the three steps for the $N$-body simulation. In this section we focus on the implementation details of the first two steps. Equation~\ref{eq:nbody:motion} shows how to compute the force for one celestial object. Recall that the $\sum$ translates to a \cpp{for} loop as we discussed in Section~\ref{sec:iteration:statements}. To compute the forces of all bodies, the so-called nested \cpp{for} loop or direct sum is used. Listing~\ref{code:directsum} shows the concept of the direct sum which is robust, accurate, and completely general. The computational costs per body are $\mathcal{O}(n)$ and the computational costs for all bodies are $\mathcal{O}(n^2)$. The symbol $\mathcal{O}$ is the so-called "Big O" notation, which we use to describe algorithm run time or space requirement growth as the input size grows. In our case the computational cost per body increases linearly, since we have to compute the force $n-1$ times for all particles. The Big O notation $\mathcal{O}(n)$ means that the total computational cost for n computations is less than or equal to $n$. These symbols are defined in the Bachmann–Landau notation\index{Bachmann–Landau notation}~\cite{bachmann1894analytische,landau2000handbuch,knuth1997art}. For all bodies the computational cost increases to the power of two since we have to compute the forces $n-1$ times for all $n$ bodies. The direct sum is feasible for a small number of celestial objects, but for larger numbers the tree-based codes or the Barnes-Hut method~\cite{barnes1986hierarchical} reduce the computational costs to $\mathcal{O}(n\log(n))$. \\
 
 \begin{figure}[tb]
 \centering
@@ -285,14 +286,14 @@ Figure~\ref{fig:nbody:algorithm} shows the three steps for the $N$-body simulati
 \end{figure}
 
 
-\begin{lstlisting}[language=c++,caption={Example for the so-called direct sum\index{direct sum}.\label{code:directsum}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Example for the direct sum\index{direct sum}.\label{code:directsum}},float,floatplacement=tb]
 for(size_t i = 0; i < bodies.size(); i++)
 	for(size_t j = 0; j < bodies.size(); j++)
 		if ( i != j )
 			//Compute forces
 \end{lstlisting}
 
-For the second step of the algorithm, we need to update the positions for the evolution of the system over the time $T$. For the discretization in time, we define following quantities:
+For the second step of the algorithm, we need to update the positions for the evolution of the system over the time $T$. For the discretization in time, we define the following quantities:
 \begin{itemize}
 \item $\Delta t$ the uniform time step size
 \item $t_0$ the beginning of the evolution
@@ -303,7 +304,7 @@ Next, we need to compute the derivatives to obtain the velocity and the accelera
 \begin{align}
 u'(x) \approx \frac{u(x+h)-u(x)}{h}
 \end{align}
-which is the s-called finite difference method. Figure~\ref{fig:nbody:finitedifference} sketches the principle of the finite difference method. For a sufficient small enough $h$, we can approximate the derivation at the coordinate $x$. For example choosing $h=1$ and $x=3$, we get $u'(x)=\sfrac{(4-3)}{1}=1$ which confirms with $u'(x)=1$ using the analytic derivation of $u(x)$. Now we can use Euler method to compute the updated positions at time $t_{k+1}$. First, we approximate the velocity using the finite difference scheme
+which is the finite difference method. Figure~\ref{fig:nbody:finitedifference} sketches the principle of the finite difference method. For a sufficiently small $h$, we can approximate the derivation at the coordinate $x$. For example: Choosing $h=1$ and $x=3$, we get $u'(x)=\sfrac{(4-3)}{1}=1$ which aligns with $u'(x)=1$ using the analytic derivation of $u(x)$. Now we can use the Euler method to compute the updated positions at time $t_{k+1}$. First we approximate the velocity using the finite difference scheme
 \begin{align}
 \mathbf{v}_i(t_k) = \frac{d\mathbf{r}_i}{dt} \approx \frac{\mathbf{r}_i(t_{k+1})-\mathbf{r}_i(t_k)}{\Delta t}\label{eq:vel}\text{.}
 \end{align}
@@ -319,10 +320,10 @@ using Equation~\eqref{eq:acc} and the fact that the finite difference approximat
 \begin{align}
 \mathbf{r}_i(t_{k+1}) = \mathbf{r}_{t_k} + \Delta t \mathbf{v}_i(t_k)  \label{eq:position:update2}
 \end{align} 
-using Equation~\eqref{eq:vel}. Note that we used easy methods to update the positions and more sophisticated methods, \emph{e.g.}\ Crank--Nicolson method~\cite{crank1947practical}, are available
+using Equation~\eqref{eq:vel}. Note that we used easy methods to update the positions, but more sophisticated methods, \emph{e.g.}\ Crank--Nicolson method~\cite{crank1947practical}, are available
 
 \begin{exercise}
-Look into the equations in this section and try to derive the Equation~\ref{eq:position:update} and Equation~\ref{eq:position:update} on your own.
+Look at the equations in this section and try to derive the Equation~\ref{eq:position:update} and Equation~\ref{eq:position:update} on your own.
 \end{exercise}
 
 \begin{exercise}
@@ -345,7 +346,7 @@ Implement the $N$-body problem using the template code\link{https://github.com/d
 \addplot[cadetgrey,  mark=none] coordinates{(3.5,3)} node[midway,below] {$h$};
 \end{axis}
 \end{tikzpicture}
-\caption{The principle of the finite difference method. For a sufficient small enough $h$, we can approximate the derivation at the coordinate $x$. For example choosing $h=1$ and $x=3$, we get $u'(x)=\sfrac{(4-3)}{1}=1$ which confirms with $u'(x)=1$ using the analytic derivation of $u(x)$. Now we can use Euler method to compute the updated positions at time $t_{k+1}$.}
+\caption{The principle of the finite difference method. For a sufficiently small $h$, we can approximate the derivation at the coordinate $x$. For example: Choosing $h=1$ and $x=3$, we get $u'(x)=\sfrac{(4-3)}{1}=1$ which aligns with $u'(x)=1$ using the analytic derivation of $u(x)$. Now we can use the Euler method to compute the updated positions at time $t_{k+1}$.}
 \label{fig:nbody:finitedifference}
 \end{figure}
 
