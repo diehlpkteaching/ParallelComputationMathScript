@@ -562,9 +562,6 @@ to compute the actual displacement $x(t,X):= x(t-1,X) + u(t,X)$. Note that for t
 %----------------------------------------------------------------------------------------
 Figure~\ref{fig:algorithm:peri} shows the flow chart for the peridynamic simulation. The first step is to read the input file to obtain the material and discretization properties. Next, the discrete neighborhood for each of the nodes in computed and the neighbors are stored in a nested vector \cpp{std::vector<std::vector<size_t>>}. After these steps, the computation is started using a loop. Note that in the first computation the pair-wise forces $F$ are zero, since no external force $b$ was applied. In the next step, the external force $b$ is applied and the acceleration $a$ is computed. Note by adding the external force to the nodes, the acceleration of the nodes is not zero anymore. Now, the displacement $u$ is computed and the positions are updated. Last, the time step and time is updated.
 
-
-
-
 \begin{figure}[tb]
     \centering
 	\begin{tikzpicture}[node distance=1.125cm, scale=0.75, transform shape]
@@ -599,6 +596,35 @@ Figure~\ref{fig:algorithm:peri} shows the flow chart for the peridynamic simulat
 \end{figure}
 
 
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}
+
+\foreach \j in {1,...,5}{
+\foreach \i in {1,...,6}{
+	\node at (\i,\j) {\pgfuseplotmark{square*}};
+}
+}
+\foreach \i in {1,...,6}{
+	\node at (\i,0) {\pgfuseplotmark{square*}};
+}
+\foreach \i in {1,...,6}{
+	\node[below] at (\i,-0.1) {$X_\i$};	
+}
+
+\draw[thick,->] (-1,0) -- (-.5,0);
+\draw[thick,->] (-1,0) -- (-1,0.5);
+\node[right] at (-0.5,0) {$x$};
+\node[above] at (-1,0.5) {$t$};
+
+\node[left] at (0.75,2) {$t_{i-1}$};
+\node[left] at (0.75,3) {$t_{i}$};
+\node[left] at (0.75,4) {$t_{i+1}$};
+
+\node[below] at (1,-0.75) {$0$};
+\node[below] at (6,-0.75) {$L$};
+\end{tikzpicture}
+\end{figure}
 %----------------------------------------------------------------------------------------
 \chapter{One-dimensional heat equation}
 %----------------------------------------------------------------------------------------
