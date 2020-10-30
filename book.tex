@@ -580,8 +580,10 @@ int main(){
 
 
 %----------------------------------------------------------------------------------------
-\chapter{Distributed memory}
+\chapter{Distributed Programming}
 %----------------------------------------------------------------------------------------
+Previously, we considered shared memory parallelism which means we only considered one physical computational node. Now, we will look into distributed programming because the memory or the computational resources of one physical computational node are not sufficient. Figure~\ref{}
+
 
 
 \newpage
@@ -823,7 +825,7 @@ Third, HPX has the keyword \cpp{hpx::dataflow}\index{HPX!dataflow} to use unwrap
 
 Figure~\ref{fig::stencil:benchmark:1} shows the execution time of the serial vs the asynchronous implementation for 1 CPU. We clearly see that the execution time even for one CPU is lower. Figure~\ref{fig::stencil:benchmark:2} shows the execution time for various amount of CPUs for the asynchronous implementation. Here, we can see that for enough grid points the we get some benefit for adding more CPUs which means we have to have enough work to keep the CPUs busy. To obtain better results, we have to extend the code to control its granularity.
 
-\begin{lstlisting}[language=c++,caption={Futurized version of the one-dimensional heat equation.\label{code:hpx:future:ready}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Futurized version of the one-dimensional heat equation.\label{code:hpx:future:ready}},float,floatplacement=tbp]
 struct stepper
 {
     // Our partition type
@@ -911,6 +913,58 @@ struct stepper
 \end{figure}
 
 %----------------------------------------------------------------------------------------
+\subsection{Adding grain size control}
+%----------------------------------------------------------------------------------------
+In Section~\ref{heatequation:serial:grainsize} the control of the granularity was added to the serial implementation of the one-dimensional heat equation. here, we extend the code with the futurization with the grain size control. First, we extend the \cpp{struct partion_data}, see Listing~\ref{code:hpx:future:grain}. In Line~39 we change the class members to a \cpp{double []} array and we introduce \cpp{size_t size_} to the store the size of the partition. Note that we use a smart pointer \cpp{std::unique_ptr} to store the  \cpp{double []} array. For more details about smart pointer we refer to Section~\ref{cpp:smart:pointer}.
+
+
+\begin{lstlisting}[language=c++,caption={Adding the grain size control the futurized one-dimensional heat equation.\label{code:hpx:future:grain}},float,floatplacement=tbp]
+struct partition_data
+{
+public:
+    explicit partition_data(std::size_t size)
+      : data_(new double[size])
+      , size_(size)
+    {
+    }
+
+    partition_data(std::size_t size, double initial_value)
+      : data_(new double[size])
+      , size_(size)
+    {
+        double base_value = double(initial_value * size);
+        for (std::size_t i = 0; i != size; ++i)
+            data_[i] = base_value + double(i);
+    }
+
+    partition_data(partition_data&& other) noexcept
+      : data_(std::move(other.data_))
+      , size_(other.size_)
+    {
+    }
+
+    double& operator[](std::size_t idx)
+    {
+        return data_[idx];
+    }
+    double operator[](std::size_t idx) const
+    {
+        return data_[idx];
+    }
+
+    std::size_t size() const
+    {
+        return size_;
+    }
+
+private:
+    std::unique_ptr<double[]> data_;
+    std::size_t size_;
+};
+
+\end{lstlisting}
+
+%----------------------------------------------------------------------------------------
 \section{Semaphores}
 \index{semaphores}
 %----------------------------------------------------------------------------------------
@@ -931,10 +985,6 @@ sem.signal(t);
 // Obtain ownership for t
 sem.wait(t);
 \end{lstlisting}
-
-
-
-
 
 \newpage
 \theendnotes
