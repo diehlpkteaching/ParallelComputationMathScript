@@ -915,7 +915,9 @@ struct stepper
 %----------------------------------------------------------------------------------------
 \subsection{Adding grain size control}
 %----------------------------------------------------------------------------------------
-In Section~\ref{heatequation:serial:grainsize} the control of the granularity was added to the serial implementation of the one-dimensional heat equation. here, we extend the code with the futurization with the grain size control. First, we extend the \cpp{struct partion_data}, see Listing~\ref{code:hpx:future:grain}. In Line~39 we change the class members to a \cpp{double []} array and we introduce \cpp{size_t size_} to the store the size of the partition. Note that we use a smart pointer \cpp{std::unique_ptr} to store the  \cpp{double []} array. For more details about smart pointer we refer to Section~\ref{cpp:smart:pointer}.
+In Section~\ref{heatequation:serial:grainsize} the control of the granularity was added to the serial implementation of the one-dimensional heat equation. here, we extend the code with the futurization with the grain size control. First, we extend the \cpp{struct partion_data}, see Listing~\ref{code:hpx:future:grain}. In Line~39 we change the class members to a \cpp{double []} array and we introduce \cpp{size_t size_} to the store the size of the partition. Note that we use a smart pointer \cpp{std::unique_ptr} to store the  \cpp{double []} array. The shared pointer is essential since we need to use the reference counter model to keep track that the array does not go out of scope. For more details about smart pointer we refer to Section~\ref{cpp:smart:pointer}. In the constructor, we use the expression \cpp{new double [size]} to allocate a double array od the size \cpp{size}. Fore more details about the \cpp{new} expression, we refer to Section~\ref{sec:memory:management}. \\
+
+By adding the grain size control to futurized implementation, we see some performance improvement compared to the previous implementation, see Figure~\ref{fig:hpx:stencil:scaling1}. In Figure~\ref{fig:scaling:future:grain:size} the number of discrete nodes is fixed to $1000000$ and the grain size varies which means the amount of point inside a partition change. For using one and two CPUs, we see the typical curve for the grain size control. Using a grain size of one results in the largest execution time. First, while increasing the grain size the execution times goes down until the so-called sweet spot. At the sweet spot the execution is as its minimum and decreases after. Here, it is important to find this sweet spot which depends on various factors, \emph{e.g.}\ the computation, the algorithm, and the architecture of the hardware. So for each amount of discrete nodes one has to find the sweet spot.
 
 
 \begin{lstlisting}[language=c++,caption={Adding the grain size control the futurized one-dimensional heat equation.\label{code:hpx:future:grain}},float,floatplacement=tbp]
@@ -964,6 +966,20 @@ private:
 
 \end{lstlisting}
 
+\begin{figure}[tbp]
+\centering
+\begin{tikzpicture}
+\selectcolormodel{gray}
+\begin{axis}[xlabel=Partitions,ylabel=Execution time, grid=both,title=Stencil 4,legend pos=north west]
+\addplot table [x=Partitions, y=Execution_Time_sec, col sep=comma] {./data/stencil_4_1cpu_1000000.dat};
+\addlegendentry{1 CPU}
+\addplot table [x=Partitions, y=Execution_Time_sec, col sep=comma] {./data/stencil_4_2cpu_1000000.dat};
+\addlegendentry{2 CPU}
+\end{axis}
+\end{tikzpicture}
+\caption{Variation of grain size for fixed $1000000$ discrete nodes. For one CPU and the two CPUs, we see the typical curve where the execution time goes down, ther sweet spot is reached, and the execution increases after. }
+\label{fig:scaling:future:grain:size}
+\end{figure}
 %----------------------------------------------------------------------------------------
 \section{Semaphores}
 \index{semaphores}

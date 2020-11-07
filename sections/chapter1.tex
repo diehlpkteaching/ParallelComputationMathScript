@@ -725,7 +725,7 @@ std::cout << fp2(5);
 \end{lstlisting}
 
 %----------------------------------------------------------------------------------------
-\subsection*{Memory management}
+\subsection{Memory management}
 \label{sec:memory:management}
 %----------------------------------------------------------------------------------------
 From the Spider-Man comics and the movies, we all know the sentence
@@ -786,7 +786,7 @@ std::cout << "After moving the string, its content is: " << v[1] << std::endl;
 \end{lstlisting}
 
 %----------------------------------------------------------------------------------------
-\subsection*{Smart pointer}
+\subsection{Smart pointer}
 \label{cpp:smart:pointer}
 %----------------------------------------------------------------------------------------
 The so-called smart pointers\index{pointer!smart} are defined in the header \cpp{#include <memory>}\link{https://en.cppreference.com/w/cpp/header/memory}. In the previous section, we looked at so-called raw pointers and these should be used only in small code blocks of limited scope or where performance is a major issue. Using a raw pointer you are responsible to manage the memory and deallocate the memory if the object is not needed anymore. Using a smart pointer there is no need to call the \cpp{delete} explicitly. The first smart pointer is the \cpp{std::unique_ptr}\link{https://en.cppreference.com/w/cpp/memory/unique_ptr}\index{pointer!unique}, see Listing~\ref{code:pointer:unique}. The unique pointer points to exactly one object in the memory and no other pointer can point to this object. In Line~1 we initialize a smart unique pointer containing a array \cpp{double []} by using \cpp{std::unique_ptr<double[]>a}. We use the \cpp{new} operator to allocate a array of size two. For more details about the \cpp{new} keyword, we refer to Section~\ref{sec:memory:management}. In the Lines~5--6 the values of the array are initialized. Note that the Line+9 is commented out on purpose, since this line of code will not compile. Since we use a \cpp{std::unique_ptr} for the array \cpp{a}, we can not use a second smart pointer \cpp{b} pointing to \cpp{a}. However, moving the pointer \cpp{a} to the unique pointer \cpp{b} will work, since we move the control from \cpp{a} to \cpp{b}. Fore more details about \cpp{std:move}, we refer to Section~\ref{sec:moving:data}.\\
