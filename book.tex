@@ -609,7 +609,10 @@ HPX (High Performance ParalleX) is a general purpose C++ runtime system for para
 \vspace{0.25cm}
 For a brief overview of HPX, we refer to~\cite{heller2017hpx} and for a detailed overview, we refer to~\cite{heller2019extending}. For more details about asynchronous many-task systems (AMT), we refer to~\cite{thoman2018taxonomy}.
 
-\subsection*{Using HPX}
+%----------------------------------------------------------------------------------------
+\subsection{Using HPX}
+\label{sec:hpx:using}
+%----------------------------------------------------------------------------------------
 Let us look into HPX's hello world example. We have to ways to initialize the HPX runtime system. First way is to include the header \cpp{#include <hpx/hpx_main.hpp>}, see Listing~\ref{code:hpx:main}. In that case, the only thing we have to add is the new header file. Note that this header file should be the first one to be included. Before we can call the first HPX function, the HPX runtime system needs to be initialized. Second way is to include the header \cpp{#include <hpx/hpx_init.hpp>}, see Listing~\ref{code:hpx:init}. In that case, the \cpp{hpx_main} function is defined in Line~4 and we place the code as we like to have in the \cpp{main} function there and use \cpp{hpx::finalize()} as the return value to make sure the HPX runtime system is stopped. To initialize the HPX runtime system, the function \cpp{hpx::init(argc, argv)} has to be called. Note that this header file should be the first one to be included. All HPX functions have to be called within the \cpp{hpx_main} function to make sure the HPX runtime system is initialized. \\
 
 Assuming that HPX is installed on the system, we need to provide some compiler and linker flags to compile the HPX application. Note that on Fedora one can install HPX by using \bash{sudo dnf install hpx-devel} or using this
@@ -753,6 +756,7 @@ return EXIT_SUCCESS;
 
 %----------------------------------------------------------------------------------------
 \section{Asynchronous programming}
+\label{sec:hpx:async}
 \index{future}
 \index{async}
 \index{HPX!asynchronous programming}
@@ -982,6 +986,7 @@ private:
 \end{figure}
 %----------------------------------------------------------------------------------------
 \section{Semaphores}
+\label{sec:hpx:semaphores}
 \index{semaphores}
 %----------------------------------------------------------------------------------------
 In Section~\ref{sec:deadlocks} the \cpp{std::mutex}, which is tied to one thread and only one thread can lock or unlock the mutex. Now the look into a semaphore and here any thread can access the ownership on a semaphore. Note that the C++ standard does not define semaphores and they are only available suing HPX. The concept of semaphores was introduced by E. Dijkstra~\cite{dijkstra1962over} and more details are available here~\cite{downey2008little}. Before we look into the source code, we will focus on one example. \\
@@ -1001,6 +1006,55 @@ sem.signal(t);
 // Obtain ownership for t
 sem.wait(t);
 \end{lstlisting}
+
+
+%----------------------------------------------------------------------------------------
+\section{Distributed programming}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+\subsection{Serialization}
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Components and Actions}
+%----------------------------------------------------------------------------------------
+
+
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Receiving topology information}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+\section{Overview of HPX headers}
+%----------------------------------------------------------------------------------------
+This section recaps some of the HPX headers and the functionality they provide. 
+\begin{itemize}
+\item \cpp{#include <hpx/hpx_main.hpp>} \\
+This header includes the HPX run time systems and has to be always the first HPX header to be included. This header provides a way to initialize the HPX runtime system, see Listing~\ref{code:hpx:main}. For more details, we refer to Section~\ref{sec:hpx:using}. 
+
+\item \cpp{#include <hpx/hpx_init.hpp>} \\
+This header includes the HPX run time systems and has to be always the first HPX header to be included. This header provides a different way to initialize the HPX runtime system, see Listing~\ref{code:hpx:init}. For more details, we refer to Section~\ref{sec:hpx:using}.
+
+\item \cpp{#include <hpx/include/locs.hpp>} \\
+This header provides for example \cpp{hpx::future} and \cpp{hpx::async} functionality. Fore more details, we refer to Section~\ref{sec:hpx:async}. In addition, the advanced synchronization features, see Section~\ref{sec:hpx:advanced:sync}, are included in this header as well.
+
+\item \cpp{#include <hpx/algorithm.hpp>} \\
+This header provides the functionality of the parallel algorithms and compares to \cpp{#include <algorithm>}.
+\begin{itemize}
+\item \cpp{#include <hpx/include/parallel_for_loop.hpp>}
+This header includes the method \cpp{hpx::parallel::for_loop} functionality, see Listing~\ref{code:hpx:parallel:range:loop}. Note if you intend to use multiple parallel algorithms, you could use \cpp{#include <hpx/algorithm.hpp>} which compares to \cpp{#include <algorithm>}.
+\item \cpp{#include <hpx/include/parallel_reduce.hpp>} \\
+This header includes the method \cpp{hpx::parallel::v1::reduce} functionality which is comparable to the \cpp{std::reduce}, see Listing~\ref{code:hpx:parallel:reduce}. Note if you intend to use multiple parallel algorithms, you could use \cpp{#include <hpx/algorithm.hpp>} which compares to \cpp{#include <algorithm>}. 
+\end{itemize}
+
+\item \cpp{#include <hpx/modules/synchronization.hpp>} \\
+This header provides the \cpp{hpx::lcos::local::sliding_semaphore}, see Listing~\ref{code:hpx:semaphore}. Fore more details, we refer to Section~\ref{sec:hpx:semaphores}. 
+
+\end{itemize}
 
 \newpage
 \theendnotes
