@@ -1027,6 +1027,27 @@ sem.wait(t);
 %----------------------------------------------------------------------------------------
 \subsection{Receiving topology information}
 %----------------------------------------------------------------------------------------
+Following functions are available to receive topology information:
+\begin{itemize}
+\item \lstinline|hpx::find_here| \\
+Get the global address of the locality the function is called on.
+
+\item \lstinline|hpx::find_all_localities| \\
+Get the global addresses of all available localities.
+
+\item \lstinline|hpx::find_remote_localities| \\
+Get the global addresses of all available remote localities.
+
+\item \lstinline| hpx::get_num_localities| \\
+Get the number of all available localities.
+
+\item \lstinline|hpx::find_locality| \\
+Get the global address of any locality hosting the component.
+
+\item \lstinline|hpx::get_colocation_id| \\
+Get the locality hosting the object with the given address.
+\end{itemize}
+
 
 %----------------------------------------------------------------------------------------
 \section{Overview of HPX headers}
