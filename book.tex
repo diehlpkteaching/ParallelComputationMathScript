@@ -581,6 +581,7 @@ int main(){
 
 %----------------------------------------------------------------------------------------
 \chapter{Distributed Programming}
+\label{sec:distributed:programming}
 %----------------------------------------------------------------------------------------
 Previously, we considered shared memory parallelism which means we only considered one physical computational node. Now, we will look into distributed programming because the memory or the computational resources of one physical computational node are not sufficient. Figure~\ref{}
 
@@ -1014,11 +1015,72 @@ sem.wait(t);
 
 %----------------------------------------------------------------------------------------
 \subsection{Serialization}
+\index{serialization}
 %----------------------------------------------------------------------------------------
+In shared memory parallelism the allocated data resits in the memory on the node, however, in the distributed memory parallelism each of the physical nodes has its own memory. If one uses \cpp{std::vector<double>} or \cpp{double[]} this is a so--called unflatten\index{serialization!unflatten} data structure representation in C++. However, this data structure can not be wrapped in a parcel and send over the network to another physical node. Before the data structure can be wrapped in a parcel, the data needs to be flatten\index{serialization!flatten} to a one-dimensional stream of bits. For the serialized stream of bits there is human-readable (text) and non-human-readable (binary) format possible. The advantage of the text variant is that the message is readable, but is larger. For the binary variant the message is might smaller, but can not be analyzed for debugging.\\
+
+Figure~\ref{fig:sending:network} shows the protocol to send data over the network from locality 1 to locality 2. On locality 1, first the data is allocated in the local memory, for example one could allocate the vector \cpp{std::vector<double> vec = {0.0,0.5,1.0};} in the local memory of locality 1. Second, the \cpp{std::vector<double>} is serialized which means the \cpp{std::vector} is transformed in a stream of bits containing the data of the vector and some additional information, \emph{e.g.}\ the size of elements. Third, the flattened bit of streams is wrapped into a parcel which is send over the network to locality 2. For more details for sending parcels over the network, we refer to Section~\ref{sec:distributed:programming}. On the receiving locality 2, first the parcel is received and unpacked. Second, the data for the content of the parcel is allocated in the local memory of locality 2. Third, the flattened data from the received parcel is deserialized and stored in the local memory of locality 2.
+
+\begin{figure}[tb]
+\begin{center}
+\begin{tikzpicture}
+\draw (0,0) rectangle ++(3,-0.75) node[pos=.5] {Allocate data};
+
+\draw (0,-1.25) rectangle ++(3,-.75) node[pos=.5] {Serialize data};
+
+\draw (0,-2.5) rectangle ++(3,-.75) node[pos=.5] {Send parcel};
+
+\draw (-0.1,0.1) rectangle ++(3.2,-3.75);
+
+\node[above] at (1.5,0) {Locality 1};
+
+\draw (6,0) rectangle ++(3,-0.75) node[pos=.5] {Deserialize data};
+
+\draw (6,-1.25) rectangle ++(3,-.75) node[pos=.5] {Allocate data};
+
+\draw (6,-2.5) rectangle ++(3,-.75) node[pos=.5] {Receive parcel};
+
+\draw (5.9,0.1) rectangle ++(3.2,-3.75);
+
+\node[above] at (7.5,0) {Locality 2};
+
+\draw (1.5,-0.75) -- (1.5,-1.23) ;
+\draw (1.5,-2.) -- (1.5,-2.5) ;
+
+\draw (3,-2.875) -- (6,-2.875) ;
+
+\draw (7.5,-0.75) -- (7.5,-1.23) ;
+\draw (7.5,-2.) -- (7.5,-2.5) ;
+
+\end{tikzpicture}
+\end{center}
+\caption{The communication between the localities (nodes) is handled by the so-called parcel port~\cite{kaiser2009parallex}. HPX uses MPI or libfrabric for communication between nodes.}
+\label{fig:sending:network} 
+\end{figure}
+
+Before, we looked into the general concept of serialization and now we look on the implementation within HPX. In Listing~\ref{code:hpx:serialization} the data is allocated in the first three lines. To serialize the \cpp{double* data} array, first a \cpp{hpx::serialization::serialize_buffer} us used in Line~6 is defined. In Line~8 the buffer \cpp{serialize_buffer<double>} with \cpp{double} as its template argument is used, since we intend to serialize the \cpp{double* data} array. As the arguments of the constructor, we pass the pointer to the data and the size of the data. For now we ignore the third argument and just use this mode as the default mode. This is the part of the serialization which happens on locality 1. The deserialization which would happen on locality 2 is shown in Line~12, assuming we received the \cpp{serializable_data} object on locality 2. On locality 2 a pointer \cpp{data* copied_data} is used to store the deseralized data obtained by the function \cpp{.data()}. For sending and receiving parcels, we will look into components and action, in Section~\ref{sec:hpx:components:actions}.
+
+
+\begin{lstlisting}[language=c++,caption={Serialization in HPX.\label{code:hpx:serialization}},float,floatplacement=tb]
+// Allocation of the data
+size_t size = 5;
+double* data = new double[size];
+
+// Serialization
+using hpx::serialization::serialize_buffer;
+
+serialize_buffer<double> serializable_data(
+     data, size,
+     serialize_buffer<double>::init_mode::reference);
+     
+// Deserialization
+double* copied_data = serializable_data.data();
+\end{lstlisting}
 
 
 %----------------------------------------------------------------------------------------
 \subsection{Components and Actions}
+\label{sec:hpx:components:actions}
 %----------------------------------------------------------------------------------------
 
 
