@@ -360,11 +360,27 @@ if (tmp == nullptr)
 \end{lstlisting}
 
 
-
-
 %----------------------------------------------------------------------------------------
 \subsection*{Removing the first element}
 %----------------------------------------------------------------------------------------
+
+
+Listing~\ref{code:list:pop:front} shows the implementation of the \cpp{pop_front} function. In Line~3 we check for the case if the first pointer is the \cpp{nullptr} and we do not need to delete the first element. In Line~6 the first pointer is stored temporarily in \cpp{tmp}, the first pointer points to the second pointer \cpp{first-next}, and finally we can delete the \cpp{tmp} pointer.
+
+
+\begin{lstlisting}[language=c++,caption={Implementation of the \cpp{pop_front} function of a linked list.\label{code:list:pop:front}},float,floatplacement=tb]
+void pop_front(){
+    
+    if (first == nullptr) 
+        return; 
+  
+    // Move the head pointer to the next node 
+    data<T>* tmp = first; 
+    first = first->next; 
+  
+    delete tmp;   
+}
+\end{lstlisting}
 
 
 %----------------------------------------------------------------------------------------
