@@ -165,7 +165,7 @@ As a reference the corresponding methods for the \cpp{std::list}\link{https://en
   \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (C);
   \draw[*->] let \p1 = (C.two), \p2 = (C.center) in (\x1,\y2) -- (D);
 \end{tikzpicture}
-\caption{}
+\caption{A sketch of the linked-list containing three elements. The first pointer points to the second element of the list, the pointer of the second element points to the third element of the list, and the last pointer points to nowhere. This indicates that the end of the list is reached.}
 \label{fig:sketch:linked:list}
 \end{figure}
 
@@ -322,6 +322,44 @@ tmp->next = new data<T>(element);
 %----------------------------------------------------------------------------------------
 \subsection*{Inserting an element}
 %----------------------------------------------------------------------------------------
+Listing~\ref{code:list:insert} shows the implementation of the insertion of an element at a given index. In Line~3 a new element \cpp{data<T>* newNode = new data<T>(element);} containing the new element is generated. In Line~8 we have the first special case, since we want to replace the first node. Here, \cpp{newNode->next} points to the previous first element which is temporarily stored in \cpp{tmp}. Now, the pointer \cpp{first} points to the new first node. The next case is that we want to insert at not the first index. Here, we use the \cpp{while} loop in Line~17 to find the pointer to the element at the given \cpp{index}. Once we found the pointer to the index, we have to check if the pointer is not the \cpp{nullptr} which would mean that we want to insert at an index larger as the size of the list, see Line~24. After this check, we can finally insert the new element.
+
+\begin{lstlisting}[language=c++,caption={Implementation of the \cpp{insert} function of a linked list.\label{code:list:insert}},float,floatplacement=tb]
+void insert(data<T>* first, T element, size_t index){
+
+data<T>* newNode = new data<T>(element);
+data<T>* tmp = first;
+data<T>* prev = nullptr;
+
+//Case: Replace the head node
+if (index == 0 && tmp != nullptr){
+    newNode->next = tmp;
+    first = newNode;
+    return;
+}
+
+// Case: search for the node
+size_t i = 0;
+
+while(i < index && tmp != nullptr){
+
+    prev = tmp;
+    tmp = tmp->next;
+    i++;
+}
+
+if (tmp == nullptr)
+    {
+    std::cout << "Index " << index << " out of range" << std::endl;
+    return;
+    }
+    
+    prev->next = newNode;    
+    newNode->next = tmp;
+}
+\end{lstlisting}
+
+
 
 
 %----------------------------------------------------------------------------------------
