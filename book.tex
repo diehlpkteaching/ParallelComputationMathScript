@@ -102,7 +102,7 @@
 \include{sections/chapter1}
 
 %----------------------------------------------------------------------------------------
-%\part{Linear algebra and solvers}
+\part{Linear algebra and solvers}
 %----------------------------------------------------------------------------------------
 
 \include{sections/chapter2}
@@ -127,6 +127,257 @@
 %----------------------------------------------------------------------------------------
 
 \include{sections/chapter5}
+
+%----------------------------------------------------------------------------------------
+\part{Linked list}
+\index{list}
+%----------------------------------------------------------------------------------------
+
+This course does not go deep into pointers, since I believe that one should avoid to use pointers a much as possible and use the C++ standard library as much as possible. For more details about the C++ standard library, we refer to Section~\ref{chapter:stl}. In this section, we looked into the containers, see Section~\ref{sec:containers}, to store values in a \cpp{std::vector} or a \cpp{std::list}. In this section, we look into the implementation of the \cpp{std::list} where pointers are heavily used. We do this for two reasons: 1) To showcase why one should avoid to use pointers and use the containers instead and 2) I believe it is important that you understand how the \cpp{std::list} is implemented. In most implementations the \cpp{std::list} is implemented as a doubly-linked list. Due to the doubly-linked list\index{list!doubly-linked}, a forward and backward iterator is available. However, for this exercise, we focus on a singly-linked list\index{list!singly-linked} which relates to the \cpp{std::forward_list}\link{https://en.cppreference.com/w/cpp/container/forward_list}. For more details about different types of lists, we refer to~\cite{abelson1996structure}. \\
+
+Figure~\ref{fig:sketch:linked:list} sketches the data structure and the usage of pointers. Each element of the list contains a value in this example a integer value and a pointer of the element's type. For example the first element contains the value 12 and point to the second element of the list. The second element contains the value 99 and points to the third element. For any additional element in the list, the same principle would hold, except of the last element of the list which point to nowhere. This is needed to determine the end of the list. Following operations are most commons for lists
+\vspace{0.25cm}
+\begin{itemize}
+\item Creating an empty list (\cpp{std::list<int> list;})
+\item Check if a list is empty (\cpp{list.empty();})
+\item Prepending an element to a list (\cpp{list.push_front(42);}
+\item Appending an element to a list (\cpp{list.push_back(42)};)
+\item Getting the first element of the list (\cpp{list.front();}
+\item Accessing the element at a given index 
+\item Deleting the last element (\cpp{list.pop_back()};)
+\item Deleting the first element (\cpp{list.pop_front();})
+\end{itemize}
+\vspace{0.25cm}
+As a reference the corresponding methods for the \cpp{std::list}\link{https://en.cppreference.com/w/cpp/container/list} are shown. Fore more details, we refer to~\cite[Chapter 2]{knuth1997art}.
+
+\begin{figure}[tbp]
+\centering
+\begin{tikzpicture}[list/.style={rectangle split, rectangle split parts=2,
+    draw, rectangle split horizontal}, >=stealth, start chain]
+
+  \node[list,on chain] (A) {12};
+  \node[list,on chain] (B) {99};
+  \node[list,on chain] (C) {37};
+  \node[on chain,draw,inner sep=6pt] (D) {};
+  \draw (D.north east) -- (D.south west);
+  \draw (D.north west) -- (D.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (C);
+  \draw[*->] let \p1 = (C.two), \p2 = (C.center) in (\x1,\y2) -- (D);
+\end{tikzpicture}
+\caption{}
+\label{fig:sketch:linked:list}
+\end{figure}
+
+
+
+
+%----------------------------------------------------------------------------------------
+\chapter{Implementation}
+%----------------------------------------------------------------------------------------
+In this section, we look into the implementation of a singly-linked list using raw C++. Note that this in an exercise to showcase why you should avoid pointers if possible, because handling them will get messy. 
+
+%----------------------------------------------------------------------------------------
+\section*{Data structures}
+%----------------------------------------------------------------------------------------
+One list element in Figure~\ref{fig:sketch:linked:list} contains one the data of the type \cpp{T} and one pointer to the next element or a \cpp{nullptr} at the last element. Listing~\ref{code:list:struct} shows the implementation of the list element using a \cpp{struct data}. For more details about the struct, we refer to Section~\ref{sec:struct}. In Line~10 the content of the list is stored in the variable \cpp{element}. In Line~12 the pointer \cpp{data<T>* next} is used to link to the next list element. Note that the pointer is initialized to \cpp{nullptr} since we assume that the element is inserted as the end of the list and points to nowhere. We add one constructor which assigns the value of the element. To make the list generic, we use generic programming and adding the template \cpp{typename T}. For more details for generic programming, we refer to Section~\ref{sec:generic:programming}. For the initialization of the list, we would use \cpp{std::list<double>} using the C++ STL and \cpp{data<double> * myList}.\\
+
+Now, since we have the data structure for the element of the, we need the wrapper class to hide the pointers from the user, as the C++ STL does. Listing~\ref{code:list:struct} shows the \cpp{struct myList} with a pointer to the struct \cpp{struct data} which points to nowhere \cpp{nullptr} if the list is empty or to the first element of the list. The first constructor in Line~24 will generate an empty list. The second constructor will generate a list of size one and pointing to the first element. For the example in Figure~\ref{fig:sketch:linked:list} this pointer would point to the element containing the value 12. Now we can generate an empty list \cpp{myList<int> mylist;} or a list of size one \cpp{myList<int> mylist = myList<int>(42);}. The corresponding expression using the C++ STL are \cpp{std::list<int> list;} and \cpp{std::list<int> list = {42};}. The easiest function to implement is the \cpp{empty()} function which is shown in Line~32. Here, we check if the first pointer is equal to the \cpp{nullptr} and if so, the list is empty. 
+
+
+\begin{lstlisting}[language=c++,caption={Example for a structure for a three dimensional vector.\label{code:list:struct}},float,floatplacement=tb]
+//Struct for the element of a list
+template<typename T>
+struct data{
+
+data(T in){
+
+element = in;
+}
+
+// Element of the type std::list<T>
+T element;
+// Pointer of type of the class/struct
+data<T>* next = nullptr;
+
+};
+
+// Struct for our implementation of the list
+template<typename T>
+struct myList{
+
+//Pointer to the first element
+data<T>* first = nullptr;
+
+myList(){}
+
+myList(T in){
+
+	first = new data<T>(in);
+
+}
+
+bool empty(){
+
+	if (first == nullptr)
+		return true;
+	
+	return false;
+}
+
+};
+\end{lstlisting}
+
+%----------------------------------------------------------------------------------------
+\section*{Inserting}
+%----------------------------------------------------------------------------------------
+
+Figure~\ref{fig:sketch:linked:list:init} shows the linked list after the initialization \cpp{myList<int> mylist = myList(1);}. Here, we called the contructor in Listing~\ref{code:list:struct} and the pointer \cpp{data<double>* first} points to the \cpp{new data<double>(1)}. Since this element is the last element the pointer \cpp{next} is the \cpp{nullptr} to indicate that this is the first and last element of the list.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[list/.style={rectangle split, rectangle split parts=2,
+    draw, rectangle split horizontal}, >=stealth, start chain]
+  \node[list,on chain] (A) {1};
+  \node[on chain,draw,inner sep=6pt] (D) {};
+  \draw (D.north east) -- (D.south west);
+  \draw (D.north west) -- (D.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (D);
+\end{tikzpicture}
+\caption{The linked list after the initialization \cpp{myList<double> mylist = myList<double>(1);}. The pointer \cpp{first} point now to the \cpp{new data<double>(1)} instead to the \cpp{nullptr}.}
+\label{fig:sketch:linked:list:init}
+\end{figure}
+
+
+
+%----------------------------------------------------------------------------------------
+\subsection*{Inserting at the beginning}
+%----------------------------------------------------------------------------------------
+
+Figure~\ref{fig:sketch:linked:list:push_front} shows the list after inserting a element at the beginning of the list. In this case the need to manipulate pointer \cpp{first} to the first element, see Listing~\ref{code:list:push:front}. In Line~3 we keep a temporary copy \cpp{tmp} of the first element. In Line~5 the pointer to the first element points to the new first element. In Line~7 the new first element points to the previous first element which was temporarily stored in the \cpp{tmp} pointer.
+
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[list/.style={rectangle split, rectangle split parts=2,
+    draw, rectangle split horizontal}, >=stealth, start chain]
+  \node[list,on chain,azure] (A) {2};
+  \node[list,on chain] (B) {1};
+  \node[on chain,draw,inner sep=6pt] (C) {};
+  \draw (C.north east) -- (C.south west);
+  \draw (C.north west) -- (C.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (C);
+\end{tikzpicture}
+\caption{The linked list after inserting a new element at the beginning. The pointer \cpp{first} point now to \cpp{new data(double>(2)} and the pointer \cpp{next} of the first element points to the previous first element.}
+\label{fig:sketch:linked:list:push_front}
+\end{figure}
+
+\begin{lstlisting}[language=c++,caption={Implementation of the \cpp{push_back} function of a linked list.\label{code:list:push:front}},float,floatplacement=tb]
+void push_front(T element){
+    
+data<T>* tmp = first;
+    
+first = new data<T>(element);
+    
+first->next = tmp; 
+    
+}
+\end{lstlisting}
+
+%----------------------------------------------------------------------------------------
+\subsection*{Inserting at the end}
+%----------------------------------------------------------------------------------------
+
+Figure~\ref{fig:sketch:linked:list:push_back} shows the list after inserting one element at the end of the list. The last element of the list is the element where \cpp{next} is the \cpp{nullptr}. Listing~\ref{code:list:pus:back} shows the implementation of the \cpp{push_back} function. We assign the pointer to the first element to a temporary pointer \cpp{tmp} to do not change the pointer to the first element, since we could lose access to the list. To find the last element of the list, the while loop in Line~5 iterates as long as the \cpp{next} pointer is not the \cpp{nullptr}. If the \cpp{next} pointer is the \cpp{nullptr} we found the last element. So the \cpp{next} pointer points now to the \cpp{new data<T>element(2);} and this element becomes the last element. In Figure~\ref{fig:sketch:linked:list:push_back} we have the new element colored in \textcolor{azure}{blue} and the first element points to the second element. The second element points to nowhere.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[list/.style={rectangle split, rectangle split parts=2,
+    draw, rectangle split horizontal}, >=stealth, start chain]
+  \node[list,on chain] (A) {1};
+  \node[list,on chain,azure] (B) {2};
+  \node[on chain,draw,inner sep=6pt] (C) {};
+  \draw (C.north east) -- (C.south west);
+  \draw (C.north west) -- (C.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (C);
+\end{tikzpicture}
+\caption{The linked list after inserting an element at the end. The pointer \cpp{next} of the first element does not point to the \cpp{nullptr} and instead points to \cpp{new data<double>(2)} and this element point to the \cpp{nullptr}, since this is the new last element of the list.}
+\label{fig:sketch:linked:list:push_back}
+\end{figure}
+
+\begin{lstlisting}[language=c++,caption={Implementation of the \cpp{push_back} function of a linked list.\label{code:list:pus:back}},float,floatplacement=tb]
+void push_back(T element){
+
+data<T>* tmp = first;
+
+while (tmp->next != nullptr)
+    tmp = tmp->next;
+
+tmp->next = new data<T>(element);
+}
+\end{lstlisting}
+
+%----------------------------------------------------------------------------------------
+\subsection*{Inserting an element}
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+\subsection*{Removing the first element}
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+\subsection*{Removing the last element}
+%----------------------------------------------------------------------------------------
+Figure~\ref{fig:sketch:linked:remove last} shows the linked list with the last element colored in \textcolor{amaranth}{red} which is deleted. Listing~\ref{code:list:pop_back} shows the implementation of the \cpp{pop_back} function. In Line~3 the pointer to the first element is stored in the temporary pointer \cpp{tmp} and we keep a copy of the previous pointer in the pointer \cpp{prev}. In line~6 we search for the element before the last element by using \cpp{tmp->next->next} and after the while loop \cpp{tmp} points to the second element of the example list.  Thus, in Line~10 we can delete the last element \cpp{tmp->next} and after that point to the \cpp{nullptr} since the second element became the last element.
+
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[list/.style={rectangle split, rectangle split parts=2,
+    draw, rectangle split horizontal}, >=stealth, start chain]
+
+  \node[list,on chain] (A) {1};
+  \node[list,on chain] (B) {2};
+  \node[list,on chain,amaranth] (C) {3};
+  \node[on chain,draw,inner sep=6pt] (D) {};
+  \draw (D.north east) -- (D.south west);
+  \draw (D.north west) -- (D.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (C);
+  \draw[*->] let \p1 = (C.two), \p2 = (C.center) in (\x1,\y2) -- (D); 
+  
+  \node[list,on chain,yshift=-1cm,xshift=-7.25cm] (A) {1};
+  \node[list,on chain] (B) {2};
+  \node[on chain,draw,inner sep=6pt] (D) {};
+  \draw (D.north east) -- (D.south west);
+  \draw (D.north west) -- (D.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (D); 
+\end{tikzpicture}
+\caption{In the first row the linked list before the last element was deleted and in the second row the linked list after deleting the last element. The pointer \cpp{next} of the second element points now to the \cpp{nullptr} since it became the last element. Note that we had to use \cpp{delete} to free the memory allocated by the last element.}
+\label{fig:sketch:linked:remove last}
+\end{figure}
+
+
+\begin{lstlisting}[language=c++,caption={Implementation of the \cpp{pop_back} function of a linked list.\label{code:list:pop_back}},float,floatplacement=tb]
+void pop_back(){
+
+data<T>* tmp = first;
+data<T>* prev;
+
+while (tmp->next->next != nullptr){
+    tmp = tmp->next;
+    }
+    
+    delete tmp->next;
+    tmp->next = nullptr;
+}
+\end{lstlisting}
+
 
 %----------------------------------------------------------------------------------------
 \part{Appendix}

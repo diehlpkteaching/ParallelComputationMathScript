@@ -37,9 +37,11 @@
 \usepackage{tikz} % Required for drawing custom shapes
 \usetikzlibrary{graphdrawing}
 \usetikzlibrary{mindmap}
-\usetikzlibrary{shapes.geometric, arrows,matrix}
+\usetikzlibrary{shapes.geometric, arrows,matrix,shapes.multipart}
 \usetikzlibrary{calc}
 \usetikzlibrary{fit}
+\usetikzlibrary{chains}
+
 \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=0.5cm,text centered, draw=black, fill=cadetgrey!30]
 \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=0.5cm, text centered, draw=black] %, fill=blue!30]
 \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=0.5cm, text centered, draw=black] %, fill=orange!30]
@@ -68,15 +70,11 @@
     \foreach \i in {1,2,...,#1}{%
         \typeout{Point \i}%
         \pgfmathsetmacro\x{rnd}%
-        \typeout{X \x}%
         \pgfmathsetmacro\y{rnd}%
-        \typeout{Y \y}%
         \pgfmathsetmacro\k{(pow(\x,2)+pow(\y,2)) <pow(1,2)}%
-        \typeout{im Kreis?: \k}%
         \pgfmathparse{ifthenelse(\k==1,1,0)}%
         \pgfmathparse{\n+\pgfmathresult}
         \xdef\n{\pgfmathresult}
-        \typeout{N \n} 
         }
 \pgfmathparse{4*\n/#1}
 \xdef\r{\pgfmathresult}
