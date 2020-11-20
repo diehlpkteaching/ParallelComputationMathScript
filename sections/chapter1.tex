@@ -362,6 +362,49 @@ Transform the \cpp{struct} in Listing~\ref{code:struct} to a \cpp{class}.
 \end{exercise}
 
 %----------------------------------------------------------------------------------------
+\subsection{Access specifiers}
+\index{access specifiers}
+\index{structure! access specifiers}
+\label{sec:access:specifiers}
+%----------------------------------------------------------------------------------------
+for all functions and members of a \cpp{struct} or \cpp{class} the accessibility can be restricted to following access specifiers\link{https://en.cppreference.com/w/cpp/language/access}:
+\begin{itemize}
+\item \cpp{public} - All members below this expression are accessible from outside \index{access specifiers!public}
+\item \cpp{public} - All members below this expression are not accessible from outside\text{.}\index{access specifiers!private}
+\end{itemize}
+\vspace{0.25cm}
+Listing~\ref{code:access:specifiers} shows the usage of the access specifiers. Since \cpp{double x} is declared as \cpp{private}, we can not access the struct member using \cpp{a.x} anymore, since we only allowed access within the definition of the \cpp{struct}. To access the \cpp{private} member, a so-called get method, see Line~11, and a do-called set method, see Line~9 is declared in the \cpp{public} scope of the \cpp{struct}.
+
+\begin{lstlisting}[language=c++,caption={Example for a access specifiers.\label{code:access:specifiers}},float,floatplacement=tb]
+#include <cmath>
+
+struct A 
+{
+public:
+
+A (double value) : x(value {};
+
+void setX(double value) { x = value;}
+
+double getX() ( return x;)
+
+private:
+
+double x;
+
+}
+
+A a = A(10);
+
+// Access the private member
+double value = a.getX();
+
+// Change the value
+a.setX(11);
+\end{lstlisting}
+
+
+%----------------------------------------------------------------------------------------
 \subsection{Header and Source files}
 \index{header file}
 %----------------------------------------------------------------------------------------
@@ -494,6 +537,46 @@ vector3::vector2(double x, double y, double z)
 }
 
 double vector3::norm(){return std::sqrt(x*x+y*y+z*z)}
+\end{lstlisting}
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Inheritance}
+\index{inheritance}
+%----------------------------------------------------------------------------------------
+In some cases we like to define a base class, \emph{e.g.}\ for a shape, see Listing~\ref{code:class:inheritance}. Here, we define the \cpp{class Shape} and the expression \cpp{abstract}\link{https://en.cppreference.com/w/cpp/language/abstract_class}\index{class!abstract} means that we can not generate instances of the class. This class will only be used to derive different shapes, like \cpp{class Rectangle} and \cpp{class Square}. To inherit all functions and class members to from the parent class to the child class, the expression \cpp{class Rectangle : public Shape}\link{https://en.cppreference.com/book/intro/inheritance} is used, see Line~19. Fir the usage of the access specifiers, we refer to Section~\ref{sec:access:specifiers}. Here, the new access specifier \cpp{protected} is introduced. We assume that each derived shape has a \cpp{width} and a \cpp{height}. To showcase the difference between \cpp{private} and \cpp{protected}, the \cpp{width} is declared with \cpp{private} access and the \cpp{height} is declared as \cpp{protected}, respectively. Note that both of these class members are inherit to the child class, however, both of them are accessed differently. Since the \cpp{width} in the parent class wad declared as \cpp{private}, we only can access this class member using the parent class. In Line~23, the constructor of the child class \cpp{Rectangle} is defined. To access the \cpp{private} class member we have to use \cpp{: Shape(width)} since only the parent class can access it. For the \cpp{protected} variable, we can write \cpp{height = height} since we can access this variable directly.
+
+\begin{lstlisting}[language=c++,caption={Example for inheritance of classes.\label{code:class:inheritance}},float,floatplacement=tb]
+abstract class Shape {
+
+public:
+
+Shape (){}
+
+Shape (int width) : width(width) {};
+
+private:
+
+int width;
+
+protected:
+
+int height;
+
+};
+
+class Rectangle : public Shape {
+
+public:
+
+Rectangle (int width, int height) : Shape(width) {
+	height = height;
+}
+
+int area(){ return height * width;}
+
+};
+
 \end{lstlisting}
 
 
