@@ -704,6 +704,10 @@ int second = *(array + 1);
 ptrdiff_t dist = array+2 - array;
 \end{lstlisting}
 
+%----------------------------------------------------------------------------------------
+\subsection*{Function pointer}
+%----------------------------------------------------------------------------------------
+\index{pointer!function}
 In the last example, we look into pointers to function, the so-called function pointers. In Listing~\ref{code:pointer:function} shows how to generate function pointers to the function \cpp{square}. In Line~7 the first possibility to generate a function pointer to the \cpp{square} function. The first \cpp{int} stands for the return type of the function and the second \cpp{int} for the function's argument. In Line~2 the left-hand side is the same, but on the right-hand side we use the address operator. In Lines~112--12 the function is called using its function pointer. Note that each of two lines to get the pointer or call the function are equivalent. 
 
 
@@ -723,6 +727,32 @@ std::cout << (*fp)(5);
 std::cout << fp2(5);
 
 \end{lstlisting}
+
+%----------------------------------------------------------------------------------------
+\subsection*{Pointer to objects}
+%----------------------------------------------------------------------------------------
+\index{pointer!objects}
+Listing~\ref{code:pointer:object} shows the definition of the \cpp{struct A}, for more details about \cpp{struct} we refer to Section~\ref{sec:struct}. In Line~12 we use a point \cpp{A* a} and assign the address of the \cpp{new A(10)} object to it. Note for accessing the variable \cpp{value} using the pointer, the expression \cpp{->}\link{https://en.cppreference.com/w/cpp/language/operator_member_access} is used. 
+
+\begin{lstlisting}[language=c++,caption={Example for pointers to objects.
+\label{code:pointer:object}},float,floatplacement=tb]
+struct A {
+
+public: 
+
+A(double in)
+{
+	value = in;
+}
+
+double value;
+};
+
+A* a = new A();
+double val = a->value;
+\end{lstlisting}
+
+
 
 %----------------------------------------------------------------------------------------
 \subsection{Memory management}
