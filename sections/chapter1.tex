@@ -1,3 +1,19 @@
+%Book
+%Copyright (C) 2019  Patrick Diehl
+%
+%This program is free software: you can redistribute it and/or modify
+%it under the terms of the GNU General Public License as published by
+%the Free Software Foundation, either version 3 of the License, or
+%(at your option) any later version.
+
+%This program is distributed in the hope that it will be useful,
+%but WITHOUT ANY WARRANTY; without even the implied warranty of
+%MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%GNU General Public License for more details.
+
+%You should have received a copy of the GNU General Public License
+%along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 %\chapterimage{chapter_head_2.pdf} % Chapter heading image
 
 %----------------------------------------------------------------------------------------
@@ -346,6 +362,49 @@ Transform the \cpp{struct} in Listing~\ref{code:struct} to a \cpp{class}.
 \end{exercise}
 
 %----------------------------------------------------------------------------------------
+\subsection{Access specifiers}
+\index{access specifiers}
+\index{structure! access specifiers}
+\label{sec:access:specifiers}
+%----------------------------------------------------------------------------------------
+for all functions and members of a \cpp{struct} or \cpp{class} the accessibility can be restricted to following access specifiers\link{https://en.cppreference.com/w/cpp/language/access}:
+\begin{itemize}
+\item \cpp{public} - All members below this expression are accessible from outside \index{access specifiers!public}
+\item \cpp{public} - All members below this expression are not accessible from outside\text{.}\index{access specifiers!private}
+\end{itemize}
+\vspace{0.25cm}
+Listing~\ref{code:access:specifiers} shows the usage of the access specifiers. Since \cpp{double x} is declared as \cpp{private}, we can not access the struct member using \cpp{a.x} anymore, since we only allowed access within the definition of the \cpp{struct}. To access the \cpp{private} member, a so-called get method, see Line~11, and a do-called set method, see Line~9 is declared in the \cpp{public} scope of the \cpp{struct}.
+
+\begin{lstlisting}[language=c++,caption={Example for a access specifiers.\label{code:access:specifiers}},float,floatplacement=tb]
+#include <cmath>
+
+struct A 
+{
+public:
+
+A (double value) : x(value {};
+
+void setX(double value) { x = value;}
+
+double getX() ( return x;)
+
+private:
+
+double x;
+
+}
+
+A a = A(10);
+
+// Access the private member
+double value = a.getX();
+
+// Change the value
+a.setX(11);
+\end{lstlisting}
+
+
+%----------------------------------------------------------------------------------------
 \subsection{Header and Source files}
 \index{header file}
 %----------------------------------------------------------------------------------------
@@ -478,6 +537,46 @@ vector3::vector2(double x, double y, double z)
 }
 
 double vector3::norm(){return std::sqrt(x*x+y*y+z*z)}
+\end{lstlisting}
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Inheritance}
+\index{inheritance}
+%----------------------------------------------------------------------------------------
+In some cases we like to define a base class, \emph{e.g.}\ for a shape, see Listing~\ref{code:class:inheritance}. Here, we define the \cpp{class Shape} and the expression \cpp{abstract}\link{https://en.cppreference.com/w/cpp/language/abstract_class}\index{class!abstract} means that we can not generate instances of the class. This class will only be used to derive different shapes, like \cpp{class Rectangle} and \cpp{class Square}. To inherit all functions and class members to from the parent class to the child class, the expression \cpp{class Rectangle : public Shape}\link{https://en.cppreference.com/book/intro/inheritance} is used, see Line~19. Fir the usage of the access specifiers, we refer to Section~\ref{sec:access:specifiers}. Here, the new access specifier \cpp{protected} is introduced. We assume that each derived shape has a \cpp{width} and a \cpp{height}. To showcase the difference between \cpp{private} and \cpp{protected}, the \cpp{width} is declared with \cpp{private} access and the \cpp{height} is declared as \cpp{protected}, respectively. Note that both of these class members are inherit to the child class, however, both of them are accessed differently. Since the \cpp{width} in the parent class wad declared as \cpp{private}, we only can access this class member using the parent class. In Line~23, the constructor of the child class \cpp{Rectangle} is defined. To access the \cpp{private} class member we have to use \cpp{: Shape(width)} since only the parent class can access it. For the \cpp{protected} variable, we can write \cpp{height = height} since we can access this variable directly.
+
+\begin{lstlisting}[language=c++,caption={Example for inheritance of classes.\label{code:class:inheritance}},float,floatplacement=tb]
+abstract class Shape {
+
+public:
+
+Shape (){}
+
+Shape (int width) : width(width) {};
+
+private:
+
+int width;
+
+protected:
+
+int height;
+
+};
+
+class Rectangle : public Shape {
+
+public:
+
+Rectangle (int width, int height) : Shape(width) {
+	height = height;
+}
+
+int area(){ return height * width;}
+
+};
+
 \end{lstlisting}
 
 
@@ -631,10 +730,9 @@ std::vector<int>:: iterator p = std::find_if(
 std::cout << "First number greater than 4 is : " << *p << endl;
 \end{lstlisting}
 
-
 %----------------------------------------------------------------------------------------
 \section{Pointers}
-\index{pointers}
+\index{pointer}\index{pointer!raw}
 %----------------------------------------------------------------------------------------
 Imagine following conversation:
 \begin{flushleft}
@@ -689,6 +787,10 @@ int second = *(array + 1);
 ptrdiff_t dist = array+2 - array;
 \end{lstlisting}
 
+%----------------------------------------------------------------------------------------
+\subsection*{Function pointer}
+%----------------------------------------------------------------------------------------
+\index{pointer!function}
 In the last example, we look into pointers to function, the so-called function pointers. In Listing~\ref{code:pointer:function} shows how to generate function pointers to the function \cpp{square}. In Line~7 the first possibility to generate a function pointer to the \cpp{square} function. The first \cpp{int} stands for the return type of the function and the second \cpp{int} for the function's argument. In Line~2 the left-hand side is the same, but on the right-hand side we use the address operator. In Lines~112--12 the function is called using its function pointer. Note that each of two lines to get the pointer or call the function are equivalent. 
 
 
@@ -710,7 +812,34 @@ std::cout << fp2(5);
 \end{lstlisting}
 
 %----------------------------------------------------------------------------------------
-\subsection*{Memory management}
+\subsection*{Pointer to objects}
+%----------------------------------------------------------------------------------------
+\index{pointer!objects}
+Listing~\ref{code:pointer:object} shows the definition of the \cpp{struct A}, for more details about \cpp{struct} we refer to Section~\ref{sec:struct}. In Line~12 we use a point \cpp{A* a} and assign the address of the \cpp{new A(10)} object to it. Note for accessing the variable \cpp{value} using the pointer, the expression \cpp{->}\link{https://en.cppreference.com/w/cpp/language/operator_member_access} is used. 
+
+\begin{lstlisting}[language=c++,caption={Example for pointers to objects.
+\label{code:pointer:object}},float,floatplacement=tb]
+struct A {
+
+public: 
+
+A(double in)
+{
+	value = in;
+}
+
+double value;
+};
+
+A* a = new A();
+double val = a->value;
+\end{lstlisting}
+
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Memory management}
+\label{sec:memory:management}
 %----------------------------------------------------------------------------------------
 From the Spider-Man comics and the movies, we all know the sentence
 \begin{center}
@@ -746,6 +875,7 @@ delete[] p;
 
 %----------------------------------------------------------------------------------------
 \section{Moving data}
+\label{sec:moving:data}
 %----------------------------------------------------------------------------------------
 In some cases, if we pass a value to some function, we like to avoid to copy the data and instead we like to \cpp{std::move}\link{https://en.cppreference.com/w/cpp/utility/move} the data. Let us look into the example in Listing~\ref{code:move} to explain what we mean by moving a value. In Line~4 we add the string \cpp{hello} to the vector using the \cpp{push_back} method. However, by passing the string \cpp{hello} a copy of the string is passed to the function. Depending on the object size, the copying takes some time. However, if we print the content of the string \cpp{hello} by using the copy, the value of the string will be \cpp{"Hello"}. If, we want to avoid the copying, one can use the \cpp{std::move} function in Line~9. However, if we print the content of the sting \cpp{hello}, the empty string will be printed. This happens since we moved the data (in that case the content \cpp{"Hello"}) to the \cpp{std::vector<std::string>}. So, if we print the content of \cpp{v[i]}, we will see again the content \cpp{"Hello"} again, since we moved the content. Note that you have to be aware of undefined states after moving. For example \cpp{v.clear()} is a valid state since there is no precondition. However, \cpp{v.back()} could result in a undefined behavior, since the size of the string is zero.
 
@@ -766,6 +896,47 @@ std::cout << "After moving the string, its content is: " << hello << std::endl;
 //Printing the moved content
 std::cout << "After moving the string, its content is: " << v[1] << std::endl;
 
+\end{lstlisting}
+
+%----------------------------------------------------------------------------------------
+\subsection{Smart pointer}
+\label{cpp:smart:pointer}
+%----------------------------------------------------------------------------------------
+The so-called smart pointers\index{pointer!smart} are defined in the header \cpp{#include <memory>}\link{https://en.cppreference.com/w/cpp/header/memory}. In the previous section, we looked at so-called raw pointers and these should be used only in small code blocks of limited scope or where performance is a major issue. Using a raw pointer you are responsible to manage the memory and deallocate the memory if the object is not needed anymore. Using a smart pointer there is no need to call the \cpp{delete} explicitly. The first smart pointer is the \cpp{std::unique_ptr}\link{https://en.cppreference.com/w/cpp/memory/unique_ptr}\index{pointer!unique}, see Listing~\ref{code:pointer:unique}. The unique pointer points to exactly one object in the memory and no other pointer can point to this object. In Line~1 we initialize a smart unique pointer containing a array \cpp{double []} by using \cpp{std::unique_ptr<double[]>a}. We use the \cpp{new} operator to allocate a array of size two. For more details about the \cpp{new} keyword, we refer to Section~\ref{sec:memory:management}. In the Lines~5--6 the values of the array are initialized. Note that the Line+9 is commented out on purpose, since this line of code will not compile. Since we use a \cpp{std::unique_ptr} for the array \cpp{a}, we can not use a second smart pointer \cpp{b} pointing to \cpp{a}. However, moving the pointer \cpp{a} to the unique pointer \cpp{b} will work, since we move the control from \cpp{a} to \cpp{b}. Fore more details about \cpp{std:move}, we refer to Section~\ref{sec:moving:data}.\\
+
+\begin{lstlisting}[language=c++,caption={Using the smart unique pointer.
+\label{code:pointer:unique}},float,floatplacement=tb]
+// Generate a unique pointer of a double array
+std::unique_ptr<double[]>a(new double[2]);
+
+// Initialize the values
+a[0] = 1;
+a[1] = 2;
+
+// Generate a copy of the array a
+//std::unique_ptr<double[]>b(a);
+
+// Generate a copy of the array a
+std::unique_ptr<double[]>b(std::move(a));
+\end{lstlisting}
+
+
+The second smart pointer is the so--called share pointer \cpp{std::shared_ptr}\link{https://en.cppreference.com/w/cpp/memory/shared_ptr}\index{pointer!shared}. The shared pointer allows that pointers can point to the same object and a reference counter is used. Listing~\ref{code:pointer:smart} shows the usage of smart pointers. In Line~2 a smart pointer of a double array is generated and we allocate a array of size two. Now, since we use a shared pointer the pointer \cpp{a} can be passed to the new share pointer \cpp{b}, since multiple pointer can point to the same object. In addition, we can use the function \cpp{use_count()} to check the pointers pointing to the object the pointer \cpp{a} is pointing to. 
+
+
+\begin{lstlisting}[language=c++,caption={Using the smart unique pointer.
+\label{code:pointer:smart}},float,floatplacement=tb]
+// Generate a unique pointer of a double array
+std::shared_ptr<double[]>a(new double[2]);
+
+// Initialize the values
+a[0] = 1;
+a[1] = 2;
+
+// Generate a copy of the array a
+//std::unique_ptr<double[]>b(a);
+
+std::cout << a.use_count) << std::endl;
 \end{lstlisting}
 
 

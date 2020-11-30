@@ -1,5 +1,6 @@
 %Book
 %Copyright (C) 2019  Patrick Diehl
+%			   2020  Christoph Larson
 %
 %This program is free software: you can redistribute it and/or modify
 %it under the terms of the GNU General Public License as published by
@@ -98,13 +99,13 @@
 %	CHAPTER 1
 %----------------------------------------------------------------------------------------
 
-%\include{sections/chapter1}
+\include{sections/chapter1}
 
 %----------------------------------------------------------------------------------------
-%\part{Linear algebra and solvers}
+\part{Linear algebra and solvers}
 %----------------------------------------------------------------------------------------
 
-%\include{sections/chapter2}
+\include{sections/chapter2}
 
 %----------------------------------------------------------------------------------------
 \part{Numerical examples}
@@ -117,474 +118,7 @@
 \part{Parallel and distributed computing}
 %----------------------------------------------------------------------------------------
 
-%----------------------------------------------------------------------------------------
-\chapter{Parallel computing}
-%----------------------------------------------------------------------------------------
-In this Chapter, a brief overview of the technical aspects of parallel computing is given. Note that this course focuses on the implementation details, like asynchronous programming, see Chapter~\ref{sec:async:coding}; parallel algorithms, see Section~\ref{sec:stl:parallel:algorithms}; and the C++ standard library for parallelism and concurrency (HPX), see Chapter~\ref{sec:hpx}. However, we provide some details and further references for the technical aspects and hardware details.\\
-
-Let us begin with a definition of parallelism: \textit{1)} we need multiple resources which can operate at the same, \textit{2)} we have to have more than one task that can be performed at the same time, \textit{3)} we have to do multiple tasks on multiple resources the same time. First, we have to have multiple resources, \emph{e.g.}\ multiple threads of a computation node at the same time. However, with current hardware architecture this is not an issue. Second, this part is more interesting, since we need some code which is independent of each other and can be executed concurrent. Third, here we want to have overlapping computations and communication on multiple resources. For more details about parallel computing, we refer to~\cite{grama2003introduction,trobec2018introduction}.\\
-
-For the second part of the definition, Amdahl's law\index{Amdahl's law}~\cite{amdahl1967validity} or strong scaling\index{scaling} is important. Amdahl's law is given as
-\begin{align}
-S = \frac{1}{(1-P) + \frac{P}{N}}
-\end{align}
-where $S$ is the speed up, $P$ the proportion of parallel code, and $N$ the numbers of threads. Figure~\ref{fig:amdals:law} plots Amdahl's law for different ratios of parallel code. Obviously, for zero percent parallel code, there is no speedup. If the portion to parallel code increases, the speedup increases up to a certain amount of threads. Therefore, the parallel computing with many threads is only beneficial for highly parallelism in our program. For example if our code took 20 hours using a single thread to complete and there in a part of one hour which can not be executed in parallel. Thus, only 19 hours of execution time can be parallized $(p=0.95)$ and independent of the amount of threads we use the theoretical speedup is limited to $S=\sfrac{1}{(1-p)}=20$.\\
-
-\begin{figure}[tb]
-\centering
- \begin{tikzpicture}
-        \begin{axis}[
-            no markers,
-            samples=100,
-            /pgf/declare function={
-            f(\x,\a) = 1. / ((1.-\a)+(\a/x));
-       		},
-       		grid=both,
-       		xlabel=$N$ number of threads,
-       		ylabel=$S$ speedup,
-       		legend pos=outer north east,
-        ]
-            % ... and use it here
-            \addplot+ [domain=1:2048,azure,thick] {f(x,0)};
-            \addlegendentry{$P=0\%$}
-            \addplot+ [domain=1:2048,cadetgrey,thick] {f(x,0.5)};
-            \addlegendentry{$P=50\%$}
-            \addplot+ [domain=1:2048,darkgreen,thick] {f(x,.75)};
-            \addlegendentry{$P=75\%$}
-            \addplot+ [domain=1:2048,amaranth,thick] {f(x,.90)};
-            \addlegendentry{$P=90\%$}
-            \addplot+ [domain=1:2048,black,thick] {f(x,.95)};
-            \addlegendentry{$P=95\%$}
-       \end{axis}
-    \end{tikzpicture}
-\caption{Plot of Amdahl's law for different parallel portions of the code.}
-\label{fig:amdals:law}
-\end{figure}
-
-Before we look into different parallelism approaches, we look into the example how to compute the dot product $S = \mathbf{X} \cdot \mathbf{V} = \sum_i^N x_i y_i$ of two vectors $\mathbf{X} = \lbrace x_1,x_2,\ldots,x_n \rbrace$ and $\mathbf{Y} = \lbrace y_1,y_2,\ldots,y_n \rbrace$  in a sequential manner and extend this example to the various parallelism approaches. So we have to compute $S = (x_1y_1) + (x_2y_2) + \ldots + (x_n y_n)$ as shown in the flow chart in Figure~\ref{fig:flow:chart:dot:seq}. In the sequential processing, the first to elements of each vector are multiplied $x_1 \times y_1$ and added to the temporal result. After that the second elements are multiplied and added to the temporal result, and so on. \\
-
-\begin{figure}
-\centering
-\begin{tikzpicture}
-\draw (0,0) circle [radius=0.3] node {$\times$};
-\draw (2,0) circle [radius=0.3] node {$\times$};
-\draw (4,0) circle [radius=0.3] node {$\times$};
-\draw (6,0) circle [radius=0.3] node {$\times$};
-\draw (10,0) circle [radius=0.3] node {$\times$};
-\node[above] at (8,0) {$\ldots$} ;
-
-\draw (2,-1) circle [radius=0.3] node {$+$};
-\draw (4,-1) circle [radius=0.3] node {$+$};
-\draw (6,-1) circle [radius=0.3] node {$+$};
-\draw (10,-1) circle [radius=0.3] node {$+$};
-\node[above] at (8,-1) {$\ldots$} ;
-
-\draw[->](0,-0.3) -- (1.7,-1);
-\draw[->](2,-0.3) -- (2,-0.7);
-\draw[->](4,-0.3) -- (4,-0.7);
-\draw[->](6,-0.3) -- (6,-0.7);
-\draw[->](10,-0.3) -- (10,-0.7);
-
-\draw[->](2.3,-1) -- (3.7,-1.);
-\draw[->](4.3,-1) -- (5.7,-1.);
-\draw[->](6.3,-1) -- (7.7,-1.);
-\draw[->](8.3,-1) -- (9.7,-1.);
-
-\draw (-0.15,0.3) -- (-0.3,0.6);
-\node[above] at (-0.3,0.6) {$x_1$} ;
-\draw (2-0.15,0.3) -- (2-0.3,0.6);
-\node[above] at (2-0.3,0.6) {$x_2$} ;
-\draw (4-0.15,0.3) -- (4-0.3,0.6);
-\node[above] at (4-0.3,0.6) {$x_3$} ;
-\draw (6-0.15,0.3) -- (6-0.3,0.6);
-\node[above] at (6-0.3,0.6) {$x_4$} ;
-\draw (10-0.15,0.3) -- (10-0.3,0.6);
-\node[above] at (10-0.3,0.6) {$x_n$} ;
-
-\draw (0.15,0.3) -- (0.3,0.6);
-\node[above] at (0.3,0.6) {$y_1$} ;
-\draw (2+0.15,0.3) -- (2+0.3,0.6);
-\node[above] at (2+0.3,0.6) {$y_2$} ;
-\draw (4+0.15,0.3) -- (4+0.3,0.6);
-\node[above] at (4+0.3,0.6) {$y_3$} ;
-\draw (6+0.15,0.3) -- (6+0.3,0.6);
-\node[above] at (6+0.3,0.6) {$y_4$} ;
-\draw (10+0.15,0.3) -- (10+0.3,0.6);
-\node[above] at (10+0.3,0.6) {$y_n$} ;
-
-\draw[->](10,-1.3) -- (10,-1.6);
-\node[below] at (10,-1.6) {$s$} ;
-\end{tikzpicture}
-\caption{Flow chart of the sequential evaluation of the dot product of two vectors. }
-\label{fig:flow:chart:dot:seq}
-\end{figure}
-
-The first parallelism approach is the pipeline parallelism\index{pipeline parallelism}~\cite{ramamoorthy1977pipeline}. The pipeline parallelism is used in vector processors and in execution pipelines in all general microprocessors. Let us look into some example of from the automotive industry. First, the body of the car is assembled. Second, workers assemble the chassis. Third, workers add the engine into the chassis. Next, the steering wheel is added and many more steps until the car is finally assembled. TO make this process efficient, the workers assembling the chassis do not wait until the last step is finalized before they start working on the next chassis. Side note this is similar to the assembly line introduced bu Henry Ford to enable mass production of cars~\cite{watts2009people}.\\
-
-Figure~\ref{fig:dataflow:pipeline} shows the data flow chart for the pipeline parallelism. In the first step, the values $x_1$ and $y_1$ are read from memory. In the second step the values are multiplied. In the last step the result of the multiplication is added to the variable $S$. However, the other threads do not idle until the result is computed and do a previous step if possible. Meaning if the multiplication at stage two is happening, another thread starts to get the next values. For more details, we refer to~\cite{quinn2003parallel}. \\
-
-
-\begin{figure}[tb]
-\centering
-\begin{tikzpicture}
-\draw (0,0) rectangle ++(0.75,0.75) node[pos=.5] {$+S$};
-\draw (1.5,0) rectangle ++(0.75,0.75) node[pos=.5] {$xy$}; 
-\draw (3.5,0) rectangle ++(2,0.75) node[pos=.5] {\text{get} $x_i$,$y_i$};
-
-\node[above] at (8,0.5*0.75) {$\mathbf{X} = \lbrace x_1,x_2,\ldots,x_n \rbrace$} ;
-\node[below] at (8,0.5*0.75) {$\mathbf{Y} = \lbrace y_1,y_2,\ldots,y_n \rbrace$} ;
-\node at (-1,0.5*0.75) {$S$} ;
-
-\draw[<-](-0.8,0.5*0.75) -- (0,0.5*0.75) ;
-\draw[<-](0.75,0.5*0.75) -- (1.5,0.5*0.75) ;
-\draw[<-](2.25,0.5*0.75) -- (3.5,0.5*0.75) ;
-\draw[<-](5.75,0.8*0.75) -- (6,0.8*0.75) ;
-\draw[<-](5.75,0.2*0.75) -- (6,0.2*0.75) ;
-\end{tikzpicture}
-\caption{Flow chart for the pipeline processing for the dot product.}
-\label{fig:dataflow:pipeline}
-\end{figure}
-
-The second parallelism approach is the Single instructions and multiple data (SIMD)\index{SIMD}\index{single instructions and multiple data}. SIMD is part of Flynn's taxonomy, a classification of computer architectures, proposed by Michael J. Flynn in 1966~\cite{flynn1972some,duncan1990survey}. Following aspects are relevant 
-\begin{itemize}
-\item All perform same operation at the same time
-\item But may perform different operations at different times
-\item Each operates on separate data
-\item Used in accelerators on microprocessors
-\item Scales as long as data scales.
-\end{itemize}
-\vspace{0.25cm}
-Figure~\ref{fig:reduction:tree:simd} shows the reduction tree for the dot product computation. For this parallelism approach all threads perform the same operation at the same time. In our case all available threads multiply two values at the first level. Second one of these threads add the partial results. Until not all elements are read from the vector these steps are repeated. The last step is to accumulate all partial results and the final result is available. For example previous CUDA architectures were designed this way and introducing branching had some effect on the performance. Newer CUDA architectures perform better here and these things are explained in following talk\link{https://youtu.be/5vr7ItjyIH8}.
-
-\begin{figure}[tb]
-\centering
-  \begin{tikzpicture}
-   \draw (0,0) rectangle ++(0.75,0.75) node[pos=.5] {$P_1$}; 
-   \draw (1.5,0) rectangle ++(0.75,0.75) node[pos=.5] {$P_2$}; 
-   \draw (3,0) rectangle ++(0.75,0.75) node[pos=.5] {$P_3$}; 
-   \draw (4.5,0) rectangle ++(0.75,0.75) node[pos=.5] {$P_4$}; 
-   
-   \draw (0.75,-2) rectangle ++(0.75,0.75) node[pos=.5] {$+$}; 
-   \draw (3.75,-2) rectangle ++(0.75,0.75) node[pos=.5] {$+$}; 
-   
-   \draw (2.25,-4) rectangle ++(0.75,0.75) node[pos=.5] {$+$}; 
-   
-   \draw[->] (0.75+0.5*0.75,-2) -- (2.25,-4+0.75) ;
-   \draw[->] (3.75+0.5*0.75,-2) -- (3,-4+0.75) ;
-   
-   \draw[->] (1.5+0.5*0.75,0) -- (1.5,-2+0.75) ;
-   \draw[->] (0.5*0.75,0) -- (0.75,-2+0.75) ; 
-   
-   \draw[->] (3+0.5*0.75,0) -- (3.75,-2+0.75) ;
-   \draw[->] (4.5+0.5*0.75,0) -- (4.5,-2+0.75) ; 
-   
-   \draw[->] (2.25+0.5*0.75,-4) -- (2.25+0.5*0.75,-4.5) ; 
-   
-   \draw[dashed] (0,-0.75) -- (5,-0.75) ;
-   \node[below,rotate=90] at (-.75,-2) {\small Reduction tree}; 
-   
-   \node at (0.5*0.75,1.5) {\tiny $X=\lbrace x_1,x_2 \rbrace$};
-   \node at (0.5*0.75,1.25) {\tiny $Y=\lbrace x_9,x_{10} \rbrace$};
-   \node at (1.5+0.5*0.75,1.5) {\tiny $X=\lbrace x_3,x_4 \rbrace$};
-   \node at (1.5+0.5*0.75,1.25) {\tiny $Y=\lbrace x_{11},x_{12} \rbrace$};
-   \node at (3.+0.5*0.75,1.5) {\tiny $X=\lbrace x_5,x_6 \rbrace$};
-   \node at (3.+0.5*0.75,1.25) {\tiny $Y=\lbrace x_{13},x_{14} \rbrace$}; 
-   \node at (4.5+0.5*0.75,1.5) {\tiny $X=\lbrace x_7,x_8 \rbrace$};
-   \node at (4.5+0.5*0.75,1.25) {\tiny $Y=\lbrace x_{15},x_{16} \rbrace$};
-   
-   \draw[->] (0.5*0.75,1.125) -- (0.5*0.75,0.75) ;
-   \draw[->] (1.5+0.5*0.75,1.125) -- (1.5+0.5*0.75,0.75) ;
-   \draw[->] (3.+0.5*0.75,1.125) -- (3.+0.5*0.75,0.75) ;
-   \draw[->] (4.5+0.5*0.75,1.125) -- (4.5+0.5*0.75,0.75) ;
-   \end{tikzpicture}
-   \caption{Reduction tree for the dot product using single instructions and multiple data.}
-   \label{fig:reduction:tree:simd}
-\end{figure}
-
-%----------------------------------------------------------------------------------------
-\subsection*{Memory access}
-\index{memory access}
-%----------------------------------------------------------------------------------------
-For parallel computing, the memory access scheme is important to understand performance behavior. If we initialize for example the two vectors in the dot product example, some space in the memory is reserved and filled with the values. For the computation of the dot product these elements have to be read from memory and the CPU is doing the computation. In a layman's view the CPU is connected to the memory via a so-called bus. Depending on the bus's architecture the access time differs and may have effects on the performance if there is a switch from one CPU to the second CPU.\\
-
-The first memory access scheme is uniform memory access (UMA), see Figure~ref{fig:memory:uma},  where all memory is attached to one bus and all CPU are attached to the same bus. Therefore, the memory access times are the same for all CPU. So we do not see any effect if we switch from one two two CPU. The second memory access scheme is non-uniform memory access (NUMA), see Figure~\ref{fig:memory:numa}. Here, the access time to the memory depends on the memory location relative to the CPU. Thus, local memory access is fast and non-local memory access has some overhead. For more details about memory access, we refer to~\cite{el2005advanced,hager2010introduction}.
-
-\begin{figure}
-\centering
-\begin{minipage}[c]{0.45\textwidth}
-\centering
-   \begin{tikzpicture}
-%Threads
-\draw (0,3) rectangle (.5,3.5) node[pos=.5] {1};
-\draw (0.5,3) rectangle (1.0,3.5) node[pos=.5] {..};
-\draw (1.,3) rectangle (1.5,3.5) node[pos=.5] {n};
-
-\draw (2.5,3) rectangle (3.,3.5) node[pos=.5] {1};
-\draw (3.,3) rectangle (3.5,3.5) node[pos=.5] {..};
-\draw (3.5,3) rectangle (4,3.5) node[pos=.5] {n};
-
-\draw (0.75,2.5) -- (0.75,3.);
-\draw (3.25,2.5) -- (3.25,3.);
-
-%BUS
-\draw (0,1) rectangle (4,1.5) node[pos=.5] {Bus};
-
-
-%CPU
-\draw (0,2) rectangle (1.5,2.5) node[pos=.5] {CPU 1};
-\draw (2.5,2) rectangle (4,2.5) node[pos=.5] {CPU 2};
-\draw (0.75,2) -- (0.75,1.5);
-\draw (3.25,2) -- (3.25,1.5);
-
-%Memory
-\draw (0,0) rectangle (4,0.5) node[pos=.5] {Memory};
-\draw (0.75,.5) -- (0.75,1.);
-\draw (3.25,.5) -- (3.25,1.);
-\end{tikzpicture}
-    \caption{Uniform memory access (UMA)\index{uniform memory access}\index{UMA}}
-    \label{fig:memory:uma}
-\end{minipage}
-\hfill
-\begin{minipage}[c]{0.45\textwidth}
-\begin{tikzpicture}
-%Threads
-\draw (0,3) rectangle (.5,3.5) node[pos=.5] {1};
-\draw (0.5,3) rectangle (1.0,3.5) node[pos=.5] {..};
-\draw (1.,3) rectangle (1.5,3.5) node[pos=.5] {n};
-
-\draw (2.5,3) rectangle (3.,3.5) node[pos=.5] {1};
-\draw (3.,3) rectangle (3.5,3.5) node[pos=.5] {..};
-\draw (3.5,3) rectangle (4,3.5) node[pos=.5] {n};
-
-\draw (0.75,2.5) -- (0.75,3.);
-\draw (3.25,2.5) -- (3.25,3.);
-
-%BUS
-\draw (0,1) rectangle (1.5,1.5) node[pos=.5] {Bus};
-\draw (2.5,1) rectangle (4,1.5) node[pos=.5] {Bus};
-
-%CPU
-\draw (0,2) rectangle (1.5,2.5) node[pos=.5] {CPU 1};
-\draw (2.5,2) rectangle (4,2.5) node[pos=.5] {CPU 2};
-\draw (0.75,2) -- (0.75,1.5);
-\draw (3.25,2) -- (3.25,1.5);
-
-%Memory
-\draw (0,0) rectangle (1.5,0.5) node[pos=.5] {Memory};
-\draw (2.5,0) rectangle (4,0.5) node[pos=.5] {Memory};
-\draw (0.75,.5) -- (0.75,1.);
-\draw (3.25,.5) -- (3.25,1.);
-\end{tikzpicture}
-    \caption{Non-uniform memory access (NUMA)\index{non-uniform memory access}\index{NUMA}}
-    \label{fig:memory:numa}
-\end{minipage}
-
-\end{figure}
-
-
-
-%----------------------------------------------------------------------------------------
-\section{Caution: Data races and dead locks}
-\label{sec:deadlocks}
-%----------------------------------------------------------------------------------------
-Remember with great power comes great responsibility! Meaning with shared memory parallelism you add an additional source of error to your code. When using parallel execution policy, it is the programmer's responsibility to avoid
-\begin{itemize}
-\item data races
-\item race conditions
-\item deadlocks.
-\end{itemize} 
-Let us look into some code examples for these kind of errors. A data race\index{data race} exists when multithreaded (or otherwise parallel) code that would access a shared resource could do so in such a way as to cause unexpected results. Listing~\ref{code:data:race} shows an example for a data race for the variable \cpp{sum}. Since the parallel execution policy is used, multiple threads can access the variable \cpp{sum} at the same time which means that not all threads can write to the variable. Thus, the result is might not correct. There are two solutions to avoid the data race. First, the atomic library\link{https://en.cppreference.com/w/cpp/atomic/atomic}. The atomic library\footnote{\tiny\url{https://en.cppreference.com/w/cpp/atomic}} provides components for fine-grained atomic operations allowing for lockless concurrent programming. Each atomic operation is indivisible with regards to any other atomic operation that involves the same object. Atomic objects are free of data races. Listing~\ref{code:datarace:atomic} shows the solution using \cpp{std::atomic:<int>}\link{https://en.cppreference.com/w/cpp/atomic/atomic}. The second solution is shown in Listing~\ref{code:datarace:mutex}. Here, the \cpp{std::mutex} class is used to avoid the data race. The mutex class\link{https://en.cppreference.com/w/cpp/thread/mutex} is a synchronization primitive that can be used to protect shared data from being simultaneously accessed by multiple threads. In Line~4 a \cpp{std::mutex m;} is generated. In Line~8 the lock of the code is started by using \cpp{m.lock();} and in Line~10 the lock is released by using \cpp{m.unlock();}.
-
-\begin{exercise}
-Give a definition for \cpp{std::atomic} and \cpp{std::mutex} in your own words. 
-\end{exercise}
-
-Another source of error is the race condition\index{race condition} where a check of a shared variable within a parallel execution and another thread could change this variable before it is used. Listing~\ref{code:racecondition} shows the solution to avoid the race condition.  Imagine the code without the \cpp{std::mutex} and the implication to get a wrong result. In the code there is a check if \cpp{x} is equal to 5 and a special treatment of the computation in this case. Now in Line~4 it was true that \cpp{x} was equal to five and the thread enters the \cpp{if} branch. However, in between another thread could change the value of \cpp{x} and not \cpp{y = 5 *2} is computed. By using the mutex this situation is avoided.
-
-\begin{exercise}
-Explain a data race in your own words and explain why a \cpp{std::mutex} avoids the data race.
-\end{exercise}
-
-\begin{lstlisting}[language=c++,caption={Example code and Solution for a data race.\label{code:data:race}},float,floatplacement=tb]
-//Compute the sum of the array a in parallel
-int a[] = {0,1,2,3,4};
-int sum = 0;
-std::for_each(std::execution::par, 
-              std::begin(a), 
-              std::end(a), [&](int i) {
-  sum += a[i]; // Error: Data race
-});
-\end{lstlisting}
-
-
-\begin{lstlisting}[language=c++,caption={Solution to avoid the data race using \cpp{std::atomic}.\label{code:datarace:atomic}},float,floatplacement=tb]
-//Compute the sum of the array a in parallel
-int a[] = {0,1};
-std::atomic<int> sum{0};
-std::for_each(std::execution::par, 
-              std::begin(a), 
-              std::end(a), [&](int i) {
-  sum += a[i]; 
-});
-\end{lstlisting}
-
-\begin{lstlisting}[language=c++,caption={Solution to avoid the data race using \cpp{std::mutex}.\label{code:datarace:mutex}},float,floatplacement=tb]
-//Compute the sum of the array a in parallel
-int a[] = {0,1};
-int sum = 0;
-std::mutex m;
-std::for_each(std::execution::par, 
-              std::begin(a), 
-              std::end(a), [&](int i) {
-  m.lock();
-  sum += a[i];
-  m.unlock(); 
-});
-\end{lstlisting}
-
-
-\begin{lstlisting}[language=c++,caption={Example for the race condition.\label{code:racecondition}},float,floatplacement=tb]
-std::mutex m;
-
-m.lock();
-if (x == 5)  // Checking x
-{
-   // Different thread could change x 
-      
-   y = x * 2; // Using x
-}
-m.unlock();
-// Now it is sure that y will be 10
-\end{lstlisting}
-
-
-A deadlock\index{deadlock} describes a situation where two or more threads are blocked forever and waiting for each others. Following example taken from\link{https://docs.oracle.com/javase/tutorial/essential/concurrency/deadlock.html} explains a deadlock nicely. \\
-
-\textit{Alphonse and Gaston are friends, and great believers in courtesy. A strict rule of courtesy is that when you bow to a friend, you must remain bowed until your friend has a chance to return the bow. Unfortunately, this rule does not account for the possibility that two friends might bow to each other at the same time.}
-
-\begin{exercise}
-The implementation of this examples is available on GitHub\link{https://github.com/diehlpkteaching/ParallelComputationMathExamples/blob/master/chapter10/lecture6-deadlock.cpp.ipynb}. Play around with the example and try to understand why the code results in a deadlock. 
-\end{exercise}
-
-%----------------------------------------------------------------------------------------
-\chapter{Asynchronous programming}
-\label{sec:async:coding}
-\index{future}
-\index{async}
-\index{C++!asynchronous programming}
-%----------------------------------------------------------------------------------------
-A different concept for shared memory parallelism is asynchronous programming~\cite{williams2012c++}. Before we look into asynchronous programming, we look again into the concept of serial programming. Figure~\ref{fig:async:dependencygraph} shows the dependency graph for one computation and one can see that we can compute $P$ and $X$ independent and only $H$ depends on both of them. Listing~\ref{code:serial:dependency} shows the serial computation of the dependency graph. Each line of code is executed line by line Each time a function is called the code waits until the function finishes. Thus, we can not compute $P$ and $X$ independently, even if the data is independent. 
-
-\vspace{0.25cm}
-\begin{minipage}{\linewidth}
-\begin{minipage}{0.45\linewidth}
-\centering
-\begin{tikzpicture}
-\node (a) [draw,circle] at (0,2) {$H$};
-\node (b) [draw,circle] at (0,0) {$P$};
-\node (c) [draw,circle] at (1,0) {$X$};
-\draw [->] (a) -- (b);
-\draw [->] (a) -- (c);
-\end{tikzpicture}
-\captionof{figure}{Example dependency graph}
-\label{fig:async:dependencygraph}
-\end{minipage}
-\hfill
-\begin{minipage}{0.5\linewidth}
-\begin{lstlisting}[language=c++,caption={Synchronous execution of the dependency graph.\label{code:serial:dependency}}]
-auto P = compute();
-auto X = compute();
-auto H = compute(P,X);
-\end{lstlisting}
-\end{minipage}
-\end{minipage}
-\vspace{0.25cm}
-
-To executed lines asynchronously the C++ language provides the \cpp{std::async}\link{https://en.cppreference.com/w/cpp/thread/async}\index{async}\index{C++!async} expression provided by the \cpp{#include <future>}. Listing~\ref{code:async:dependency} shows the asynchronous implementation of the dependency graph in Figure~\ref{fig:async:dependencygraph}. Line~2 shows the usage of \cpp{std::async} for the function \cpp{compute}. The first argument is the name of the function or a lambda expression, see Section~\ref{sec:lambda:function}. Because we used \cpp{std::async} this line of code is executed in the background on a different thread and the next line of code is executed, even if the result of the computation is not ready yet. Therefore, \cpp{std::async} return a \cpp{std::future<int>}\link{https://en.cppreference.com/w/cpp/thread/future}\index{future}\index{C++!future} object provided by the \cpp{#include <future>} header which is a template and contains the return type of the function which is in this example the \cpp{int} data type. In Line~4, the computation of $X$ is started on another thread. Such that both computations happens at the same time. In Line~7--9 the results of the asynchronous function call are gathered, since these are needed to compute $H$. With the \cpp{.get()} function a barrier is introduced and the line of codes waits until the computation is ready. In our case, we can wait since we need the two results to compute the last one. Meaning that Line~8 is only executed if the computation in Line~2 has finished. Following synchronization features are available:
-\begin{itemize}
-\item \lstinline|.get()| returns the result of the functions and wait until the computation finished
-\item \lstinline|.wait()|\link{https://en.cppreference.com/w/cpp/thread/future/wait} waits until the computation finished
-\item \lstinline|.wait_for(std::chrono::seconds(1))|\link{https://en.cppreference.com/w/cpp/thread/future/wait_for} returns if it is not available for the specified timeout duration 
-\item \lstinline|.wait_until(std::chrono::seconds(1))|\link{https://en.cppreference.com/w/cpp/thread/future/wait_until} waits for a result to become available. It blocks until specified timeout time has been reached or the result becomes available, whichever comes first. 
-\end{itemize}
-
-\begin{lstlisting}[language=c++,caption={Asynchronous execution of the dependency graph.\label{code:async:dependency}},float,floatplacement=tb]
-// Compute P
-std::future<int> f1 = std::async(compute);
-// Compute X
-auto f2 = std::async(compute);
-
-// Gather the results
-int P = f1.get();
-int X = f2.get();
-
-// Compute the dependent result H
-std::cout << compute(P,X) << std::endl;
-\end{lstlisting}
-
-\section*{Example}
-Let us look into one example to show the parallelism using asynchronous programming for the Taylor series. The approximation of the $\sin$ function is given as
-\begin{align}
-\sin(x) = \sum\limits_{n=0}^N (-1)^{n-1} \frac{x^{2n}}{(2n)!} 
-\label{eq:sin:taylor}
-\end{align}
-One approach to parallize the above function using two threads is:
-\begin{enumerate}
-\item Split $n$ into slices, e.g. 2 times $\sfrac{n}{2}$ for two threads
-\item Start two times \lstinline|std::async| where each thread computes $\sfrac{n}{2}$
-\item Use the two futures to synchronize the results
-\item Combine the two futures to obtain the result.
-\end{enumerate}
-To distribute $n$ into slices, we need to write the sum in Equation~\eqref{eq:sin:taylor} as
-\begin{align}
-\sum\limits_{n=begin}^{end} (-1)^{n-1} \frac{x^{2n}}{(2n)!} \text{.}
-\end{align}
-Listing~\ref{code:async:taylor} shows how to implement the function to splice the computation of the Taylor series, see Line~5--14. In Line~18--19 the two splices $\sfrac{n}{2}$ are launched from $0$ up to $49$ on the first thread and from $50$ up to $99$ on the second thread. In Line~22 the result is gathered and finally the accumulated result is evaluated. For more details, we refer to following talk\link{https://www.youtube.com/watch?v=js-e8xAMd1s}.
-
-To compile the code using asynchronous programming, we need to add \lstinline|-pthread| to our compiler to use the POSIX threads to launch the functions asynchronous (\lstinline|std::async|). More details about POSIX\index{POSIX} threads~\cite{butenhof1997programming,kleiman1996programming}.
-
-
-
-
-\begin{lstlisting}[language=c++,caption={Asynchronous computation of the $\sin$ function using a Taylor series.\label{code:async:taylor}},float,floatplacement=tb]
-#include <future>
-#include <iostream>
-
-// Function to compute portion of the Taylor series
-double taylor(size_t begin, size_t end, 
-double x,size_t n){
-double res = 0;
-
-	for( size_t i = begin ; i < end ; i++)
-	{
-	  res += pow(-1,i-1) * pow(x,2*n) / factorial(2*n);
-	} 
-return res;
-}
-
-int main(){
-	// Asynchronous computation using two slices
-	auto f1 = std::async(taylor,0,49,2,100); 
-	auto f2 = std::async(taylor,50,99,2,100); 
-	
-	// Gather the result
-	double result = f1.get() + f2.get();
-
-	// Print the result
-	std::cout << "sin(2)= " res << std::endl;
-
-	return 0;
-}
-\end{lstlisting}
-
-
-%----------------------------------------------------------------------------------------
-\chapter{Distributed memory}
-%----------------------------------------------------------------------------------------
-
-
-\newpage
-\theendnotes
+\include{sections/chapter4}
 
 
 %----------------------------------------------------------------------------------------
@@ -592,351 +126,312 @@ int main(){
 \label{sec:hpx}
 %----------------------------------------------------------------------------------------
 
+\include{sections/chapter5}
+
 %----------------------------------------------------------------------------------------
-\chapter{Introduction to HPX}
+\part{Linked list}
+\index{list}
 %----------------------------------------------------------------------------------------
-HPX (High Performance ParalleX) is a general purpose C++ runtime system for parallel and distributed applications of any scale. It strives to provide a unified programming model which transparently utilizes the available resources to achieve unprecedented levels of scalability.  This library strictly adheres to the C++14 Standard and leverages the Boost C++ Libraries which makes HPX easy to use, highly optimized, and very portable. These are the most notable features of HPX:
+
+This course does not go deep into pointers, since I believe that one should avoid to use pointers a much as possible and use the C++ standard library as much as possible. For more details about the C++ standard library, we refer to Section~\ref{chapter:stl}. In this section, we looked into the containers, see Section~\ref{sec:containers}, to store values in a \cpp{std::vector} or a \cpp{std::list}. In this section, we look into the implementation of the \cpp{std::list} where pointers are heavily used. We do this for two reasons: 1) To showcase why one should avoid to use pointers and use the containers instead and 2) I believe it is important that you understand how the \cpp{std::list} is implemented. In most implementations the \cpp{std::list} is implemented as a doubly-linked list. Due to the doubly-linked list\index{list!doubly-linked}, a forward and backward iterator is available. However, for this exercise, we focus on a singly-linked list\index{list!singly-linked} which relates to the \cpp{std::forward_list}\link{https://en.cppreference.com/w/cpp/container/forward_list}. For more details about different types of lists, we refer to~\cite{abelson1996structure}. \\
+
+Figure~\ref{fig:sketch:linked:list} sketches the data structure and the usage of pointers. Each element of the list contains a value in this example a integer value and a pointer of the element's type. For example the first element contains the value 12 and point to the second element of the list. The second element contains the value 99 and points to the third element. For any additional element in the list, the same principle would hold, except of the last element of the list which point to nowhere. This is needed to determine the end of the list. Following operations are most commons for lists
 \vspace{0.25cm}
 \begin{itemize}
-\item HPX exposes a uniform, standards-oriented API for ease of programming parallel and \textcolor{azure}{distributed} applications.
-\item HPX provides unified syntax and semantics for \textcolor{azure}{local and remote} operations.
-\item HPX exposes a uniform, flexible, and extendable \textcolor{azure}{performance counter framework}~\cite{grubel2016dynamic,grubel2016using} which can enable runtime adaptivity
-\item HPX has been designed and developed for systems of \textcolor{azure}{any scale}, from hand-held devices to very large scale systems (Raspberry Pi, Android, Server, up to super computers~\cite{daiss2019piz,heller2019harnessing}).
+\item Creating an empty list (\cpp{std::list<int> list;})
+\item Check if a list is empty (\cpp{list.empty();})
+\item Prepending an element to a list (\cpp{list.push_front(42);}
+\item Appending an element to a list (\cpp{list.push_back(42)};)
+\item Getting the first element of the list (\cpp{list.front();}
+\item Accessing the element at a given index 
+\item Deleting the last element (\cpp{list.pop_back()};)
+\item Deleting the first element (\cpp{list.pop_front();})
 \end{itemize}
 \vspace{0.25cm}
-For a brief overview of HPX, we refer to~\cite{heller2017hpx} and for a detailed overview, we refer to~\cite{heller2019extending}. For more details about asynchronous many-task systems (AMT), we refer to~\cite{thoman2018taxonomy}.
+As a reference the corresponding methods for the \cpp{std::list}\link{https://en.cppreference.com/w/cpp/container/list} are shown. Fore more details, we refer to~\cite[Chapter 2]{knuth1997art}.
 
-\subsection*{Using HPX}
-Let us look into HPX's hello world example. We have to ways to initialize the HPX runtime system. First way is to include the header \cpp{#include <hpx/hpx_main.hpp>}, see Listing~\ref{code:hpx:main}. In that case, the only thing we have to add is the new header file. Note that this header file should be the first one to be included. Before we can call the first HPX function, the HPX runtime system needs to be initialized. Second way is to include the header \cpp{#include <hpx/hpx_init.hpp>}, see Listing~\ref{code:hpx:init}. In that case, the \cpp{hpx_main} function is defined in Line~4 and we place the code as we like to have in the \cpp{main} function there and use \cpp{hpx::finalize()} as the return value to make sure the HPX runtime system is stopped. To initialize the HPX runtime system, the function \cpp{hpx::init(argc, argv)} has to be called. Note that this header file should be the first one to be included. All HPX functions have to be called within the \cpp{hpx_main} function to make sure the HPX runtime system is initialized. \\
+\begin{figure}[tbp]
+\centering
+\begin{tikzpicture}[list/.style={rectangle split, rectangle split parts=2,
+    draw, rectangle split horizontal}, >=stealth, start chain]
 
-Assuming that HPX is installed on the system, we need to provide some compiler and linker flags to compile the HPX application. Note that on Fedora one can install HPX by using \bash{sudo dnf install hpx-devel} or using this
-tutorial\link{https://www.diehlpk.de/blog/hpx-fedora/}. Listing~\ref{code:cmake:hpx} shows a example \textit{CMakeLists.txt} file to compile the programs shown in Listing~\ref{code:hpx:main} or Listing~\ref{code:hpx:init}. For more details about CMake, we refer to Section~\ref{sec:cmake}. Listing~\ref{code:cmake:compile:hpx} shows how to compile the program and run it. Note that the command line option \cpp{--hpx:threads} specifies how many CPUs HPX is allowed yo use. 
+  \node[list,on chain] (A) {12};
+  \node[list,on chain] (B) {99};
+  \node[list,on chain] (C) {37};
+  \node[on chain,draw,inner sep=6pt] (D) {};
+  \draw (D.north east) -- (D.south west);
+  \draw (D.north west) -- (D.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (C);
+  \draw[*->] let \p1 = (C.two), \p2 = (C.center) in (\x1,\y2) -- (D);
+\end{tikzpicture}
+\caption{A sketch of the linked-list containing three elements. The first pointer points to the second element of the list, the pointer of the second element points to the third element of the list, and the last pointer points to nowhere. This indicates that the end of the list is reached.}
+\label{fig:sketch:linked:list}
+\end{figure}
 
-
-\begin{lstlisting}[language=c++,caption={Initializing the HPX runtime system (I).\label{code:hpx:main}},float,floatplacement=tb]
-#include <hpx/hpx_main.hpp>
-#include <iostream>
-
-int main()
-{
-    std::cout << "Hello World!\n" << std::endl;
-    return 0;
-}
-\end{lstlisting}
-
-
-\begin{lstlisting}[language=c++,caption={Initializing the HPX runtime system (II).\label{code:hpx:init}},float,floatplacement=tb]
-#include <hpx/hpx_init.hpp>
-#include <iostream>
-
-int hpx_main(int, char**)
-{
-    // Say hello to the world!
-    std::cout << "Hello World!\n" << std::endl;
-    return hpx::finalize();
-}
-
-int main(int argc, char* argv[])
-{
-    return hpx::init(argc, argv);
-}
-\end{lstlisting}
-
-
-\begin{minipage}{\linewidth}
-\begin{minipage}{0.45\linewidth}
-\begin{lstlisting}[language=bash,caption={Content of the CMakeLists.txt to build HPX applications.\label{code:cmake:hpx}},emph={project, add_executable,cmake_minimum_required},emphstyle={\color{azure}\bfseries}]
-cmake_minimum_required(VERSION 3.3.2)
-project(my_hpx_project CXX)
-find_package(HPX REQUIRED)
-add_hpx_executable(my_hpx_program
-    SOURCES main.cpp
-)
-\end{lstlisting}
-\end{minipage}
-\hfill
-\begin{minipage}{0.45\linewidth}
-\begin{lstlisting}[language=bash,caption={Build instructions for CMake.\label{code:cmake:compile:hpx}}]
-cmake .
-make
-./my_hpx_program --hpx:threads=4
-\end{lstlisting}
-\end{minipage}
-\end{minipage}
 
 
 
 %----------------------------------------------------------------------------------------
-\section{Parallel algorithms}
-\index{algorithms!parallel}
-\index{parallel algorithms}
-\index{HPX!parallel algorithms}
+\chapter{Implementation}
 %----------------------------------------------------------------------------------------
-In Section~\ref{sec:stl:parallel:algorithms} we looked at the experimental parallel algorithms provided by the C++ STL. HPX provides the parallel algorithms as well and the API is identical and we just need to replace the \cpp{std} name space with \cpp{hpx} name space. Recall the example in Listing~\ref{code:parallel:algorithms} and now we implement the same example using HPX's parallel algorithms. Listing~\ref{code:hpx:parallel:reduce} shows how to compute the sum of the elements in the vector \cpp{values} parallel. Note that solely had to replace \cpp{std::execution::par} by HPX's name space which is a little bit different and reads as \cpp{hpx::parallel::execution::par}. The same for \cpp{std::reduce} and this name space reads as \cpp{hpx::parallel::v1::reduce}\link{https://hpx-docs.stellar-group.org/latest/html/libs/algorithms/api.html?highlight=reduce\#\_CPPv3N3hpx8parallel2v16reduceERR8ExPolicy8FwdIterB8FwdIterE1TRR1F}. Until now the API is equal to the one of the C++ STL. Now, we look into the additional features provided by HPX. First, we look into the additional features for execution policies\index{HPX!execution policies}. In Line~16 we specify a dynamic chunk size \cpp{dynamic_chunk_size} and pass this execution policy to the execution policy using \cpp{.with(scs)}. Following execution parameters are provided:
-\vspace{0.25cm}
-\begin{itemize}
-\item \lstinline|hpx::parallel::execution::static_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=static\_chunk\_size\#\_CPPv3N3hpx8parallel9execution17static\_chunk\_sizeE} \\
-Loop iterations are divided into pieces of a given size and then assigned to threads.
-\item \lstinline|hpx::parallel::execution::auto_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=auto\_chunk\_size\#\_CPPv3N3hpx8parallel9execution15auto\_chunk\_sizeE} \\
-Pieces are determined based on the first 1\% of the total loop iterations. 
-\item \lstinline|hpx::parallel::execution::dynamic_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=dynamic\_chunk\_size\#\_CPPv3N3hpx8parallel9execution18dynamic\_chunk\_sizeE} \\
-Dynamically scheduled among the cores and if one core finished it gets dynamically assigned a new chunk.
-\end{itemize}
-\vspace{0.25cm}
-For more details, we refer to~\cite{grubel2015performance}. Another possibility is to use machine learning techniques for choosing the chunk size. For more details, we refer to~\cite{shirzad2019scheduling}. Second, in HPX once can obtain a future from a parallel for loop and us it for synchronization. In Line~23 of Listing~\ref{code:hpx:parallel:reduce} shows how to obtain a future with the result of the reduce operation by adding the expression \cpp{hpx::parallel::execution::task} as an argument to the execution policy. Now we can use the parallel for loops and combined them with the future for asynchronous programming. Note that currently these features are only available yet in HPX. Third, HPX provides range-based for loops\link{https://hpx-docs.stellar-group.org/latest/html/manual/writing_single_node_hpx_applications.html?highlight=parallel\_for\_loop} which is neat for iteration over the elements of a vector using the index and not the vector element itself. Listing~\ref{code:hpx:parallel:range:loop} shows how to use a range-based parallel for loop to print the vector's element to the standard output stream.  The second function argument is the first value of the vector, the third one the vector's length, and the fourth argument is a Lambda function, see Section~\ref{sec:lambda:function}. The first argument of the Lambda function is the index of the the vector to be processed in the range of \cpp{0} and \cpp{values.size()}.
+In this section, we look into the implementation of a singly-linked list using raw C++. Note that this in an exercise to showcase why you should avoid pointers if possible, because handling them will get messy. 
+
+%----------------------------------------------------------------------------------------
+\section*{Data structures}
+%----------------------------------------------------------------------------------------
+One list element in Figure~\ref{fig:sketch:linked:list} contains one the data of the type \cpp{T} and one pointer to the next element or a \cpp{nullptr} at the last element. Listing~\ref{code:list:struct} shows the implementation of the list element using a \cpp{struct data}. For more details about the struct, we refer to Section~\ref{sec:struct}. In Line~10 the content of the list is stored in the variable \cpp{element}. In Line~12 the pointer \cpp{data<T>* next} is used to link to the next list element. Note that the pointer is initialized to \cpp{nullptr} since we assume that the element is inserted as the end of the list and points to nowhere. We add one constructor which assigns the value of the element. To make the list generic, we use generic programming and adding the template \cpp{typename T}. For more details for generic programming, we refer to Section~\ref{sec:generic:programming}. For the initialization of the list, we would use \cpp{std::list<double>} using the C++ STL and \cpp{data<double> * myList}.\\
+
+Now, since we have the data structure for the element of the, we need the wrapper class to hide the pointers from the user, as the C++ STL does. Listing~\ref{code:list:struct} shows the \cpp{struct myList} with a pointer to the struct \cpp{struct data} which points to nowhere \cpp{nullptr} if the list is empty or to the first element of the list. The first constructor in Line~24 will generate an empty list. The second constructor will generate a list of size one and pointing to the first element. For the example in Figure~\ref{fig:sketch:linked:list} this pointer would point to the element containing the value 12. Now we can generate an empty list \cpp{myList<int> mylist;} or a list of size one \cpp{myList<int> mylist = myList<int>(42);}. The corresponding expression using the C++ STL are \cpp{std::list<int> list;} and \cpp{std::list<int> list = {42};}. The easiest function to implement is the \cpp{empty()} function which is shown in Line~32. Here, we check if the first pointer is equal to the \cpp{nullptr} and if so, the list is empty. 
 
 
-\begin{lstlisting}[language=c++,caption={Parallel algorithms (reduce) using HPX.\label{code:hpx:parallel:reduce}},float,floatplacement=tb]
-#include <hpx/hpx_init.hpp>
-#include<hpx/include/parallel_reduce.hpp>
+\begin{lstlisting}[language=c++,caption={Example for a structure for a three dimensional vector.\label{code:list:struct}},float,floatplacement=tb]
+//Struct for the element of a list
+template<typename T>
+struct data{
 
-int main()
-{
+data(T in){
 
-std::vector<double> values = {1,2,3,4,5,6,7,8,9};
+element = in;
+}
 
-// HPX parallel algorithms
-std::cout<< hpx::parallel::v1::reduce(hpx::parallel::execution::par,
-	values.begin(),
-	values.end(),
-	0);
+// Element of the type std::list<T>
+T element;
+// Pointer of type of the class/struct
+data<T>* next = nullptr;
+
+};
+
+// Struct for our implementation of the list
+template<typename T>
+struct myList{
+
+//Pointer to the first element
+data<T>* first = nullptr;
+
+myList(){}
+
+myList(T in){
+
+	first = new data<T>(in);
+
+}
+
+bool empty(){
+
+	if (first == nullptr)
+		return true;
 	
-// HPX parallel algorithms using execution policies
-hpx::parallel::execution::dynamic_chunk_size scs(10);
-std::cout<< hpx::parallel::v1::reduce(hpx::parallel::execution::par.with(cs),
-	values.begin(),
-	values.end(),
-	0);
-	
-// HPX parallel algorithms returning a future
-auto f = hpx::parallel::v1::reduce(
-	hpx::parallel::execution::par(hpx::parallel::execution::task),
-	values.begin(),
-	values.end(),
-	0);
-
-std::cout<< f.get();
-  
-return EXIT_SUCCESS;
+	return false;
 }
 
-\end{lstlisting}
-
-\begin{lstlisting}[language=c++,caption={Parallel range-based for loops using HPX.\label{code:hpx:parallel:range:loop}},float,floatplacement=tb]
-#include <hpx/hpx_init.hpp>
-#include<vector>
-#include<iostream>
-#include<hpx/include/parallel_for_loop.hpp>
-
-int main()
-{
-
-std::vector<double> values = {1,2,3,4,5,6,7,8,9};
-
-hpx::parallel::for_loop(
-	hpx::parallel::execution::par, 
-	0, 
-	values.size();
-	[](boost::uint64_t i)
-		{
-		std::cout<< values[i] << std::endl;
-		}
-	);
-
-return EXIT_SUCCESS;
-}
-
-\end{lstlisting}
-
-%----------------------------------------------------------------------------------------
-\section{Asynchronous programming}
-\index{future}
-\index{async}
-\index{HPX!asynchronous programming}
-%----------------------------------------------------------------------------------------
-HPX provides the same features as the C++ language for asynchronous programming, see Chapter~\ref{sec:async:coding} for more details. In this section, we show how to use HPX's function instead of \cpp{std::future} and \cpp{std::async}, since HPX provides more flexibility here. As a disclaimer this is really easy, since we can use the code of the previous example and just replace the name space \cpp{std} with the name space \cpp{hpx}. Listing~\ref{code:hpx:future} shows an example of the example for computing the square number of a asynchronously. In Line~2 the header \cpp{#include <hpx/incldue/lcos.hpp>} is needed to use \cpp{hpx::future} and \cpp{hpx::async}\link{https://stellar-group.github.io/hpx/docs/sphinx/latest/html/examples/fibonacci_local.html?highlight=async}. In Line~12 the function \cpp{square} is called asynchronously using \cpp{hpx::async(square,10)}. Note that the first argument is the name of the function and the second one the function argument. The function call return a \cpp{hpx::future<int>} since the return type of the function is \cpp{int}. To access the result of the function, if the computation has finished the function \cpp{.get()} is used. Note that the only difference here is not to include the header \cpp{#include <future>} and use \cpp{hpx::future} instead of \cpp{std::future} and same for \cpp{hpx:async} instead of \cpp{std::async}. Thus, it is really easy to switch between HPX and C++ for asynchronous programming.
-
-\begin{lstlisting}[language=c++,caption={Asynchronous computation of the square number using HPX.\label{code:hpx:future}},float,floatplacement=tb]
-#include <hpx/hpx_init.hpp>
-#include <hpx/incldue/lcos.hpp>
-#include <iostream>
-
-int square(int a)
-{ 
-    return a*a; 
-}
-
-int main()
-{
-    hpx::future<int> f1 = hpx::async(square,10); 
-    
-    std::cout << f1.get() << std::endl;
-    
-    return EXIT_SUCCESS;
-}
-
-\end{lstlisting}
-
-\begin{exercise}
-Write the program in Listing~\ref{code:async:taylor} using \cpp{hpx::future} and \cpp{hpx::async}.
-\end{exercise}
-
-The benefit of using HPX is that more features for the synchronization of future is provided. In Listing~\ref{code:hpx:future:sync} some of these functionality is shown. In Line~1 a \cpp{std::vector} holding the \cpp{hpx::future<int>} is declared. In Lines~2--3 two futures of the two asynchronous function class are pushed to the vector. In Line~6 the expression \cpp{hpx::when_all} is used to make a barrier which waits until all computations of the asynchronous launched functions are ready. By calling \cpp{.then()} we specify what is done if all futures are ready. To do so, we provide a lambda function, see Section~\ref{sec:lambda:function}, which has a future with the \cpp{std::vector} of futures as its argument. In Line~7 we use the function \cpp{.get()} and this future to get the \cpp{std::vector} of futures. In line~7 and Line~8, we print the results as usual. Following synchronization options\link{https://stellar-group.github.io/hpx/docs/sphinx/latest/html/terminology.html\#term-lco} are available:
-\begin{itemize}
-\item \cpp{hpx::when_all} \\
-It \textit{AND}-composes all the given futures and returns a new future containing all the given futures.
-\item \cpp{hpx::when_any} \\
-It \textit{OR}-composes all the given futures and returns a new future containing all the given futures.
-\item \cpp{hpx::when_each} \\
-It \textit{AND}-composes all the given futures and returns a new future containing all futures being ready.
-\item \cpp{hpx::when_some} \\
-It \textit{AND}-composes all the given futures and returns a new future object representing the same list of futures after n of them finished.
-\end{itemize}
-
-
-
-\begin{lstlisting}[language=c++,caption={Advanced synchronization of futures using HPX.\label{code:hpx:future:sync}},float,floatplacement=tb]
-std::vector<hpx::future<int>> futures;
-
-futures.push_back(hpx::async(square,10);
-futures.push_back(hpx::async(square,100);
-
-hpx::when_all(futures).then([](auto&& f){
- auto futures = f.get();
- std::cout << futures[0].get() 
- 	<< " and " << futures[1].get();
-});
-\end{lstlisting}
-
-%----------------------------------------------------------------------------------------
-\subsection{Advanced asynchronous programming}
-\label{sec:hpx:advanced:sync}
-%----------------------------------------------------------------------------------------
-HPX provides additional features for asynchronous programming which are not yet in the C++ standard. In this section, we look into these. Therefore, we look into the \cpp{struct stepper} of the serial version, see Listing~\ref{code:heat:central:difference}, and add futures to have asynchronous execution of the solver for the one-dimensional heat equation. Listing~\ref{code:hpx:future:ready} shows the new \cpp{struct stepper} using futures. The first change is that the type \cpp{partition}, which was a simple \cpp{double} value before, is replaced by \cpp{hpx::shared_future}\index{future!shared}. Note that the \cpp{hpx::lcos::future} has the exclusive ownership model and if the future is out of scope, it will be not available anymore. To avoid the out of scope situation, the \cpp{hpx::shared_future} has the reference counting ownership model. Here, all references to the object are counted and the object solely goes out of scope if there are zero references. These concepts are equal to \cpp{std::unique_ptr}\link{https://en.cppreference.com/w/cpp/memory/unique_ptr} and \cpp{std::shared_ptr}\link{https://en.cppreference.com/w/cpp/memory/shared_ptr}.\\
- 
-The first feature is the keyword \cpp{hpx::make_ready_future}\link{https://hpx-docs.stellar-group.org/latest/html/api.html?highlight=make_ready_future}\index{future!ready}, see Line~22 of Listing~\ref{code:hpx:future:ready}. Since the \cpp{partition} is now a \cpp{hpx::shared_future} the boundary conditions and initial conditions have to be a future too. However, since these are constant values and no computation is needed the future is immediately ready. Since HPX does not know that there is no execution, we can use a \cpp{hpx::make_ready_future} ready to propagate this information to the asynchronous execution tree.\\
-
-Second, since we use futures for the \cpp{partition}, but the function to evaluate the central difference \cpp{heat(double left, double middle, double right)} takes \cpp{double} values as arguments. We either have to change the function to take futures as its arguments and call the \cpp{.get()} function inside. To avoid these two things, HPX provides the so-called unwrapping of a function with the keyword \cpp{hpx::util::unwrapping}\index{HPX!unwrapping}. In Line~24 of Listing~\ref{code:hpx:future:ready} the function \cpp{heat} is unwrapped and the function \cpp{Op} takes futures as its arguments. So In Line~37 of the \cpp{hpx::launch::async} we can pass the \cpp{current} elements which are of the type \cpp{hpx::shared_future<double>} to a function which assumes \cpp{double values}.\\
-
-Third, HPX has the keyword \cpp{hpx::dataflow}\index{HPX!dataflow} to use unwrapping for the combination of \cpp{hpx::when_all} and \cpp{.then}. Imagine you have a vector \cpp{std::vector<hpx::lcos::future<int>> futures;} and pass it to \cpp{hpx::when_all(futures).then([](auto&& f)\{\});} the vector \cpp{futures} will be wrapped in the future \cpp{auto&& f}. SO if we want to access the elements of the vector we have to call \cpp{f.get()}. An easier approach is to use \cpp{hpx::dataflow} as it is done in Line~36 in Listing~\ref{code:hpx:future:ready}. The first argument is \cpp{hpx::launch::async} to launch asynchronous and a future is returned. Another possibility is to use \cpp{hpx::launch::sync} to launch synchronous. The second argument is the unwrapped function of the \cpp{heat} function, see Line~24. The last three remaining arguments are the futures with the values for the central difference scheme evaluation. Before we can return the current solution, we have to call \cpp{hpx::when_all} to synchronous all futures of the current solution.\\
-
-Figure~\ref{fig::stencil:benchmark:1} shows the execution time of the serial vs the asynchronous implementation for 1 CPU. We clearly see that the execution time even for one CPU is lower. Figure~\ref{fig::stencil:benchmark:2} shows the execution time for various amount of CPUs for the asynchronous implementation. Here, we can see that for enough grid points the we get some benefit for adding more CPUs which means we have to have enough work to keep the CPUs busy. To obtain better results, we have to extend the code to control its granularity.
-
-\begin{lstlisting}[language=c++,caption={Futurized version of the one-dimensional heat equation.\label{code:hpx:future:ready}},float,floatplacement=tb]
-struct stepper
-{
-    // Our partition type
-    typedef hpx::shared_future<double> partition;
-
-    // Our data for one time step
-    typedef std::vector<partition> space;
-
-    // do all the work on 'nx' data points for 'nt' time steps
-    hpx::future<space> do_work(std::size_t nx, std::size_t nt)
-    {
-        using hpx::dataflow;
-        using hpx::util::unwrapping;
-
-        // U[t][i] is the state of position i at time t.
-        std::vector<space> U(2);
-        for (space& s : U)
-            s.resize(nx);
-
-        // Initial conditions: f(0, i) = i
-        for (std::size_t i = 0; i != nx; ++i)
-            U[0][i] = hpx::make_ready_future(double(i));
-
-        auto Op = unwrapping(&stepper::heat);
-
-        // Actual time step loop
-        for (std::size_t t = 0; t != nt; ++t)
-        {
-            space const& current = U[t % 2];
-            space& next = U[(t + 1) % 2];
-
-            // WHEN U[t][i-1], U[t][i], and U[t][i+1] have been computed, THEN we
-            // can compute U[t+1][i]
-            for (std::size_t i = 0; i != nx; ++i)
-            {
-                next[i] = dataflow(
-                        hpx::launch::async, Op,
-                        current[idx(i, -1, nx)], current[i], current[idx(i, +1, nx)]
-                    );
-            }
-        }
-
-        // Return the solution at time-step 'nt'.
-        return hpx::when_all(U[nt % 2]);
-    }
 };
 \end{lstlisting}
 
+%----------------------------------------------------------------------------------------
+\section*{Inserting}
+%----------------------------------------------------------------------------------------
 
-\begin{figure}[btp]
+Figure~\ref{fig:sketch:linked:list:init} shows the linked list after the initialization \cpp{myList<int> mylist = myList(1);}. Here, we called the contructor in Listing~\ref{code:list:struct} and the pointer \cpp{data<double>* first} points to the \cpp{new data<double>(1)}. Since this element is the last element the pointer \cpp{next} is the \cpp{nullptr} to indicate that this is the first and last element of the list.
+
+\begin{figure}[h]
 \centering
-\begin{subfigure}{.4\textwidth}
-\begin{tikzpicture}
-\selectcolormodel{gray}
-\begin{axis}[xlabel=Grid points,ylabel=Execution time, grid=both,title=1 CPU]
-\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_serial.dat};
-\addlegendentry{Serial}
-\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_1.dat};
-\addlegendentry{Futurization}
-\end{axis} 
+\begin{tikzpicture}[list/.style={rectangle split, rectangle split parts=2,
+    draw, rectangle split horizontal}, >=stealth, start chain]
+  \node[list,on chain] (A) {1};
+  \node[on chain,draw,inner sep=6pt] (D) {};
+  \draw (D.north east) -- (D.south west);
+  \draw (D.north west) -- (D.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (D);
 \end{tikzpicture}
-\caption{Serial vs asynchronous execution}
-\label{fig::stencil:benchmark:1}
-\end{subfigure}
-
-\begin{subfigure}{.4\textwidth}
-\begin{tikzpicture}
-\selectcolormodel{gray}
-\begin{axis}[xlabel=Grid points,ylabel=Execution time, grid=both,title= Stencil 2,legend pos=north west]
-\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_1.dat};
-\addlegendentry{1 CPU}
-\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_2.dat};
-\addlegendentry{2 CPU}
-\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_4.dat};
-\addlegendentry{4 CPU}
-\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_6.dat};
-\addlegendentry{6 CPU}
-\end{axis}
-\end{tikzpicture}
-\caption{Execution time for various number of CPUs for the asynchronous implementation}
-\label{fig::stencil:benchmark:2}
-\end{subfigure}
-\caption{Comparison of the serial vs asynchronous execution~(\subref{fig::stencil:benchmark:1}) and speed-up for various amount of CPUs~(\subref{fig::stencil:benchmark:2}).}
-\label{fig:hpx:stencil:scaling1}
+\caption{The linked list after the initialization \cpp{myList<double> mylist = myList<double>(1);}. The pointer \cpp{first} point now to the \cpp{new data<double>(1)} instead to the \cpp{nullptr}.}
+\label{fig:sketch:linked:list:init}
 \end{figure}
 
+
+
 %----------------------------------------------------------------------------------------
-\section{Semaphores}
-\index{semaphores}
+\subsection*{Inserting at the beginning}
 %----------------------------------------------------------------------------------------
-In Section~\ref{sec:deadlocks} the \cpp{std::mutex}, which is tied to one thread and only one thread can lock or unlock the mutex. Now the look into a semaphore and here any thread can access the ownership on a semaphore. Note that the C++ standard does not define semaphores and they are only available suing HPX. The concept of semaphores was introduced by E. Dijkstra~\cite{dijkstra1962over} and more details are available here~\cite{downey2008little}. Before we look into the source code, we will focus on one example. \\
 
-Imagine a public library lending books with no late fee. The library has 5 copies of the Hitckhiker's Guide to the Galaxy~\cite{adams2017ultimate}. So the first five people can borrow these copies and keep them for an infinite amount of time, since there are no late fees. Now, if person number six wants to borrow one copy, this person has to wait until one of the five borrowers return one copy. So the library assigns one of the copies to this person, but if none is waiting the copy just goes back to the shelf until one asks for it. \\
-
-This example can be explained in C++ using a semaphore. A semaphore has two variables. First, a \cpp{maximum count} which is from the example the total amount of copies. Second, a \cpp{current count} which relates to the amount of currently borrowed copies. Now, we have the the so-called \textcolor{azure}{P-Operation} and \textcolor{azure}{V-Operation}. The \textcolor{azure}{P-Operation} is done using the \cpp{wait} function. Here the variable \cpp{current count} is decreased. If the count is $\geq$ zero then the decrement just happens and the function will return. If the count is zero the function will wait until one other thread called the \lstinline|signal| function. This is refereed to as \textcolor{azure}{P-Operation}\index{P-Operation}. If the \lstinline|signal| function is called, the current count is increased. If the count was zero before you called \lstinline|signal| function and another thread was blocked in \lstinline|wait| then that thread will be executed. If multiple threads are waiting, only one will be executed and the reaming ones have to wait for another increment of the counter. This is refereed to as \textcolor{azure}{V-Operation}\index{V-Operation}. Listing~\ref{code:hpx:semaphore} shows the usage of the semaphore in HPX. In Line~2 the semaphore is generated an the maximal count is passed as argument \cpp{nd}. In Line~5 the ownership of thread \cpp{t} is released using the P-Operation (\cpp{signal} function). In Line~8 the thread \cpp{t} obtains the ownership using the V-Operation (\cpp{wait} function).
+Figure~\ref{fig:sketch:linked:list:push_front} shows the list after inserting a element at the beginning of the list. In this case the need to manipulate pointer \cpp{first} to the first element, see Listing~\ref{code:list:push:front}. In Line~3 we keep a temporary copy \cpp{tmp} of the first element. In Line~5 the pointer to the first element points to the new first element. In Line~7 the new first element points to the previous first element which was temporarily stored in the \cpp{tmp} pointer.
 
 
-\begin{lstlisting}[language=c++,caption={HPX's semaphores.\label{code:hpx:semaphore}},float,floatplacement=tb]
-// Generate a semaphore with maximal count nd
-hpx::lcos::local::sliding_semaphore sem(nd);
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[list/.style={rectangle split, rectangle split parts=2,
+    draw, rectangle split horizontal}, >=stealth, start chain]
+  \node[list,on chain,azure] (A) {2};
+  \node[list,on chain] (B) {1};
+  \node[on chain,draw,inner sep=6pt] (C) {};
+  \draw (C.north east) -- (C.south west);
+  \draw (C.north west) -- (C.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (C);
+\end{tikzpicture}
+\caption{The linked list after inserting a new element at the beginning. The pointer \cpp{first} point now to \cpp{new data(double>(2)} and the pointer \cpp{next} of the first element points to the previous first element.}
+\label{fig:sketch:linked:list:push_front}
+\end{figure}
 
-// Release ownership for t
-sem.signal(t);
+\begin{lstlisting}[language=c++,caption={Implementation of the \cpp{push_back} function of a linked list.\label{code:list:push:front}},float,floatplacement=tb]
+void push_front(T element){
+    
+data<T>* tmp = first;
+    
+first = new data<T>(element);
+    
+first->next = tmp; 
+    
+}
+\end{lstlisting}
 
-// Obtain ownership for t
-sem.wait(t);
+%----------------------------------------------------------------------------------------
+\subsection*{Inserting at the end}
+%----------------------------------------------------------------------------------------
+
+Figure~\ref{fig:sketch:linked:list:push_back} shows the list after inserting one element at the end of the list. The last element of the list is the element where \cpp{next} is the \cpp{nullptr}. Listing~\ref{code:list:pus:back} shows the implementation of the \cpp{push_back} function. We assign the pointer to the first element to a temporary pointer \cpp{tmp} to do not change the pointer to the first element, since we could lose access to the list. To find the last element of the list, the while loop in Line~5 iterates as long as the \cpp{next} pointer is not the \cpp{nullptr}. If the \cpp{next} pointer is the \cpp{nullptr} we found the last element. So the \cpp{next} pointer points now to the \cpp{new data<T>element(2);} and this element becomes the last element. In Figure~\ref{fig:sketch:linked:list:push_back} we have the new element colored in \textcolor{azure}{blue} and the first element points to the second element. The second element points to nowhere.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[list/.style={rectangle split, rectangle split parts=2,
+    draw, rectangle split horizontal}, >=stealth, start chain]
+  \node[list,on chain] (A) {1};
+  \node[list,on chain,azure] (B) {2};
+  \node[on chain,draw,inner sep=6pt] (C) {};
+  \draw (C.north east) -- (C.south west);
+  \draw (C.north west) -- (C.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (C);
+\end{tikzpicture}
+\caption{The linked list after inserting an element at the end. The pointer \cpp{next} of the first element does not point to the \cpp{nullptr} and instead points to \cpp{new data<double>(2)} and this element point to the \cpp{nullptr}, since this is the new last element of the list.}
+\label{fig:sketch:linked:list:push_back}
+\end{figure}
+
+\begin{lstlisting}[language=c++,caption={Implementation of the \cpp{push_back} function of a linked list.\label{code:list:pus:back}},float,floatplacement=tb]
+void push_back(T element){
+
+data<T>* tmp = first;
+
+while (tmp->next != nullptr)
+    tmp = tmp->next;
+
+tmp->next = new data<T>(element);
+}
+\end{lstlisting}
+
+%----------------------------------------------------------------------------------------
+\subsection*{Inserting an element}
+%----------------------------------------------------------------------------------------
+Listing~\ref{code:list:insert} shows the implementation of the insertion of an element at a given index. In Line~3 a new element \cpp{data<T>* newNode = new data<T>(element);} containing the new element is generated. In Line~8 we have the first special case, since we want to replace the first node. Here, \cpp{newNode->next} points to the previous first element which is temporarily stored in \cpp{tmp}. Now, the pointer \cpp{first} points to the new first node. The next case is that we want to insert at not the first index. Here, we use the \cpp{while} loop in Line~17 to find the pointer to the element at the given \cpp{index}. Once we found the pointer to the index, we have to check if the pointer is not the \cpp{nullptr} which would mean that we want to insert at an index larger as the size of the list, see Line~24. After this check, we can finally insert the new element.
+
+\begin{lstlisting}[language=c++,caption={Implementation of the \cpp{insert} function of a linked list.\label{code:list:insert}},float,floatplacement=tb]
+void insert(data<T>* first, T element, size_t index){
+
+data<T>* newNode = new data<T>(element);
+data<T>* tmp = first;
+data<T>* prev = nullptr;
+
+//Case: Replace the head node
+if (index == 0 && tmp != nullptr){
+    newNode->next = tmp;
+    first = newNode;
+    return;
+}
+
+// Case: search for the node
+size_t i = 0;
+
+while(i < index && tmp != nullptr){
+
+    prev = tmp;
+    tmp = tmp->next;
+    i++;
+}
+
+if (tmp == nullptr)
+    {
+    std::cout << "Index " << index << " out of range" << std::endl;
+    return;
+    }
+    
+    prev->next = newNode;    
+    newNode->next = tmp;
+}
 \end{lstlisting}
 
 
+%----------------------------------------------------------------------------------------
+\subsection*{Removing the first element}
+%----------------------------------------------------------------------------------------
 
 
+Listing~\ref{code:list:pop:front} shows the implementation of the \cpp{pop_front} function. In Line~3 we check for the case if the first pointer is the \cpp{nullptr} and we do not need to delete the first element. In Line~6 the first pointer is stored temporarily in \cpp{tmp}, the first pointer points to the second pointer \cpp{first-next}, and finally we can delete the \cpp{tmp} pointer.
 
-\newpage
-\theendnotes
+
+\begin{lstlisting}[language=c++,caption={Implementation of the \cpp{pop_front} function of a linked list.\label{code:list:pop:front}},float,floatplacement=tb]
+void pop_front(){
+    
+    if (first == nullptr) 
+        return; 
+  
+    // Move the head pointer to the next node 
+    data<T>* tmp = first; 
+    first = first->next; 
+  
+    delete tmp;   
+}
+\end{lstlisting}
+
+
+%----------------------------------------------------------------------------------------
+\subsection*{Removing the last element}
+%----------------------------------------------------------------------------------------
+Figure~\ref{fig:sketch:linked:remove last} shows the linked list with the last element colored in \textcolor{amaranth}{red} which is deleted. Listing~\ref{code:list:pop_back} shows the implementation of the \cpp{pop_back} function. In Line~3 the pointer to the first element is stored in the temporary pointer \cpp{tmp} and we keep a copy of the previous pointer in the pointer \cpp{prev}. In line~6 we search for the element before the last element by using \cpp{tmp->next->next} and after the while loop \cpp{tmp} points to the second element of the example list.  Thus, in Line~10 we can delete the last element \cpp{tmp->next} and after that point to the \cpp{nullptr} since the second element became the last element.
+
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[list/.style={rectangle split, rectangle split parts=2,
+    draw, rectangle split horizontal}, >=stealth, start chain]
+
+  \node[list,on chain] (A) {1};
+  \node[list,on chain] (B) {2};
+  \node[list,on chain,amaranth] (C) {3};
+  \node[on chain,draw,inner sep=6pt] (D) {};
+  \draw (D.north east) -- (D.south west);
+  \draw (D.north west) -- (D.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (C);
+  \draw[*->] let \p1 = (C.two), \p2 = (C.center) in (\x1,\y2) -- (D); 
+  
+  \node[list,on chain,yshift=-1cm,xshift=-7.25cm] (A) {1};
+  \node[list,on chain] (B) {2};
+  \node[on chain,draw,inner sep=6pt] (D) {};
+  \draw (D.north east) -- (D.south west);
+  \draw (D.north west) -- (D.south east);
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (D); 
+\end{tikzpicture}
+\caption{In the first row the linked list before the last element was deleted and in the second row the linked list after deleting the last element. The pointer \cpp{next} of the second element points now to the \cpp{nullptr} since it became the last element. Note that we had to use \cpp{delete} to free the memory allocated by the last element.}
+\label{fig:sketch:linked:remove last}
+\end{figure}
+
+
+\begin{lstlisting}[language=c++,caption={Implementation of the \cpp{pop_back} function of a linked list.\label{code:list:pop_back}},float,floatplacement=tb]
+void pop_back(){
+
+data<T>* tmp = first;
+data<T>* prev;
+
+while (tmp->next->next != nullptr){
+    tmp = tmp->next;
+    }
+    
+    delete tmp->next;
+    tmp->next = nullptr;
+}
+\end{lstlisting}
+
 
 %----------------------------------------------------------------------------------------
 \part{Appendix}
@@ -951,7 +446,7 @@ sem.wait(t);
 \section*{Jupyter notebooks}
 %----------------------------------------------------------------------------------------
 
-Some examples for the usage of the Jupyter notesbooks are provided here\link{https://github.com/diehlpk/gateways2020}.
+Some examples for the usage of the Jupyter notesbooks are provided here\link{https://github.com/diehlpk/gateways2020} and more details are available here~\cite{diehl2020gateways}.
 
 %----------------------------------------------------------------------------------------
 \section*{GitHub classroom}

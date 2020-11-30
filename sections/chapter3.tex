@@ -1,3 +1,20 @@
+%Book
+%Copyright (C) 2019  Patrick Diehl
+%			   2020  Christoph Larson
+%
+%This program is free software: you can redistribute it and/or modify
+%it under the terms of the GNU General Public License as published by
+%the Free Software Foundation, either version 3 of the License, or
+%(at your option) any later version.
+
+%This program is distributed in the hope that it will be useful,
+%but WITHOUT ANY WARRANTY; without even the implied warranty of
+%MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%GNU General Public License for more details.
+
+%You should have received a copy of the GNU General Public License
+%along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 %----------------------------------------------------------------------------------------
 \chapter{Monte-Carlo methods}
 \label{sec:monte:carlo}
@@ -36,7 +53,7 @@ Let us look into the computational aspects of the Monte Carlo methods. Independe
   \caption{Sketch of the geometry used within the Monte Carlo method to estimate the value of $\pi$.}
   \label{fig:monte}
 \end{figure}
-To understand these four steps, we will compute the value of $\pi$ using a Monte Carlo method. Figure~\ref{fig:monte} sketches the first two ingredients: a unit square and a circle. First, a unit square is defined as $1 \times 1$, which means it has a side length of 1. The area $A_s$ is therefore also $1. Second, the circle with radius $r=\sfrac{1}{2}$ is drawn at the center of the unit square. The area of the circle is $A_c=\pi r^2$. Using the radius $r=\sfrac{1}{2}$ the area is $A_c=\pi(\sfrac{1}{2})^2=\sfrac{\pi}{4}$. Now, since we have defined the area of the circle and the square, we can use them to estimate the value of $\pi$:
+To understand these four steps, we will compute the value of $\pi$ using a Monte Carlo method. Figure~\ref{fig:monte} sketches the first two ingredients: a unit square and a circle. First, a unit square is defined as $1 \times 1$, which means it has a side length of 1. The area $A_s$ is therefore also 1. Second, the circle with radius $r=\sfrac{1}{2}$ is drawn at the center of the unit square. The area of the circle is $A_c=\pi r^2$. Using the radius $r=\sfrac{1}{2}$ the area is $A_c=\pi(\sfrac{1}{2})^2=\sfrac{\pi}{4}$. Now, since we have defined the area of the circle and the square, we can use them to estimate the value of $\pi$:
 \begin{align}
 A_c &= \sfrac{\pi}{4} \notag\\
 \pi &= 4 A_c \notag\\
@@ -563,9 +580,6 @@ to compute the actual displacement $x(t,X):= x(t-1,X) + u(t,X)$. Note that for t
 %----------------------------------------------------------------------------------------
 Figure~\ref{fig:algorithm:peri} shows the flow chart for the peridynamic simulation. The first step is to read the input file to obtain the material and discretization properties. Next, the discrete neighborhood for each of the nodes in computed and the neighbors are stored in a nested vector \cpp{std::vector<std::vector<size_t>>}. After these steps, the computation is started using a loop. Note that in the first computation the pair-wise forces $F$ are zero, since no external force $b$ was applied. In the next step, the external force $b$ is applied and the acceleration $a$ is computed. Note by adding the external force to the nodes, the acceleration of the nodes is not zero anymore. Now, the displacement $u$ is computed and the positions are updated. Last, the time step and time is updated.
 
-
-
-
 \begin{figure}[tb]
     \centering
 	\begin{tikzpicture}[node distance=1.125cm, scale=0.75, transform shape]
@@ -600,6 +614,35 @@ Figure~\ref{fig:algorithm:peri} shows the flow chart for the peridynamic simulat
 \end{figure}
 
 
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}
+
+\foreach \j in {1,...,5}{
+\foreach \i in {1,...,6}{
+	\node at (\i,\j) {\pgfuseplotmark{square*}};
+}
+}
+\foreach \i in {1,...,6}{
+	\node at (\i,0) {\pgfuseplotmark{square*}};
+}
+\foreach \i in {1,...,6}{
+	\node[below] at (\i,-0.1) {$X_\i$};	
+}
+
+\draw[thick,->] (-1,0) -- (-.5,0);
+\draw[thick,->] (-1,0) -- (-1,0.5);
+\node[right] at (-0.5,0) {$x$};
+\node[above] at (-1,0.5) {$t$};
+
+\node[left] at (0.75,2) {$t_{i-1}$};
+\node[left] at (0.75,3) {$t_{i}$};
+\node[left] at (0.75,4) {$t_{i+1}$};
+
+\node[below] at (1,-0.75) {$0$};
+\node[below] at (6,-0.75) {$L$};
+\end{tikzpicture}
+\end{figure}
 %----------------------------------------------------------------------------------------
 \chapter{One-dimensional heat equation}
 %----------------------------------------------------------------------------------------
@@ -811,6 +854,7 @@ struct stepper
 
 %----------------------------------------------------------------------------------------
 \subsection{Adding grain size control}
+\label{heatequation:serial:grainsize}
 %----------------------------------------------------------------------------------------
 In Figure~\ref{fig:hpx:stencil:scaling1} we have seen that we got some speedup with the asynchronous implementation discussed in Section~\ref{sec:hpx:advanced:sync}. However, in same cases the granularity (the amount of work) for each core was too small, since we always used one grid point wrapped in a future. Now, we want to extend the code to use partitions of grid nodes, see Figure~\ref{}. In this example we have a grid with nine nodes and we split them into three partitions, which means that each core has to compute the new values for three elements instead of for one element. The first, thing we need to do is to update the \cpp{struct participation}, see Listing~\ref{code:heat:garain:size}. In Line~4 a \cpp{std::vector<double>} is added to store the partition. In Line~8 a constructor is added to initialize the vector \cpp{data_(size)} with the provided \cpp{size_t size}. In Line~12 a second constructor is added to fill the partition with the initial values and the boundary values. Since the partition vector is declared as \cpp{private}, we use operator overloading in Line~21 and Line~25 to access the elements of the partition. For more details about operation overloading, see Section~\ref{sec:operator:overloading}. In Line~29 a function to obtain the partition size is added. \\
 
@@ -950,6 +994,15 @@ class stepper
     
 }
 \end{lstlisting}
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Distributed implementation}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+\subsection{Improving the exchange of partitions}
+%----------------------------------------------------------------------------------------
 
 
 \newpage
