@@ -19,41 +19,39 @@
 %----------------------------------------------------------------------------------------
 \chapter{Introduction C++}
 %----------------------------------------------------------------------------------------
-This chapter gives a brief introduction to the core features of the C++ language. However, the focus on this chapter is to introduce the C++ standard template library, see Section~\ref{chapter:stl}, which is essential to implement mathematical equations and algorithms. Therefore, we quickly look into these features as we need them to implement the numerical examples in Part~\ref{part:numerical:examples}. For more details we refer to
+This chapter introduces the core features of the C++ language. Specifically, we focus on introducing the C++ standard template library (see Section~\ref{chapter:stl}), which is essential for implementing mathematical equations and algorithms. Let us briefly look into this library so that we may implement the numerical examples in Part~\ref{part:numerical:examples}. For more details we refer to
 \begin{itemize}
 \item \fullcite{andrew2000accelerated}
 \end{itemize}
-since this book gives an excellent pragmatic overview with a lot of examples. For even more C++ basics, we refer to
+since this book gives an excellent pragmatic overview with many examples. For even more C++ basics, we refer to
 \begin{itemize}
 \item \fullcite{stroustrup2014programming}.
 \end{itemize}
 %----------------------------------------------------------------------------------------
 \section{History of C and C++}
 %----------------------------------------------------------------------------------------
-The development of the programming language \texttt{C} started in 1972 as an improvement of the \texttt{B}\link{https://en.wikipedia.org/wiki/B_(programming_language)} language~\cite{ritchie1993development}. In 1978 the book \textit{The C Programming Language}~\cite{kernighan2006c} which was the informal specification of the \texttt{C} language. However, a zoo of \texttt{C} compiler was around which were not standardized yet. The American National Standards Institute (ANSI) started to standardized the \texttt{C} standard based on the Unix implementation of \texttt{C}. This was the foundation of the 1988 POSIX\link{https://en.wikipedia.org/wiki/POSIX} standard in 1988. One year later, the \texttt{C} standard was published as ANSI X3.159-1989 "Programming Language C". More common names for this version are ANSI C or C89. The International Organization of Standardization (ISO) adopted the ANSI C specification and published it as ISO/IEC 9899:1990 which is called C90. Note that C90 and C89 are referring to the same s
+The development of the programming language \texttt{C} started in 1972 as an improvement of the language \texttt{B}\link{https://en.wikipedia.org/wiki/B_(programming_language)} language~\cite{ritchie1993development}. In 1978 the book by Dennis Ritchie and Brian Kernighan \textit{The C Programming Language}~\cite{kernighan2006c} became known as the informal specification of the \texttt{C} language. In contrast to the simple and small standard library, \texttt{C} compilers varied widely and had no standards. The American National Standards Institute (ANSI) began writing the \texttt{C} standard based on the Unix implementation of the language. This later became the foundation of the 1988 POSIX\link{https://en.wikipedia.org/wiki/POSIX} standard. One year later, the \texttt{C} standard was published as ANSI X3.159-1989 "Programming Language C." More common names for this version are ANSI C or C89. The International Organization of Standardization (ISO) adopted the ANSI C specification and published it as ISO/IEC 9899:1990, which is called C90. Note that C90 and C89 refer to the same standard. This standard was revised in the 1990s and published as ISO/IEC 9899:1999 in 1999 which is the C99 standard. In 2007 the C11 standard was published and in 2018 the C18 standard.\\
 
-tandard. This standard was revised in the 1990s and published as ISO/IEC 9899:1999 in 1999 which is the C99 standard. In 2007 the C11 standard was published and in 2018 the C18 standard.\\
-
-Concurrently, in 1979 Bajarne Stroustrup, the god father of \texttt{C++}, started the "C with classes"\link{http://www.stroustrup.com/bs_faq.html\#invention} which later becomes \texttt{C++}. Stroustrup added classes, derived classes, inlining, and default arguments to the \texttt{C} compiler~\cite{stroustrup1996history}. Note that the name \texttt{C++} means the increment of \texttt{C} using the increment operator \cpp{++}. The \texttt{C++} Programming Language, but not as an official standard was released in 1985~\cite{stroustrup2000c++}. In 1989, C++98~\cite{koenig1998standard}, in 1999 C++ 2.0, in 2003 C++03~\cite{c++2003iso}, in 2011 C++11~\cite{c++2011iso}, and in 2014 C++14~\cite{c++2014iso}. The latest standard is C++17~\cite{smith2017iso} and the upcoming one is C++20.
+Concurrently, in 1979, Bajarne Stroustrup began developing "C with classes"\link{http://www.stroustrup.com/bs_faq.html\#invention}, which later became \texttt{C++}. Stroustrup added classes, derived classes, inlining, and default arguments to the \texttt{C} compiler~\cite{stroustrup1996history}. The name \texttt{C++} symbolizes the increment of \texttt{C} using the increment operator \cpp{++}. The \texttt{C++} Programming Language launched in 1985, though without an official standard~\cite{stroustrup2000c++}. Updated and standardized versions followed: In 1998 C++98~\cite{koenig1998standard}; In 1999 C++ 2.0; In 2003 C++03~\cite{c++2003iso}; In 2011 C++11~\cite{c++2011iso}; In 2014 C++14~\cite{c++2014iso}. The latest standard is C++17~\cite{smith2017iso}, and the upcoming one is C++20.
 
 %----------------------------------------------------------------------------------------
 \section{Getting started with C++}
 %----------------------------------------------------------------------------------------
-To begin with C++ programming, we look at a simple C++ program, the so-called ``Hello World'' example which most programming language start with. Listing~\ref{code:hello:world} shows this program and the first line in green a comment is shown. A  single-line comments always starts with \lstinline[language=C++]|//| and is used to explain the functionality of the program or the next lines of codes. It is also possible to use multi-line comments\endnote{\url{https://en.cppreference.com/w/cpp/comment}} by using \lstinline[language=C++]{/* */}. Comments are important to understand the program, especially if the code is shared with other collaborators. Fore more details we refer to~\cite{kernighan1974elements}.
+To begin with C++ programming, we look at a simple C++ program: the classic''Hello World'' example. Listing~\ref{code:hello:world} shows this program. The first line in green is a comment. Single-line comments start with \lstinline[language=C++]|//|. Programmers often use them to explain the functionality of the program or the next lines of code. Once may also use multi-line comments\endnote{\url{https://en.cppreference.com/w/cpp/comment}} by enclosing the text within \lstinline[language=C++]{/* */}. Comment early and often; comments are crucial for readability and clarity of the program, especially if the code is shared with other collaborators. Fore more details refer to~\cite{kernighan1974elements}.
 
-The second line starts with a so-called include directive\endnote{\url{https://en.cppreference.com/w/cpp/preprocessor/include}} \lstinline[language=C++]{#include <iostream>}. This include directive is needed to include functionality of the C++ standard library, see Chpater~\ref{chapter:stl}, in our case we include the \lstinline|iostream| header to print the Hello World to the terminal, see Line 6.
+The second line starts with a so-called include directive\endnote{\url{https://en.cppreference.com/w/cpp/preprocessor/include}} \lstinline[language=C++]{#include <iostream>}. This include directive incorporates functionality of the C++ standard library (see Chpater~\ref{chapter:stl}). In our case we include the \lstinline|iostream| header so that we may print "Hello World" to the terminal (see Line 6).
 
-The fourth line \lstinline[language=C++]{int main()} starts with the so-called Main function\endnote{\url{https://en.cppreference.com/w/cpp/language/main_function}} which is the entry point of the program and all code lines within are executed sequentially one by one. Every C++ which will be compiled to an executable needs exact one function called \lstinline[language=C++]|main| which have a integer \lstinline[language=C++]{int} as its return type. On most operation systems a return value of zero means that the program executed successfully and any other value indicates an failure. The second last line \lstinline[]|return| is the so--called return statement\endnote{\url{https://en.cppreference.com/w/cpp/language/return}} which has to match the return type in front of the \lstinline[language=C++]{int main()}.
+The fourth line \lstinline[language=C++]{int main()} starts with the Main function\endnote{\url{https://en.cppreference.com/w/cpp/language/main_function}}, which is the entry point of the program. This means all subsequent lines are executed sequentially. Every C++ program which will be compiled to an executable file needs exactly one function called \lstinline[language=C++]|main|, which has an integer \lstinline[language=C++]{int} as its return type. On most operating systems a return value of zero means that the program executed successfully, and any other value (often 1 or -1) indicates a failure. The second-to-last line \lstinline[]|return| is the return statement\endnote{\url{https://en.cppreference.com/w/cpp/language/return}}, which must match the return type in front of the \lstinline[language=C++]{int main()}.
 
 
-\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example, which most languages start with.\label{code:hello:world}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-main.cpp}
+\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example.\label{code:hello:world}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-main.cpp}
 
-Once we have written the program, we have to compile the C++ code into an executable to run the code and print ``Hello world'' to the terminal. Note that there are plenty of C++ compilers\endnote{\url{https://en.wikipedia.org/wiki/List_of_compilers\#C++_compilers}} available, however this book will use the GNU Compiler Collection (GCC) for all examples. Line 1 in Listing~\ref{code:hello:world:compile} shows how to compile the file \lstinline[language=bash]|lecture1-1.cpp|, which contains the C++ code in Listing~\ref{code:hello:world}, to an executable. The GCC provides the \lstinline[language=bash]{g++} compiler to compile C++ code and the \lstinline[language=bash]{gcc} compiler to compile C code. As the first argument to the \lstinline[language=bash]{g++} compiler the file name of the C++ is provided and with the \lstinline[language=bash]|-o| option the name of the executable is specified. To run the generated executable, we type \lstinline[language=bash]|./lecture-1-1| in the terminal. Note for the basic usage of the Linux terminal we refer to~\cite{newham2005learning,robbins2016bash}.
+Once we have written the program, we have to compile the C++ code into an executable so that we can run the code and print ``Hello world'' to the terminal. There are a plethora of C++ compilers\endnote{\url{https://en.wikipedia.org/wiki/List_of_compilers\#C++_compilers}} available, however this book will use the GNU Compiler Collection (GCC) for all examples. Line 1 in Listing~\ref{code:hello:world:compile} shows how to compile the file \lstinline[language=bash]|lecture1-1.cpp|, which contains the C++ code in Listing~\ref{code:hello:world}, to an executable. GCC provides the \lstinline[language=bash]{g++} compiler to compile C++ code and the \lstinline[language=bash]{gcc} compiler for C code. As the first argument to the \lstinline[language=bash]{g++} compiler, we enter the C++ file name and add the \lstinline[language=bash]|-o| option to specify the name of the executable. To run the generated executable, we type \lstinline[language=bash]|./lecture-1-1| in the terminal. For basic usage of the Linux terminal refer to~\cite{newham2005learning,robbins2016bash}.
 
 \lstinputlisting[language=bash,caption={Compilation and execution of the C++ program.\label{code:hello:world:compile}},float,floatplacement=tb,firstline=2, lastline=3]{ParallelComputationMathExamples/chapter2/lecture1-main.sh}
 
 \begin{exercise}
-Download the example program\endnote{\url{https://github.com/diehlpkteaching/ParallelComputationMathExamples}} from GitHub and compile it with your favorite C++ compiler. After you ran the example you could try to modify it, for example you could print a different text or add a second line to the output.
+Download the example program\endnote{\url{https://github.com/diehlpkteaching/ParallelComputationMathExamples}} from GitHub and compile it with your favorite C++ compiler. After running the example you can try to modify it--For example you could print a different text or add a second line to the output.
 \end{exercise}
 
 
@@ -62,11 +60,11 @@ Download the example program\endnote{\url{https://github.com/diehlpkteaching/Par
 \label{sec:fundamental:types}
 %----------------------------------------------------------------------------------------
 \index{data types!fundamental}
-In this section the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language are introduced. First, the numeric data types are introduced. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For all these data types following options: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long| are available. In the \cpp{#include <climits>}\link{https://en.cppreference.com/w/cpp/header/climits} header the minimal and maximal value of all integer data types are defined. For example the minimal value of \cpp{int} data type is given by \cpp{INT_MIN} and the maximal value by \cpp{INT_MAX}, respectively. For more details about the binary numeral system we refer to~\cite{gilli1965binary}. 
+In this section we introduce the fundamental data types\endnote{\url{https://en.cppreference.com/w/cpp/language/types}} provided by the C++ language. First, the numeric data types. To represent natural numbers $\mathbb{N}=\{0,1,2,\ldots \}$ the \lstinline[language=C++]|unsigned int| data type is available. To represent integer numbers $\mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots \}$ the \lstinline[language=C++]|int| data type is available. For these data types we can apply the following sizes: \lstinline[language=C++]|short|, \lstinline[language=C++]|long|, and \lstinline[language=C++]|long long|. In the \cpp{#include <climits>}\link{https://en.cppreference.com/w/cpp/header/climits} header the minimal and maximal value of all integer data types are defined. For example the minimal value of \cpp{int} data type is given by \cpp{INT_MIN} and the maximal value by \cpp{INT_MAX}, respectively. For more details about the binary numeral system, refer to~\cite{gilli1965binary}. 
 
 To represent real numbers $\mathbb{R}$ the \lstinline[language=C++]|float| data type and \lstinline[language=C++]|double| data type are available. In the \cpp{#include <cfloat>}\link{https://en.cppreference.com/w/cpp/header/cfloat} header the minimal and maximal value of all floating point data types are defined. For example the minimal value of \cpp{double} data type is given by \cpp{DBL_MIN} and the maximal value by \cpp{DBL_MAX}, respectively. 
 
-Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. Table~\ref{chapter2:table:datatypes} summarizes all the available numeric data types and there ranges. The next section shows how to get the range of the IEEE 474 standard how floating point numbers.
+Fore more details about the IEEE 474 standard for how floating point numbers are represented in the computer, refer to~\cite{4610935,goldberg1991every}. Table~\ref{chapter2:table:datatypes} summarizes all the available numeric data types and their ranges. The next section shows how to get the range of the IEEE 474 standard for floating point numbers.
 
 \begin{table}[h]
 \centering
@@ -91,7 +89,7 @@ Data type & Size (Bytes) & Min & Max \\\midrule
 \label{chapter2:table:datatypes}
 \end{table}
 
-To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|bool| data type which has either one of the two values \lstinline[language=C++]|true| or \lstinline[language=C++]|false|. Note that the C++ STL offers \lstinline|std::complex|\endnote{\url{https://en.cppreference.com/w/cpp/numeric/complex}} for complex number $\mathbb{C}$, however, this one is not within the fundamental data types.
+To represent a boolean value we use the $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|bool| data type which has exactly one of the two available values, \lstinline[language=C++]|true| or \lstinline[language=C++]|false|. Note that the C++ STL offers \lstinline|std::complex|\endnote{\url{https://en.cppreference.com/w/cpp/numeric/complex}} for complex numbers $\mathbb{C}$, however, this one is not within the fundamental data types.
 
 %----------------------------------------------------------------------------------------
 \section{Statements and flow control}
@@ -101,22 +99,22 @@ To represent a boolean value $\mathbf{B}=\{0,1\}$ the \lstinline[language=C++]|b
 \subsection{Iteration statements}
 \label{sec:iteration:statements}
 %----------------------------------------------------------------------------------------
-\index{statements!iteration} For some applications, we have to repeat some operations multiple times. The C++ language provides the so-called iteration statements. There are two iteration statements, the \lstinline[language=C++]|for| loop and the \lstinline[language=C++]|while| loop, respectively. Let us look how to compute the sum of the numbers from one up ton $n$
+\index{statements!iteration} For some applications, we have to repeat some operations multiple times. The C++ language provides two iteration statements: the \lstinline[language=C++]|for| loop and the \lstinline[language=C++]|while| loop. Let us look how to compute the sum of the numbers from one up to $n$
 \begin{align}
 r = \sum\limits_{i=1}^n i\text{.}
 \end{align}
-The first option is using a \lstinline[language=C++]|for| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/for}}\index{loop!for statement} which shown in Listing~\ref{code:for:loop}. Line 9 shows the \lstinline[language=C++]|for| loop statement with its three arguments. First, the so--called loop variable \lstinline[language=C++]{size_t i = 0} which is initialized to zero. Note that the loop variable is only defined within the loop's body (The part between the curly braces). Second, the so--called condition statement \lstinline[language=C++]{i < n} which means that the loop body is repeated until the variable $i$ is larger than $n$. The third statement manipulates the loop variable, in our case the loop variable is incremented by one after the loop body was executed once. Note that we use the \lstinline[language=C++]|for| loop statement, if we know how often we have to loop through the loop body in advance.
+The first solution uses a \lstinline[language=C++]|for| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/for}}\index{loop!for statement}, which is shown in Listing~\ref{code:for:loop}. Line 9 shows the \lstinline[language=C++]|for| loop statement with its three arguments. First, the so--called loop variable \lstinline[language=C++]{size_t i = 0} which is initialized to zero. Note that the loop variable is only defined within the loop's body (The part between the curly braces). Second, the condition statement \lstinline[language=C++]{i < n}, which means that the loop body is repeated until the variable $i$ is equal to or larger than $n$. The third statement manipulates the loop variable. In our case the loop variable is incremented by one after each execution of the loop body. Note that we use the \lstinline[language=C++]|for| loop statement if we know in advance exactly how many times we want to repeat a block of code.
 
 
 \lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the for loop statement. \label{code:for:loop}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-for.cpp}
 
-The second option is using a \lstinline[language=C++]|while| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/while}}\index{loop!while statement} which shown in Listing~\ref{code:while:loop}. Line 10 shows the \lstinline[language=C++]|while| loop statement with its one argument. This is the so-called condition statement  \lstinline[language=C++]{i < n} which means that the loop body is repeated until the variable $i$ is larger than $n$. Note in the previous example we had three arguments. Here, the loop variable is declared before the loop in Line 9 and the third statement is  in Line 13 where the loop variable is incremented by one in each iteration. Note that we use the \lstinline[language=C++]|while| loop statement, if we do not know the amount of iterations in advance. This example has shown that we can write every \lstinline[language=C++]|for| loop statement as a \lstinline[language=C++]|while| loop statement. For more details we refer to~\cite[Chapter~2]{andrew2000accelerated}.   
+The second option employs a \lstinline[language=C++]|while| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/while}}\index{loop!while statement}, which is shown in Listing~\ref{code:while:loop}. Line 10 shows the \lstinline[language=C++]|while| loop statement with its one argument. This is the condition statement  \lstinline[language=C++]{i < n}, which means that the loop body is repeated until the variable $i$ is equal to or larger than $n$. Note in the previous example we had three arguments. In this case the loop variable is declared before the loop in Line 9, and the third statement appears in Line 13 where the loop variable is incremented by one in each iteration. Note that we use the \lstinline[language=C++]|while| loop statement, if we do not know the number of iterations in advance. This example demonstrates that we can write every \lstinline[language=C++]|for| loop statement as a \lstinline[language=C++]|while| loop statement. For more details we refer to~\cite[Chapter~2]{andrew2000accelerated}.   
 
 
-\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the while loop statement..\label{code:while:loop}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-while.cpp}
+\lstinputlisting[language=C++,caption={Computation of the sum from 1 up to $n$ using the while loop statement..\label{code:while:loop}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-while.cpp}
 
 \begin{exercise}
-Define in your own words in which case you should use a \lstinline[language=C++]|for| loop statement and a \lstinline[language=C++]|while| loop statement. 
+Define in your own words in which cases you should use a \lstinline[language=C++]|for| loop statement and a \lstinline[language=C++]|while| loop statement. 
 \end{exercise}
 
 %----------------------------------------------------------------------------------------
@@ -362,49 +360,6 @@ Transform the \cpp{struct} in Listing~\ref{code:struct} to a \cpp{class}.
 \end{exercise}
 
 %----------------------------------------------------------------------------------------
-\subsection{Access specifiers}
-\index{access specifiers}
-\index{structure! access specifiers}
-\label{sec:access:specifiers}
-%----------------------------------------------------------------------------------------
-for all functions and members of a \cpp{struct} or \cpp{class} the accessibility can be restricted to following access specifiers\link{https://en.cppreference.com/w/cpp/language/access}:
-\begin{itemize}
-\item \cpp{public} - All members below this expression are accessible from outside \index{access specifiers!public}
-\item \cpp{public} - All members below this expression are not accessible from outside\text{.}\index{access specifiers!private}
-\end{itemize}
-\vspace{0.25cm}
-Listing~\ref{code:access:specifiers} shows the usage of the access specifiers. Since \cpp{double x} is declared as \cpp{private}, we can not access the struct member using \cpp{a.x} anymore, since we only allowed access within the definition of the \cpp{struct}. To access the \cpp{private} member, a so-called get method, see Line~11, and a do-called set method, see Line~9 is declared in the \cpp{public} scope of the \cpp{struct}.
-
-\begin{lstlisting}[language=c++,caption={Example for a access specifiers.\label{code:access:specifiers}},float,floatplacement=tb]
-#include <cmath>
-
-struct A 
-{
-public:
-
-A (double value) : x(value {};
-
-void setX(double value) { x = value;}
-
-double getX() ( return x;)
-
-private:
-
-double x;
-
-}
-
-A a = A(10);
-
-// Access the private member
-double value = a.getX();
-
-// Change the value
-a.setX(11);
-\end{lstlisting}
-
-
-%----------------------------------------------------------------------------------------
 \subsection{Header and Source files}
 \index{header file}
 %----------------------------------------------------------------------------------------
@@ -537,46 +492,6 @@ vector3::vector2(double x, double y, double z)
 }
 
 double vector3::norm(){return std::sqrt(x*x+y*y+z*z)}
-\end{lstlisting}
-
-
-%----------------------------------------------------------------------------------------
-\subsection{Inheritance}
-\index{inheritance}
-%----------------------------------------------------------------------------------------
-In some cases we like to define a base class, \emph{e.g.}\ for a shape, see Listing~\ref{code:class:inheritance}. Here, we define the \cpp{class Shape} and the expression \cpp{abstract}\link{https://en.cppreference.com/w/cpp/language/abstract_class}\index{class!abstract} means that we can not generate instances of the class. This class will only be used to derive different shapes, like \cpp{class Rectangle} and \cpp{class Square}. To inherit all functions and class members to from the parent class to the child class, the expression \cpp{class Rectangle : public Shape}\link{https://en.cppreference.com/book/intro/inheritance} is used, see Line~19. Fir the usage of the access specifiers, we refer to Section~\ref{sec:access:specifiers}. Here, the new access specifier \cpp{protected} is introduced. We assume that each derived shape has a \cpp{width} and a \cpp{height}. To showcase the difference between \cpp{private} and \cpp{protected}, the \cpp{width} is declared with \cpp{private} access and the \cpp{height} is declared as \cpp{protected}, respectively. Note that both of these class members are inherit to the child class, however, both of them are accessed differently. Since the \cpp{width} in the parent class wad declared as \cpp{private}, we only can access this class member using the parent class. In Line~23, the constructor of the child class \cpp{Rectangle} is defined. To access the \cpp{private} class member we have to use \cpp{: Shape(width)} since only the parent class can access it. For the \cpp{protected} variable, we can write \cpp{height = height} since we can access this variable directly.
-
-\begin{lstlisting}[language=c++,caption={Example for inheritance of classes.\label{code:class:inheritance}},float,floatplacement=tb]
-abstract class Shape {
-
-public:
-
-Shape (){}
-
-Shape (int width) : width(width) {};
-
-private:
-
-int width;
-
-protected:
-
-int height;
-
-};
-
-class Rectangle : public Shape {
-
-public:
-
-Rectangle (int width, int height) : Shape(width) {
-	height = height;
-}
-
-int area(){ return height * width;}
-
-};
-
 \end{lstlisting}
 
 
@@ -787,10 +702,6 @@ int second = *(array + 1);
 ptrdiff_t dist = array+2 - array;
 \end{lstlisting}
 
-%----------------------------------------------------------------------------------------
-\subsection*{Function pointer}
-%----------------------------------------------------------------------------------------
-\index{pointer!function}
 In the last example, we look into pointers to function, the so-called function pointers. In Listing~\ref{code:pointer:function} shows how to generate function pointers to the function \cpp{square}. In Line~7 the first possibility to generate a function pointer to the \cpp{square} function. The first \cpp{int} stands for the return type of the function and the second \cpp{int} for the function's argument. In Line~2 the left-hand side is the same, but on the right-hand side we use the address operator. In Lines~112--12 the function is called using its function pointer. Note that each of two lines to get the pointer or call the function are equivalent. 
 
 
@@ -810,32 +721,6 @@ std::cout << (*fp)(5);
 std::cout << fp2(5);
 
 \end{lstlisting}
-
-%----------------------------------------------------------------------------------------
-\subsection*{Pointer to objects}
-%----------------------------------------------------------------------------------------
-\index{pointer!objects}
-Listing~\ref{code:pointer:object} shows the definition of the \cpp{struct A}, for more details about \cpp{struct} we refer to Section~\ref{sec:struct}. In Line~12 we use a point \cpp{A* a} and assign the address of the \cpp{new A(10)} object to it. Note for accessing the variable \cpp{value} using the pointer, the expression \cpp{->}\link{https://en.cppreference.com/w/cpp/language/operator_member_access} is used. 
-
-\begin{lstlisting}[language=c++,caption={Example for pointers to objects.
-\label{code:pointer:object}},float,floatplacement=tb]
-struct A {
-
-public: 
-
-A(double in)
-{
-	value = in;
-}
-
-double value;
-};
-
-A* a = new A();
-double val = a->value;
-\end{lstlisting}
-
-
 
 %----------------------------------------------------------------------------------------
 \subsection{Memory management}
