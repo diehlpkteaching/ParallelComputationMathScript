@@ -486,6 +486,24 @@ double* copied_data = serializable_data.data();
 %----------------------------------------------------------------------------------------
 
 
+%----------------------------------------------------------------------------------------
+\subsubsection{Plain actions}
+\index{action!plain}
+%----------------------------------------------------------------------------------------
+A plain action allows to call a \cpp{static} function locally and remotely. For a plain action, a \cpp{static} function  \cpp{square} is defined, see Listing~\ref{code:hpx:action:plain}. Note that actions can have a \cpp{return} expression, but we can not change data within the action. In Line~\ref{6} the function \cpp{square} is registered as a action with the name \cpp{square_action} using the expression \cpp{HPX_PLAIN_ACTION}\link{https://hpx-docs.stellar-group.org/latest/html/libs/actions_base/api.html?highlight=plain_action\#c.HPX_PLAIN_ACTION}.
+
+
+
+\begin{lstlisting}[language=c++,caption={Plain actions in HPX.\label{code:hpx:action:plain}},float,floatplacement=tb]
+static void square(double a){
+
+	std::cout << a * a << std::endl;
+}
+
+// Register the plain action
+HPX_PLAIN_ACTION(square, square_action)
+\end{lstlisting}
+
 
 
 %----------------------------------------------------------------------------------------
@@ -493,22 +511,22 @@ double* copied_data = serializable_data.data();
 %----------------------------------------------------------------------------------------
 Following functions are available to receive topology information:
 \begin{itemize}
-\item \lstinline|hpx::find_here| \\
+\item \lstinline|hpx::find_here|\link{https://hpx-docs.stellar-group.org/latest/html/api/full_api.html?highlight=find_here\#_CPPv4N3hpx9find_hereER10error_code} \\
 Get the global address of the locality the function is called on.
 
-\item \lstinline|hpx::find_all_localities| \\
+\item \lstinline|hpx::find_all_localities|\link{https://hpx-docs.stellar-group.org/latest/html/api/full_api.html?highlight=find_all_localities\#_CPPv4N3hpx19find_all_localitiesER10error_code} \\
 Get the global addresses of all available localities.
 
-\item \lstinline|hpx::find_remote_localities| \\
+\item \lstinline|hpx::find_remote_localities|\link{https://hpx-docs.stellar-group.org/latest/html/api/full_api.html?highlight=find_remote_localities\#_CPPv4N3hpx22find_remote_localitiesER10error_code} \\
 Get the global addresses of all available remote localities.
 
-\item \lstinline| hpx::get_num_localities| \\
+\item \lstinline| hpx::get_num_localities|\link{https://hpx-docs.stellar-group.org/latest/html/libs/runtime_local/api.html?highlight=get_num_localities\#_CPPv4N3hpx18get_num_localitiesEv} \\
 Get the number of all available localities.
 
-\item \lstinline|hpx::find_locality| \\
+\item \lstinline|hpx::find_locality|\link{https://hpx-docs.stellar-group.org/latest/html/api/full_api.html?highlight=find_locality\#_CPPv4N3hpx13find_localityEN10components14component_typeER10error_code} \\
 Get the global address of any locality hosting the component.
 
-\item \lstinline|hpx::get_colocation_id| \\
+\item \lstinline|hpx::get_colocation_id|\link{https://hpx-docs.stellar-group.org/latest/html/api/full_api.html?highlight=hpx\%20get_colocation_id\#_CPPv4N3hpx17get_colocation_idERKN6naming7id_typeE} \\
 Get the locality hosting the object with the given address.
 \end{itemize}
 
