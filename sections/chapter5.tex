@@ -483,6 +483,25 @@ double* copied_data = serializable_data.data();
 %----------------------------------------------------------------------------------------
 \subsection{Components and Actions}
 \label{sec:hpx:components:actions}
+\index{components}
+%----------------------------------------------------------------------------------------
+For distributed computations within HPX, we need to look following features:
+\begin{enumerate}
+\item Components: \\
+The server represents the global data and is a so-called HPX component which allows to create and access the data remotely through the global address space (AGAS)\cite{kaiser2014hpx}\index{AGAS}. 
+\item Client: \\
+The client represents the local and remote access to the component's data on all local or remote localities. 
+\item Component action:\\
+Each function of the component (server) needs to be wrapped into a component action to be remotely and locally available.
+\item Plain actions: \\
+Allows to wrap global (\cpp{static} functions in an action. So we can call this function remotely and locally.
+\end{enumerate}
+
+
+
+%----------------------------------------------------------------------------------------
+\subsubsection{Action}
+\index{action!component}
 %----------------------------------------------------------------------------------------
 
 
@@ -491,8 +510,6 @@ double* copied_data = serializable_data.data();
 \index{action!plain}
 %----------------------------------------------------------------------------------------
 A plain action allows to call a \cpp{static} function locally and remotely. For a plain action, a \cpp{static} function  \cpp{square} is defined, see Listing~\ref{code:hpx:action:plain}. Note that actions can have a \cpp{return} expression, but we can not change data within the action. In Line~\ref{6} the function \cpp{square} is registered as a action with the name \cpp{square_action} using the expression \cpp{HPX_PLAIN_ACTION}\link{https://hpx-docs.stellar-group.org/latest/html/libs/actions_base/api.html?highlight=plain_action\#c.HPX_PLAIN_ACTION}.
-
-
 
 \begin{lstlisting}[language=c++,caption={Plain actions in HPX.\label{code:hpx:action:plain}},float,floatplacement=tb]
 static void square(double a){
@@ -503,8 +520,6 @@ static void square(double a){
 // Register the plain action
 HPX_PLAIN_ACTION(square, square_action)
 \end{lstlisting}
-
-
 
 %----------------------------------------------------------------------------------------
 \subsection{Receiving topology information}
@@ -534,7 +549,7 @@ Get the locality hosting the object with the given address.
 %----------------------------------------------------------------------------------------
 \section{Overview of HPX headers}
 %----------------------------------------------------------------------------------------
-This section recaps some of the HPX headers and the functionality they provide. 
+This section recaps some of the HPX headers and the functionality they provide. For a overview of all HPX headers, we refer to HPX's documentation~\link{https://hpx-docs.stellar-group.org/latest/html/libs/include/api.html}.
 \begin{itemize}
 \item \cpp{#include <hpx/hpx_main.hpp>} \\
 This header includes the HPX run time systems and has to be always the first HPX header to be included. This header provides a way to initialize the HPX runtime system, see Listing~\ref{code:hpx:main}. For more details, we refer to Section~\ref{sec:hpx:using}. 
@@ -543,7 +558,7 @@ This header includes the HPX run time systems and has to be always the first HPX
 This header includes the HPX run time systems and has to be always the first HPX header to be included. This header provides a different way to initialize the HPX runtime system, see Listing~\ref{code:hpx:init}. For more details, we refer to Section~\ref{sec:hpx:using}.
 
 \item \cpp{#include <hpx/include/locs.hpp>} \\
-This header provides for example \cpp{hpx::future} and \cpp{hpx::async} functionality. Fore more details, we refer to Section~\ref{sec:hpx:async}. In addition, the advanced synchronization features, see Section~\ref{sec:hpx:advanced:sync}, are included in this header as well.
+This header provides for example \cpp{hpx::future} (\cpp{#include <hpx/future.hpp>}) and \cpp{hpx::async} (\cpp{#include <hpx/include/future.hpp>}) functionality. Fore more details, we refer to Section~\ref{sec:hpx:async}. In addition, the advanced synchronization features, see Section~\ref{sec:hpx:advanced:sync}, are included in this header as well.
 
 \item \cpp{#include <hpx/algorithm.hpp>} \\
 This header provides the functionality of the parallel algorithms and compares to \cpp{#include <algorithm>}.
@@ -557,6 +572,14 @@ This header includes the method \cpp{hpx::parallel::v1::reduce} functionality wh
 \item \cpp{#include <hpx/modules/synchronization.hpp>} \\
 This header provides the \cpp{hpx::lcos::local::sliding_semaphore}, see Listing~\ref{code:hpx:semaphore}. Fore more details, we refer to Section~\ref{sec:hpx:semaphores}. 
 
+\item \cpp{#include <hpx/include/actions.hpp>} \\
+This header provides the functionality for actions which we need for distributed programming, see Section~\ref{sec:hpx:components:actions}.
+
+\item \cpp{#incldue <hpx/include/components.hpp>} \\
+Provides the he functionality for the components which we need for the distributed programming, see Section~\ref{sec:hpx:components:actions}.
+
+\item \cpp{#include <hpx/include/dataflow.hpp>} \\
+Provides \cpp{hpx::dataflow::dataflow}, see for example Listing~\ref{code:hpx:future:ready}.
 \end{itemize}
 
 \newpage
