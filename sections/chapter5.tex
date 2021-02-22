@@ -10,7 +10,7 @@ HPX (High Performance ParalleX) is a general purpose C++ runtime system for para
 \item HPX has been designed and developed for systems of \textcolor{azure}{any scale}, from hand-held devices to very large scale systems (Raspberry Pi, Android, Server, up to super computers~\cite{daiss2019piz,heller2019harnessing}).
 \end{itemize}
 \vspace{0.25cm}
-For a brief overview of HPX, we refer to~\cite{heller2017hpx} and for a detailed overview, we refer to~\cite{heller2019extending}. For more details about asynchronous many-task systems (AMT), we refer to~\cite{thoman2018taxonomy}.
+For a brief overview of HPX, we refer to~\cite{heller2017hpx,Kaiser2020} and for a detailed overview, we refer to~\cite{heller2019extending}. For more details about asynchronous many-task systems (AMT), we refer to~\cite{thoman2018taxonomy}.
 
 %----------------------------------------------------------------------------------------
 \subsection{Using HPX}
@@ -509,7 +509,7 @@ Allows to wrap global (\cpp{static} functions in an action. So we can call this 
 \subsubsection{Plain actions}
 \index{action!plain}
 %----------------------------------------------------------------------------------------
-A plain action allows to call a \cpp{static} function locally and remotely. For a plain action, a \cpp{static} function  \cpp{square} is defined, see Listing~\ref{code:hpx:action:plain}. Note that actions can have a \cpp{return} expression, but we can not change data within the action. In Line~\ref{6} the function \cpp{square} is registered as a action with the name \cpp{square_action} using the expression \cpp{HPX_PLAIN_ACTION}\link{https://hpx-docs.stellar-group.org/latest/html/libs/actions_base/api.html?highlight=plain_action\#c.HPX_PLAIN_ACTION}.
+A plain action allows to call a \cpp{static} function locally and remotely. For a plain action, a \cpp{static} function  \cpp{square} is defined, see Listing~\ref{code:hpx:action:plain}. Note that actions can have a \cpp{return} expression, but we can not change data within the action. In Line~6 the function \cpp{square} is registered as a action with the name \cpp{square_action} using the expression \cpp{HPX_PLAIN_ACTION}\link{https://hpx-docs.stellar-group.org/latest/html/libs/actions_base/api.html?highlight=plain_action\#c.HPX_PLAIN_ACTION}.
 
 \begin{lstlisting}[language=c++,caption={Plain actions in HPX.\label{code:hpx:action:plain}},float,floatplacement=tb]
 static void square(double a){
@@ -518,7 +518,7 @@ static void square(double a){
 }
 
 // Register the plain action
-HPX_PLAIN_ACTION(square, square_action)
+HPX_PLAIN_ACTION(&square, square_action)
 \end{lstlisting}
 
 %----------------------------------------------------------------------------------------
