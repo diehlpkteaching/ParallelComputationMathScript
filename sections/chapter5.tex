@@ -142,7 +142,7 @@ int main()
 
 std::vector<double> values = {1,2,3,4,5,6,7,8,9};
 
-hpx::parallel::for_loop(
+hpx::for_loop(
 	hpx::execution::par, 
 	0, 
 	values.size();
@@ -564,7 +564,7 @@ This header provides for example \cpp{hpx::future} (\cpp{#include <hpx/future.hp
 This header provides the functionality of the parallel algorithms and compares to \cpp{#include <algorithm>}.
 \begin{itemize}
 \item \cpp{#include <hpx/include/parallel_for_loop.hpp>}
-This header includes the method \cpp{hpx::parallel::for_loop} functionality, see Listing~\ref{code:hpx:parallel:range:loop}. Note if you intend to use multiple parallel algorithms, you could use \cpp{#include <hpx/algorithm.hpp>} which compares to \cpp{#include <algorithm>}.
+This header includes the method \cpp{hpx::for_loop} functionality, see Listing~\ref{code:hpx:parallel:range:loop}. Note if you intend to use multiple parallel algorithms, you could use \cpp{#include <hpx/algorithm.hpp>} which compares to \cpp{#include <algorithm>}.
 \item \cpp{#include <hpx/include/parallel_reduce.hpp>} \\
 This header includes the method \cpp{hpx::ranges::reduce} functionality which is comparable to the \cpp{std::reduce}, see Listing~\ref{code:hpx:parallel:reduce}. Note if you intend to use multiple parallel algorithms, you could use \cpp{#include <hpx/algorithm.hpp>} which compares to \cpp{#include <algorithm>}. 
 \end{itemize}
