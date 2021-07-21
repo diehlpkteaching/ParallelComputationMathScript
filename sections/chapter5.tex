@@ -81,18 +81,18 @@ make
 \index{parallel algorithms}
 \index{HPX!parallel algorithms}
 %----------------------------------------------------------------------------------------
-In Section~\ref{sec:stl:parallel:algorithms} we looked at the experimental parallel algorithms provided by the C++ STL. HPX provides the parallel algorithms as well and the API is identical and we just need to replace the \cpp{std} name space with \cpp{hpx} name space. Recall the example in Listing~\ref{code:parallel:algorithms} and now we implement the same example using HPX's parallel algorithms. Listing~\ref{code:hpx:parallel:reduce} shows how to compute the sum of the elements in the vector \cpp{values} parallel. Note that solely had to replace \cpp{std::execution::par} by HPX's name space which is a little bit different and reads as \cpp{hpx::parallel::execution::par}. The same for \cpp{std::reduce} and this name space reads as \cpp{hpx::parallel::v1::reduce}\link{https://hpx-docs.stellar-group.org/latest/html/libs/algorithms/api.html?highlight=reduce\#\_CPPv3N3hpx8parallel2v16reduceERR8ExPolicy8FwdIterB8FwdIterE1TRR1F}. Until now the API is equal to the one of the C++ STL. Now, we look into the additional features provided by HPX. First, we look into the additional features for execution policies\index{HPX!execution policies}. In Line~16 we specify a dynamic chunk size \cpp{dynamic_chunk_size} and pass this execution policy to the execution policy using \cpp{.with(scs)}. Following execution parameters are provided:
+In Section~\ref{sec:stl:parallel:algorithms} we looked at the experimental parallel algorithms provided by the C++ STL. HPX provides the parallel algorithms as well and the API is identical and we just need to replace the \cpp{std} name space with \cpp{hpx} name space. Recall the example in Listing~\ref{code:parallel:algorithms} and now we implement the same example using HPX's parallel algorithms. Listing~\ref{code:hpx:parallel:reduce} shows how to compute the sum of the elements in the vector \cpp{values} parallel. Note that solely had to replace \cpp{std::execution::par} by HPX's name space which is a little bit different and reads as \cpp{hpx::execution::par}. The same for \cpp{std::reduce} and this name space reads as \cpp{hpx::ranges::reduce}\link{https://hpx-docs.stellar-group.org/latest/html/libs/algorithms/api.html?highlight=reduce\#\_CPPv3N3hpx8parallel2v16reduceERR8ExPolicy8FwdIterB8FwdIterE1TRR1F}. Until now the API is equal to the one of the C++ STL. Now, we look into the additional features provided by HPX. First, we look into the additional features for execution policies\index{HPX!execution policies}. In Line~16 we specify a dynamic chunk size \cpp{dynamic_chunk_size} and pass this execution policy to the execution policy using \cpp{.with(scs)}. Following execution parameters are provided:
 \vspace{0.25cm}
 \begin{itemize}
-\item \lstinline|hpx::parallel::execution::static_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=static\_chunk\_size\#\_CPPv3N3hpx8parallel9execution17static\_chunk\_sizeE} \\
+\item \lstinline|hpx::execution::static_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=static\_chunk\_size\#\_CPPv3N3hpx8parallel9execution17static\_chunk\_sizeE} \\
 Loop iterations are divided into pieces of a given size and then assigned to threads.
-\item \lstinline|hpx::parallel::execution::auto_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=auto\_chunk\_size\#\_CPPv3N3hpx8parallel9execution15auto\_chunk\_sizeE} \\
+\item \lstinline|hpx::execution::auto_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=auto\_chunk\_size\#\_CPPv3N3hpx8parallel9execution15auto\_chunk\_sizeE} \\
 Pieces are determined based on the first 1\% of the total loop iterations. 
-\item \lstinline|hpx::parallel::execution::dynamic_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=dynamic\_chunk\_size\#\_CPPv3N3hpx8parallel9execution18dynamic\_chunk\_sizeE} \\
+\item \lstinline|hpx::execution::dynamic_chunk_size|\link{https://hpx-docs.stellar-group.org/latest/html/libs/execution/api.html?highlight=dynamic\_chunk\_size\#\_CPPv3N3hpx8parallel9execution18dynamic\_chunk\_sizeE} \\
 Dynamically scheduled among the cores and if one core finished it gets dynamically assigned a new chunk.
 \end{itemize}
 \vspace{0.25cm}
-For more details, we refer to~\cite{grubel2015performance}. Another possibility is to use machine learning techniques for choosing the chunk size. For more details, we refer to~\cite{shirzad2019scheduling}. Second, in HPX once can obtain a future from a parallel for loop and us it for synchronization. In Line~23 of Listing~\ref{code:hpx:parallel:reduce} shows how to obtain a future with the result of the reduce operation by adding the expression \cpp{hpx::parallel::execution::task} as an argument to the execution policy. Now we can use the parallel for loops and combined them with the future for asynchronous programming. Note that currently these features are only available yet in HPX. Third, HPX provides range-based for loops\link{https://hpx-docs.stellar-group.org/latest/html/manual/writing_single_node_hpx_applications.html?highlight=parallel\_for\_loop} which is neat for iteration over the elements of a vector using the index and not the vector element itself. Listing~\ref{code:hpx:parallel:range:loop} shows how to use a range-based parallel for loop to print the vector's element to the standard output stream.  The second function argument is the first value of the vector, the third one the vector's length, and the fourth argument is a Lambda function, see Section~\ref{sec:lambda:function}. The first argument of the Lambda function is the index of the the vector to be processed in the range of \cpp{0} and \cpp{values.size()}.
+For more details, we refer to~\cite{grubel2015performance}. Another possibility is to use machine learning techniques for choosing the chunk size. For more details, we refer to~\cite{shirzad2019scheduling}. Second, in HPX once can obtain a future from a parallel for loop and us it for synchronization. In Line~23 of Listing~\ref{code:hpx:parallel:reduce} shows how to obtain a future with the result of the reduce operation by adding the expression \cpp{hpx::execution::task} as an argument to the execution policy. Now we can use the parallel for loops and combined them with the future for asynchronous programming. Note that currently these features are only available yet in HPX. Third, HPX provides range-based for loops\link{https://hpx-docs.stellar-group.org/latest/html/manual/writing_single_node_hpx_applications.html?highlight=parallel\_for\_loop} which is neat for iteration over the elements of a vector using the index and not the vector element itself. Listing~\ref{code:hpx:parallel:range:loop} shows how to use a range-based parallel for loop to print the vector's element to the standard output stream.  The second function argument is the first value of the vector, the third one the vector's length, and the fourth argument is a Lambda function, see Section~\ref{sec:lambda:function}. The first argument of the Lambda function is the index of the the vector to be processed in the range of \cpp{0} and \cpp{values.size()}.
 
 
 \begin{lstlisting}[language=c++,caption={Parallel algorithms (reduce) using HPX.\label{code:hpx:parallel:reduce}},float,floatplacement=tb]
@@ -105,21 +105,21 @@ int main()
 std::vector<double> values = {1,2,3,4,5,6,7,8,9};
 
 // HPX parallel algorithms
-std::cout<< hpx::parallel::v1::reduce(hpx::parallel::execution::par,
+std::cout<< hpx::ranges::reduce(hpx::execution::par,
 	values.begin(),
 	values.end(),
 	0);
 	
 // HPX parallel algorithms using execution policies
-hpx::parallel::execution::dynamic_chunk_size scs(10);
-std::cout<< hpx::parallel::v1::reduce(hpx::parallel::execution::par.with(cs),
+hpx::execution::dynamic_chunk_size scs(10);
+std::cout<< hpx::ranges::reduce(hpx::execution::par.with(cs),
 	values.begin(),
 	values.end(),
 	0);
 	
 // HPX parallel algorithms returning a future
-auto f = hpx::parallel::v1::reduce(
-	hpx::parallel::execution::par(hpx::parallel::execution::task),
+auto f = hpx::ranges::reduce(
+	hpx::execution::par(hpx::execution::task),
 	values.begin(),
 	values.end(),
 	0);
@@ -143,7 +143,7 @@ int main()
 std::vector<double> values = {1,2,3,4,5,6,7,8,9};
 
 hpx::parallel::for_loop(
-	hpx::parallel::execution::par, 
+	hpx::execution::par, 
 	0, 
 	values.size();
 	[](boost::uint64_t i)
@@ -566,7 +566,7 @@ This header provides the functionality of the parallel algorithms and compares t
 \item \cpp{#include <hpx/include/parallel_for_loop.hpp>}
 This header includes the method \cpp{hpx::parallel::for_loop} functionality, see Listing~\ref{code:hpx:parallel:range:loop}. Note if you intend to use multiple parallel algorithms, you could use \cpp{#include <hpx/algorithm.hpp>} which compares to \cpp{#include <algorithm>}.
 \item \cpp{#include <hpx/include/parallel_reduce.hpp>} \\
-This header includes the method \cpp{hpx::parallel::v1::reduce} functionality which is comparable to the \cpp{std::reduce}, see Listing~\ref{code:hpx:parallel:reduce}. Note if you intend to use multiple parallel algorithms, you could use \cpp{#include <hpx/algorithm.hpp>} which compares to \cpp{#include <algorithm>}. 
+This header includes the method \cpp{hpx::ranges::reduce} functionality which is comparable to the \cpp{std::reduce}, see Listing~\ref{code:hpx:parallel:reduce}. Note if you intend to use multiple parallel algorithms, you could use \cpp{#include <hpx/algorithm.hpp>} which compares to \cpp{#include <algorithm>}. 
 \end{itemize}
 
 \item \cpp{#include <hpx/modules/synchronization.hpp>} \\
