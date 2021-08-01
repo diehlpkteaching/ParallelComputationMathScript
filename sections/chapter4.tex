@@ -463,7 +463,14 @@ int main(){
 \chapter{Distributed Programming}
 \label{sec:distributed:programming}
 %----------------------------------------------------------------------------------------
-Previously, we considered shared memory parallelism which means we only considered one physical computational node. Now, we will look into distributed programming because the memory or the computational resources of one physical computational node are not sufficient. Figure~\ref{}
+Previously, we considered shared memory parallelism which means we only considered one physical computational node. Now, we will look into distributed programming because the memory or the computational resources of one physical computational node are not sufficient. A good definition for distributed computing is given in~\cite{van2002distributed}: ``A distributed system is a system whose components are located on different networked computers, which communicate and coordinate their actions by passing messages to one another from any system''. Fore more details about distributed systems, we refer to~\cite{van2002distributed}. Figure~\ref{} sketches the components of a distributed system. We have multiple computational nodes which are connected to a router or switch and they send messages to each other over the network. For the network connection Ethernet or more efficient Mellanox\textregistered InfiBand\texttrademark is used. A common standard to send and receive messages is the Message Passing Interface\index{Message Passing Interface} (MPI)\index{MPI} standard. Here, we have the similar definition that the MPI standard specifies the API and several implementations, \emph{e.g.}\ OpenMPI\link{https://www.open-mpi.org/} or mpich2\link{https://www.mpich.org/}, are available. Next to these open source implementations there are commercial implementaitons, \emph{e.g.}\ IntelMPI and IBM Spectrum-MPI available. For more details about MPI programming, we refer to~\cite{gropp1999using}.
+
+
+
+
+\begin{figure}[tb]
+
+\end{figure}
 
 
 
