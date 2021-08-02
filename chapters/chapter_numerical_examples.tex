@@ -213,7 +213,7 @@ Implement the Algorithm in Figure~\ref{fig:algorithm:monte} using the random num
 \index{$N$-body problems}
 \label{sec:nbody}
 %----------------------------------------------------------------------------------------
-The $N$-body problem is the physics problem of predicting the individual motions of members of a group of celestial objects interacting with each other gravitationally. We want to predict the interactive forces and the motion of all celestial bodies at all future times. We assume that we know their orbital properties, \emph{e.g.}\ the initial positions, velocity, and time.\\
+The $N$-body problem is the physics problem of predicting the individual motions of members of a group of celestial objects interacting with each other gravitational. We want to predict the interactive forces and the motion of all celestial bodies at all future times. We assume that we know their orbital properties, \emph{e.g.}\ the initial positions, velocity, and time.\\
 
 Before we look into the $N$-body problem, let us step back and look at the two-body problem. Let us look at two gravitational bodies with the masses $m_i$ and $m_j$ and the positions $\mathbf{r}_i,\mathbf{r}_j\in\mathbb{R}^3$. To define the equation of motion, we refer to the following definitions:
 \vspace{0.25cm}
@@ -280,7 +280,7 @@ These are the laws of conservation for the $N$-body problem:
 \item Energy: T-U=h with \\
 $ T = \frac{1}{2} \sum\limits_{i=1}^n m_i \mathbf{v}_i \circ \mathbf{v}_i  , U= \sum\limits_{i=1}^n \sum\limits_{j=1}^n G \frac{m_i m_j}{\vert\mathbf{r}_i - \mathbf{r}_j\vert} $
 \end{enumerate}
-These laws are just shown for completeness. For more details about the theory and the derivations, we refer to~\cite{aarseth2008cambridge,aarseth2003gravitational}. This text focuses on the implementation details of the $N$-body problem withb C++.
+These laws are just shown for completeness. For more details about the theory and the derivations, we refer to~\cite{aarseth2008cambridge,aarseth2003gravitational}. This text focuses on the implementation details of the $N$-body problem with C++.
 
 
 %----------------------------------------------------------------------------------------
@@ -295,7 +295,7 @@ Figure~\ref{fig:nbody:algorithm} shows the three steps for the $N$-body simulati
 \draw[->](-0.75,0) -- (-0.75,-1);
 \draw (-3.75,-2) rectangle (2,-1) node[pos=.5] {Update the positions};
 \draw[->](-0.75,-2) -- (-0.75,-3);
-\draw (-3.75,-4) rectangle (2,-3) node[pos=.5] {Collect statiscal information};
+\draw (-3.75,-4) rectangle (2,-3) node[pos=.5] {Collect statistical information};
 \draw[->] (2,-3.5) -- (3,-3.5) -- (3,0.5) -- (2,0.5);
 \end{tikzpicture}
 \caption{The three steps of the algorithm for the $N$-body simulation. First, the forces for all objects are computed using Equation~\ref{eq:nbody:motion}. Second, the updated positions are computed using Equation~\ref{eq:position:update} and Equation~\ref{eq:position:update2}. Third, the statistical information is evaluated.  }
@@ -697,7 +697,7 @@ Meaning we can approximate the second derivation at position $x_i$ using the lef
 \caption{Discretization in space using a so--called discrete mesh for the one-dimensional heat equation.}
 \label{fig:heat:discrete:mesh}
 \end{figure}
-Now, we combine the discretiztion on time and space, see Figure~\ref{fig:heat:time:space}, to compute the heat transfer for the next time step. At time $t=0$ we have applied the boundary conditions on the \textcolor{azure}{blue} squares. At time $t_i$ we compute the new value for the node $x_4$ at time $t_{i+1}$ using its neighbors's values at time $t_i$ using the central difference scheme. 
+Now, we combine the discretiztion on time and space, see Figure~\ref{fig:heat:time:space}, to compute the heat transfer for the next time step. At time $t=0$ we have applied the boundary conditions on the \textcolor{azure}{blue} squares. At time $t_i$ we compute the new value for the node $x_4$ at time $t_{i+1}$ using its neighbor's values at time $t_i$ using the central difference scheme. 
 
 \begin{figure}[tb]
 \center
@@ -858,7 +858,7 @@ struct stepper
 %----------------------------------------------------------------------------------------
 In Figure~\ref{fig:hpx:stencil:scaling1} we have seen that we got some speedup with the asynchronous implementation discussed in Section~\ref{sec:hpx:advanced:sync}. However, in same cases the granularity (the amount of work) for each core was too small, since we always used one grid point wrapped in a future. Now, we want to extend the code to use partitions of grid nodes, see Figure~\ref{}. In this example we have a grid with nine nodes and we split them into three partitions, which means that each core has to compute the new values for three elements instead of for one element. The first, thing we need to do is to update the \cpp{struct participation}, see Listing~\ref{code:heat:garain:size}. In Line~4 a \cpp{std::vector<double>} is added to store the partition. In Line~8 a constructor is added to initialize the vector \cpp{data_(size)} with the provided \cpp{size_t size}. In Line~12 a second constructor is added to fill the partition with the initial values and the boundary values. Since the partition vector is declared as \cpp{private}, we use operator overloading in Line~21 and Line~25 to access the elements of the partition. For more details about operation overloading, see Section~\ref{sec:operator:overloading}. In Line~29 a function to obtain the partition size is added. \\
 
-For the swapping scheme between the time steps for the computation of the temperature, see Figure~\ref{fig:heat:swap}, some small notification is applied as well. Figure~\ref{heat:swapping:partition} shows the principle of the swapping scheme using partitions. The fundamental principle is the same and we have the two space \cpp{U} to swap between the current time step and the future time step. However, with introducing the partitions, we have the two spaces per partition. These modifications are shown in Listing~\ref{code:heat:grain:size:stepper}. In Line~4 the \cpp{partition} is now of the type \cpp{partition_data}, see Listing~\ref{code:heat:garain:size}. In Line~10, each of the space vectors's size is set to the amount of partitions \cpp{np}. In Line~14, we access the space vector \cpp{U[0]} for the first time step and with \cpp{U[0][i]} each partition is accessed. We call the constructor for each partition and assign the initial values and boundary conditions. The full code is available on GitHub\link{https://github.com/STEllAR-GROUP/hpx/blob/master/examples/1d_stencil/1d_stencil_3.cpp}.
+For the swapping scheme between the time steps for the computation of the temperature, see Figure~\ref{fig:heat:swap}, some small notification is applied as well. Figure~\ref{heat:swapping:partition} shows the principle of the swapping scheme using partitions. The fundamental principle is the same and we have the two space \cpp{U} to swap between the current time step and the future time step. However, with introducing the partitions, we have the two spaces per partition. These modifications are shown in Listing~\ref{code:heat:grain:size:stepper}. In Line~4 the \cpp{partition} is now of the type \cpp{partition_data}, see Listing~\ref{code:heat:garain:size}. In Line~10, each of the space vector's size is set to the amount of partitions \cpp{np}. In Line~14, we access the space vector \cpp{U[0]} for the first time step and with \cpp{U[0][i]} each partition is accessed. We call the constructor for each partition and assign the initial values and boundary conditions. The full code is available on GitHub\link{https://github.com/STEllAR-GROUP/hpx/blob/master/examples/1d_stencil/1d_stencil_3.cpp}.
 
 
 \begin{figure}[tp]
