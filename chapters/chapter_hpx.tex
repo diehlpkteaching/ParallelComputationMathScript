@@ -34,7 +34,7 @@ int main()
 \end{lstlisting}
 
 
-\begin{lstlisting}[language=c++,caption={Initializing the HPX runtime system (II).\label{code:hpx:init}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Initializing the HPX runtime system (II).\label{code:hpx:init}},float,floatplacement=htb]
 #include <hpx/hpx_init.hpp>
 #include <iostream>
 
@@ -96,7 +96,7 @@ Dynamically scheduled among the cores and if one core finished it gets dynamical
 For more details, we refer to~\cite{grubel2015performance}. Another possibility is to use machine learning techniques for choosing the chunk size. For more details, we refer to~\cite{shirzad2019scheduling}. Second, in HPX once can obtain a future from a parallel for loop and us it for synchronization. In Line~23 of Listing~\ref{code:hpx:parallel:reduce} shows how to obtain a future with the result of the reduce operation by adding the expression \cpp{hpx::execution::task} as an argument to the execution policy. Now we can use the parallel for loops and combined them with the future for asynchronous programming. Note that currently these features are only available yet in HPX. Third, HPX provides range-based for loops\link{https://hpx-docs.stellar-group.org/latest/html/manual/writing_single_node_hpx_applications.html?highlight=parallel\_for\_loop} which is neat for iteration over the elements of a vector using the index and not the vector element itself. Listing~\ref{code:hpx:parallel:range:loop} shows how to use a range-based parallel for loop to print the vector's element to the standard output stream.  The second function argument is the first value of the vector, the third one the vector's length, and the fourth argument is a Lambda function, see Section~\ref{sec:lambda:function}. The first argument of the Lambda function is the index of the the vector to be processed in the range of \cpp{0} and \cpp{values.size()}.
 
 
-\begin{lstlisting}[language=c++,caption={Parallel algorithms (reduce) using HPX.\label{code:hpx:parallel:reduce}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Parallel algorithms (reduce) using HPX.\label{code:hpx:parallel:reduce}},float,floatplacement=htb]
 #include <hpx/hpx_init.hpp>
 #include<hpx/include/parallel_reduce.hpp>
 
@@ -132,7 +132,7 @@ return EXIT_SUCCESS;
 
 \end{lstlisting}
 
-\begin{lstlisting}[language=c++,caption={Parallel range-based for loops using HPX.\label{code:hpx:parallel:range:loop}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Parallel range-based for loops using HPX.\label{code:hpx:parallel:range:loop}},float,floatplacement=htb]
 #include <hpx/hpx_init.hpp>
 #include<vector>
 #include<iostream>
@@ -167,7 +167,7 @@ return EXIT_SUCCESS;
 %----------------------------------------------------------------------------------------
 HPX provides the same features as the C++ language for asynchronous programming, see Chapter~\ref{sec:async:coding} for more details. In this section, we show how to use HPX's function instead of \cpp{std::future} and \cpp{std::async}, since HPX provides more flexibility here. As a disclaimer this is really easy, since we can use the code of the previous example and just replace the name space \cpp{std} with the name space \cpp{hpx}. Listing~\ref{code:hpx:future} shows an example of the example for computing the square number of a asynchronously. In Line~2 the header \cpp{#include <hpx/incldue/lcos.hpp>} is needed to use \cpp{hpx::future} and \cpp{hpx::async}\link{https://stellar-group.github.io/hpx/docs/sphinx/latest/html/examples/fibonacci_local.html?highlight=async}. In Line~12 the function \cpp{square} is called asynchronously using \cpp{hpx::async(square,10)}. Note that the first argument is the name of the function and the second one the function argument. The function call return a \cpp{hpx::future<int>} since the return type of the function is \cpp{int}. To access the result of the function, if the computation has finished the function \cpp{.get()} is used. Note that the only difference here is not to include the header \cpp{#include <future>} and use \cpp{hpx::future} instead of \cpp{std::future} and same for \cpp{hpx:async} instead of \cpp{std::async}. Thus, it is really easy to switch between HPX and C++ for asynchronous programming.
 
-\begin{lstlisting}[language=c++,caption={Asynchronous computation of the square number using HPX.\label{code:hpx:future}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Asynchronous computation of the square number using HPX.\label{code:hpx:future}},float,floatplacement=htb]
 #include <hpx/hpx_init.hpp>
 #include <hpx/incldue/lcos.hpp>
 #include <iostream>
@@ -206,7 +206,7 @@ It \textit{AND}-composes all the given futures and returns a new future object r
 
 
 
-\begin{lstlisting}[language=c++,caption={Advanced synchronization of futures using HPX.\label{code:hpx:future:sync}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Advanced synchronization of futures using HPX.\label{code:hpx:future:sync}},float,floatplacement=htb]
 std::vector<hpx::future<int>> futures;
 
 futures.push_back(hpx::async(square,10);
@@ -226,7 +226,7 @@ hpx::when_all(futures).then([](auto&& f){
 HPX provides additional features for asynchronous programming which are not yet in the C++ standard. In this section, we look into these features on some small examples, In Section~\ref{heatequation:async} all of them are combined to have the asynchronous implementation of one-dimensional heat equation. First, we look into one feature which will not be used for the one-dimensional heat equation, however, it is still useful to combine the parallel algorithms in Section~\ref{sec:hpx:parallel:algorithms} with asynchronous programming. This feature is shown in Line~22 of Listing~\ref{code:hpx:parallel:reduce}. Second, we will look into the features which we will use for the asynchronous implementation of the heat equation. In some cases, for example if we initialize values at the beginning of simulation, we need a future to synchronize with the actual computation but this future is already ready since no computation is needed. Listing~\ref{code:hpx:future:ready} shows the usage of \lstinline|hpx::make_ready_future| to generate a future filled with the initial value of one. Since we used a so-called ready future the code in Line~6 will be immediately executed, since there will no barrier because the future is ready and the data is available when we call \lstinline|.get()|.
 
 
-\begin{lstlisting}[language=c++,caption={Use a ready future to initialize the computational data.\label{code:hpx:future:ready}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Use a ready future to initialize the computational data.\label{code:hpx:future:ready}},float,floatplacement=htb]
 auto f = hpx::make_ready_future(1);
 /* 
  * Since the future is ready the output will happen
@@ -235,11 +235,36 @@ auto f = hpx::make_ready_future(1);
 std::cout << f.get() << std::endl;
 \end{lstlisting}
 
+HPX provides additional features for continuation of the work flow. We will look into to different ways to attach some new task once the depending futures are ready. Listing~\ref{code:hpx:future:then} show the first approach were the future return by \lstinline|hpx::when_all| is used to specify the next depending task. In Line~\ref{code:hpx:future:then:async1} and Line~\ref{code:hpx:future:then:async2} the futures of the two asynchronous function calls are stored in the vector \lstinline|futures| and in Line~\ref{code:hpx:future:then:all}, we use \lstinline|hpx::when_all| for synchronization as before. However, this time we use the fact that \lstinline|hpx::when_all| returns a future and we can call the \lstinline|.then()| function of the returned future. We pass a lambda function, see Section~\ref{sec:lambda:function}, to this function which contains the code which is executed once the two futures are ready. The first and only argument is the \lstinline|std::vector<hpx::lcos::future<int>> futures| inside a \lstinline|hpx::lcos::future<std::vector<hpx::lcos::future<int>>>|. Therefore, we have to call \lstinline|f.get()| in Line~\ref{code:hpx:future:then:get} to access the \lstinline|std::vector|. In the \lstinline|for| loop, we iterate over the two futures and gather the results which will be printed in Line~\ref{code:hpx:future:then:print}.
+
+
+
+
+\begin{lstlisting}[language=c++,caption={Use a ready future to initialize the computational data.\label{code:hpx:future:then}},float,floatplacement=htb,escapechar=|]
+std::vector<hpx::lcos::future<int>> futures;
+futures.push_back(hpx::async(square,10)); |\label{code:hpx:future:then:async1}|
+futures.push_back(hpx::async(square,100)); |\label{code:hpx:future:then:async2}|
+
+// When all returns a future containing the vector 
+// of futures
+hpx::when_all(futures).then([](auto&& f){ |\label{code:hpx:future:then:all}|
+    // We need to unwrap this future to get 
+    // the content of it
+    auto futures = f.get(); |\label{code:hpx:future:then:get}|
+    int result = 0;
+    for(size_t i = 0; i < futures.size();i++)
+        result += futures[i].get();
+    std::cout << result << std::endl; |\label{code:hpx:future:then:print}|
+});
+\end{lstlisting}
+
+
+
 
 Another important feature is the unwrapping the futures to pass their content to some function directly without calling \lstinline|.get()| for all of the futures. Look at Listing~\ref{code:hpx:unwrapping} shows the function \lstinline|sum| taking two integers as its arguments and print their sum on the standard output stream in Line~\ref{code:hpx:unwrapping:sum}. In Line~\ref{code:hpx:unwrapping:async1} and Line~\ref{code:hpx:unwrapping:async2} we call the function \lstinline|square| asynchronously, which is not shown here and just computes the square of the argument. In Line~\ref{code:hpx:unwrapping:sum1} the function \lstinline|sum| is called and we need to call \lstinline|.get()| twice to access the content of the futures. Doing this for two futures is doable, but no really convenient. HPX provides the unwrapping of the function \lstinline|sum| so the \lstinline|.get()| will be called internally and we can pass the futures directly to the function. In Line~\ref{code:hpx:unwrapping:unwrap} we use \lstinline|hpx::util::unwrapping| to unwrap the function \lstinline|sum| and we get some function pointer \lstinline|fp| back which points to the unwrapped function. In Line~\ref{code:hpx:unwrapping:dataflow} we can now use \lstinline|hpx::dataflow| to launch the function pointer \lstinline|fp| synchronously and passing the futures directly without calling the \lstinline|.get()|. 
 
 
-\begin{lstlisting}[language=c++,caption={Unwrapping a function to pass futures without calling \lstinline|.get()|.\label{code:hpx:unwrapping}},float,floatplacement=tb,escapechar=|]
+\begin{lstlisting}[language=c++,caption={Unwrapping a function to pass futures without calling \lstinline|.get()|.\label{code:hpx:unwrapping}},float,floatplacement=htb,escapechar=|]
 void sum(int first, int second){ |\label{code:hpx:unwrapping:sum}|
 
 std:: cout << first + second << std::endl;
@@ -275,7 +300,7 @@ Imagine a public library lending books with no late fee. The library has 5 copie
 This example can be explained in C++ using a semaphore. A semaphore has two variables. First, a \cpp{maximum count} which is from the example the total amount of copies. Second, a \cpp{current count} which relates to the amount of currently borrowed copies. Now, we have the the so-called \textcolor{azure}{P-Operation} and \textcolor{azure}{V-Operation}. The \textcolor{azure}{P-Operation} is done using the \cpp{wait} function. Here the variable \cpp{current count} is decreased. If the count is $\geq$ zero then the decrement just happens and the function will return. If the count is zero the function will wait until one other thread called the \lstinline|signal| function. This is refereed to as \textcolor{azure}{P-Operation}\index{P-Operation}. If the \lstinline|signal| function is called, the current count is increased. If the count was zero before you called \lstinline|signal| function and another thread was blocked in \lstinline|wait| then that thread will be executed. If multiple threads are waiting, only one will be executed and the reaming ones have to wait for another increment of the counter. This is refereed to as \textcolor{azure}{V-Operation}\index{V-Operation}. Listing~\ref{code:hpx:semaphore} shows the usage of the semaphore in HPX. In Line~2 the semaphore is generated an the maximal count is passed as argument \cpp{nd}. In Line~5 the ownership of thread \cpp{t} is released using the P-Operation (\cpp{signal} function). In Line~8 the thread \cpp{t} obtains the ownership using the V-Operation (\cpp{wait} function).
 
 
-\begin{lstlisting}[language=c++,caption={HPX's semaphores.\label{code:hpx:semaphore}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={HPX's semaphores.\label{code:hpx:semaphore}},float,floatplacement=htb]
 // Generate a semaphore with maximal count nd
 hpx::lcos::local::sliding_semaphore sem(nd);
 
@@ -340,7 +365,7 @@ Figure~\ref{fig:sending:network} shows the protocol to send data over the networ
 Before, we looked into the general concept of serialization and now we look on the implementation within HPX. In Listing~\ref{code:hpx:serialization} the data is allocated in the first three lines. To serialize the \cpp{double* data} array, first a \cpp{hpx::serialization::serialize_buffer} us used in Line~6 is defined. In Line~8 the buffer \cpp{serialize_buffer<double>} with \cpp{double} as its template argument is used, since we intend to serialize the \cpp{double* data} array. As the arguments of the constructor, we pass the pointer to the data and the size of the data. For now we ignore the third argument and just use this mode as the default mode. This is the part of the serialization which happens on locality 1. The deserialization which would happen on locality 2 is shown in Line~12, assuming we received the \cpp{serializable_data} object on locality 2. On locality 2 a pointer \cpp{data* copied_data} is used to store the deseralized data obtained by the function \cpp{.data()}. For sending and receiving parcels, we will look into components and action, in Section~\ref{sec:hpx:components:actions}.
 
 
-\begin{lstlisting}[language=c++,caption={Serialization in HPX.\label{code:hpx:serialization}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Serialization in HPX.\label{code:hpx:serialization}},float,floatplacement=htb]
 // Allocation of the data
 size_t size = 5;
 double* data = new double[size];
@@ -388,7 +413,7 @@ Allows to wrap global (\cpp{static} functions in an action. So we can call this 
 %----------------------------------------------------------------------------------------
 A plain action allows to call a \cpp{static} function locally and remotely. For a plain action, a \cpp{static} function  \cpp{square} is defined, see Listing~\ref{code:hpx:action:plain}. Note that actions can have a \cpp{return} expression, but we can not change data within the action. In Line~6 the function \cpp{square} is registered as a action with the name \cpp{square_action} using the expression \cpp{HPX_PLAIN_ACTION}\link{https://hpx-docs.stellar-group.org/latest/html/libs/actions_base/api.html?highlight=plain_action\#c.HPX_PLAIN_ACTION}.
 
-\begin{lstlisting}[language=c++,caption={Plain actions in HPX.\label{code:hpx:action:plain}},float,floatplacement=tb]
+\begin{lstlisting}[language=c++,caption={Plain actions in HPX.\label{code:hpx:action:plain}},float,floatplacement=htb]
 static void square(double a){
 
 	std::cout << a * a << std::endl;
