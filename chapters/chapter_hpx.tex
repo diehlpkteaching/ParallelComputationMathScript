@@ -238,9 +238,7 @@ std::cout << f.get() << std::endl;
 HPX provides additional features for continuation of the work flow. We will look into to different ways to attach some new task once the depending futures are ready. Listing~\ref{code:hpx:future:then} show the first approach were the future return by \lstinline|hpx::when_all| is used to specify the next depending task. In Line~\ref{code:hpx:future:then:async1} and Line~\ref{code:hpx:future:then:async2} the futures of the two asynchronous function calls are stored in the vector \lstinline|futures| and in Line~\ref{code:hpx:future:then:all}, we use \lstinline|hpx::when_all| for synchronization as before. However, this time we use the fact that \lstinline|hpx::when_all| returns a future and we can call the \lstinline|.then()| function of the returned future. We pass a lambda function, see Section~\ref{sec:lambda:function}, to this function which contains the code which is executed once the two futures are ready. The first and only argument is the \lstinline|std::vector<hpx::lcos::future<int>> futures| inside a \lstinline|hpx::lcos::future<std::vector<hpx::lcos::future<int>>>|. Therefore, we have to call \lstinline|f.get()| in Line~\ref{code:hpx:future:then:get} to access the \lstinline|std::vector|. In the \lstinline|for| loop, we iterate over the two futures and gather the results which will be printed in Line~\ref{code:hpx:future:then:print}.
 
 
-
-
-\begin{lstlisting}[language=c++,caption={Use a ready future to initialize the computational data.\label{code:hpx:future:then}},float,floatplacement=htb,escapechar=|]
+\begin{lstlisting}[language=c++,caption={Usage of \lstinline|hpx::when_all.then()| for the continuation of futures.\label{code:hpx:future:then}},float,floatplacement=htb,escapechar=|]
 std::vector<hpx::lcos::future<int>> futures;
 futures.push_back(hpx::async(square,10)); |\label{code:hpx:future:then:async1}|
 futures.push_back(hpx::async(square,100)); |\label{code:hpx:future:then:async2}|
@@ -258,6 +256,17 @@ hpx::when_all(futures).then([](auto&& f){ |\label{code:hpx:future:then:all}|
 });
 \end{lstlisting}
 
+A more efficient way were is no need to wrap the \lstinline|std::vector| into some additional future. Listing~\ref{code:hpx:dataflow} shows the usage of \lstinline|hpx::dataflow| to do exactly the same what is shown in Listing~\ref{code:hpx:future:then}. The first argument indicates if the lambda function, see Section~\ref{sec:lambda:function}, will be executed synchronously \lstinline|hpx::launch::sync| or asynchronously \lstinline|hpx::launch::async| returning a future. As the second element the lambda function which is executed after the futures are ready is given. In the \lstinline|for| loop the results are gather and finally printed.
+
+
+\begin{lstlisting}[language=c++,caption={Usage of \lstinline|hpx::dataflow| for the continuation of futures.\label{code:hpx:dataflow}},float,floatplacement=htb,escapechar=|]
+hpx::dataflow(hpx::launch::sync,[](auto f){
+    int result = 0;
+    for(size_t i = 0; i < f.size();i++)
+        result += f[i].get();
+    std::cout << result << std::endl;
+},futures);
+\end{lstlisting}
 
 
 
