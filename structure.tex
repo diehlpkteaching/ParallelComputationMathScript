@@ -69,7 +69,7 @@
 \def\pi{3.1415}
 \def\e{0}
     \foreach \i in {1,2,...,#1}{%
-        \typeout{Point \i}%
+        %\typeout{Point \i}%
         \pgfmathsetmacro\x{rnd}%
         \pgfmathsetmacro\y{rnd}%
         \pgfmathsetmacro\k{(pow(\x,2)+pow(\y,2)) <pow(1,2)}%
@@ -79,10 +79,10 @@
         }
 \pgfmathparse{4*\n/#1}
 \xdef\r{\pgfmathresult}
-\typeout{R \r}
+%\typeout{R \r}
 \pgfmathparse{(\r-\pi)/\pi*100}
 \xdef\e{abs(\pgfmathresult)}
-\typeout{E \e}
+%\typeout{E \e}
 \addplot [only marks,mark=*] coordinates { (#2,\e) };		        
 }
 
