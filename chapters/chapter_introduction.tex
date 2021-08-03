@@ -44,11 +44,11 @@ The second line starts with a so-called include directive\endnote{\url{https://e
 The fourth line \lstinline[language=C++]{int main()} starts with the Main function\endnote{\url{https://en.cppreference.com/w/cpp/language/main_function}}, which is the entry point of the program. This means all subsequent lines are executed sequentially. Every C++ program which will be compiled to an executable file needs exactly one function called \lstinline[language=C++]|main|, which has an integer \lstinline[language=C++]{int} as its return type. On most operating systems a return value of zero means that the program executed successfully, and any other value (often 1 or -1) indicates a failure. The second-to-last line \lstinline[]|return| is the return statement\endnote{\url{https://en.cppreference.com/w/cpp/language/return}}, which must match the return type in front of the \lstinline[language=C++]{int main()}.
 
 
-\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example.\label{code:hello:world}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-main.cpp}
+\lstinputlisting[language=C++,caption={A simple C++ program, the so-called ``Hello World'' example.\label{code:hello:world}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture1-main.cpp}
 
 Once we have written the program, we have to compile the C++ code into an executable so that we can run the code and print ``Hello world'' to the terminal. There are a plethora of C++ compilers\endnote{\url{https://en.wikipedia.org/wiki/List_of_compilers\#C++_compilers}} available, but this book will use the GNU Compiler Collection (GCC) for all examples. Line 1 in Listing~\ref{code:hello:world:compile} shows how to compile the file \lstinline[language=bash]|lecture1-1.cpp|, which contains the C++ code in Listing~\ref{code:hello:world}, to an executable. GCC provides the \lstinline[language=bash]{g++} compiler to compile C++ code and the \lstinline[language=bash]{gcc} compiler for C code. As the first argument to the \lstinline[language=bash]{g++} compiler, we enter the C++ file name and add the \lstinline[language=bash]|-o| option to specify the name of the executable. To run the generated executable, we type \lstinline[language=bash]|./lecture-1-1| in the terminal. For basic usage of the Linux terminal refer to~\cite{newham2005learning,robbins2016bash}.
 
-\lstinputlisting[language=bash,caption={Compilation and execution of the C++ program.\label{code:hello:world:compile}},float,floatplacement=tb,firstline=2, lastline=3]{ParallelComputationMathExamples/chapter2/lecture1-main.sh}
+\lstinputlisting[language=bash,caption={Compilation and execution of the C++ program.\label{code:hello:world:compile}},float,floatplacement=tb,firstline=2, lastline=3]{ParallelComputationMathExamples/cpp/lecture1-main.sh}
 
 \begin{exercise}
 Download the example program\endnote{\url{https://github.com/diehlpkteaching/ParallelComputationMathExamples}} from GitHub and compile it with your favorite C++ compiler. After running the example you can try to modify it--For example you could print a different text or add a second line to the output.
@@ -106,12 +106,12 @@ r = \sum\limits_{i=1}^n i\text{.}
 The first solution uses a \lstinline[language=C++]|for| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/for}}\index{loop!for statement}, which is shown in Listing~\ref{code:for:loop}. Line 9 shows the \lstinline[language=C++]|for| loop statement with its three arguments. First, the so--called loop variable \lstinline[language=C++]{size_t i = 0} which is initialized to zero. Note that the loop variable is only defined within the loop's body (The part between the curly braces). Second, the condition statement \lstinline[language=C++]{i < n}, which means that the loop body is repeated until the variable $i$ is equal to or larger than $n$. The third statement manipulates the loop variable. In our case the loop variable is incremented by one after each execution of the loop body. Note that we use the \lstinline[language=C++]|for| loop statement if we know in advance exactly how many times we want to repeat a block of code.
 
 
-\lstinputlisting[language=C++,caption={Computation of the sum from 1 up to $n$ using the for loop statement. \label{code:for:loop}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-for.cpp}
+\lstinputlisting[language=C++,caption={Computation of the sum from 1 up to $n$ using the for loop statement. \label{code:for:loop}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture1-for.cpp}
 
 The second option employs a \lstinline[language=C++]|while| loop statement\endnote{\url{https://en.cppreference.com/w/cpp/language/while}}\index{loop!while statement}, which is shown in Listing~\ref{code:while:loop}. Line 10 shows the \lstinline[language=C++]|while| loop statement with its one argument. This is the condition statement  \lstinline[language=C++]{i < n}, which means that the loop body is repeated until the variable $i$ is equal to or larger than $n$. Note in the previous example we had three arguments. In this case the loop variable is declared before the loop in Line 9, and the third statement appears in Line 13 where the loop variable is incremented by one in each iteration. Note that we use the \lstinline[language=C++]|while| loop statement, if we do not know the number of iterations in advance. This example demonstrates that we can write every \lstinline[language=C++]|for| loop statement as a \lstinline[language=C++]|while| loop statement. For more details we refer to~\cite[Chapter~2]{andrew2000accelerated}.   
 
 
-\lstinputlisting[language=C++,caption={Computation of the sum from 1 up to $n$ using the while loop statement..\label{code:while:loop}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-while.cpp}
+\lstinputlisting[language=C++,caption={Computation of the sum from 1 up to $n$ using the while loop statement..\label{code:while:loop}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture1-while.cpp}
 
 \begin{exercise}
 Explain in your own words in which cases you should use a \lstinline[language=C++]|for| loop statement and a \lstinline[language=C++]|while| loop statement. 
@@ -132,13 +132,13 @@ i^2, \text{ else}
 \end{align}
 Listing~\ref{code:example-if} shows the implementation of Equation~\ref{eq:chapter2:if} using a \lstinline[language=c++]{for} loop. The skeleton of the \lstinline[language=c++]{for} loop is identical to the one in Listing~\ref{code:for:loop}, but the \lstinline[language=c++]{if} statement\endnote{\url{https://en.cppreference.com/w/cpp/language/if}} in Line 8 is added to check whether the current number in the series is even or odd. The \lstinline[language=c++]{if} statement takes exactly one argument, the condition statement. If the statement is evaluated as \lstinline[language=c++]{true} the code between \lstinline[language=c++]{if} and \lstinline[language=c++]{else} runs. If the statement is evaluated as \lstinline[language=c++]{false} the code line after \lstinline[language=c++]{else} runs. It is also possible to use \lstinline[language=c++]{else if} after the first \lstinline[language=c++]{if}. \\
 
-\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the selection statement.\label{code:example-if}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-if.cpp}
+\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the selection statement.\label{code:example-if}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture1-if.cpp}
 
 
 The second selection statement is the \lstinline[language=c++]{switch} statement\endnote{\url{https://en.cppreference.com/w/cpp/language/switch}}. We use this statement to execute different code branches depending on a single variable. Listing~\ref{code:example-switch} shows one example that writes the name of the color to the standard output. In this case we use an enumeration \lstinline[language=c++]{enum}\endnote{\url{https://en.cppreference.com/w/cpp/language/enum}} to store the colors. The \lstinline[language=c++]{switch} takes one argument and executes the code between the matching \lstinline[language=c++]{case} and the following \lstinline[language=c++]{break}. For more details we refer to~\cite[Chapter~2]{andrew2000accelerated}.  
 
 
-\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the selection statement.\label{code:example-switch}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-switch.cpp}
+\lstinputlisting[language=C++,caption={Computation of the sum from one up to $n$ using the selection statement.\label{code:example-switch}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture1-switch.cpp}
 
 
 %----------------------------------------------------------------------------------------
@@ -309,7 +309,7 @@ return a>b?a:b;
 
 Function are defined between \cpp{#include} and \cpp{int main (void)} in the source code file. Listing~\ref{code:example-function} shows the usage of a function definition for the example in Equation~\ref{eq:chapter2:if}. For more details we refer to~\cite[Chapter~4]{andrew2000accelerated}.
 
-\lstinputlisting[language=C++,caption={Example for a function definition to compute Equation~\ref{eq:chapter2:if}.\label{code:example-function}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture2-function.cpp}
+\lstinputlisting[language=C++,caption={Example for a function definition to compute Equation~\ref{eq:chapter2:if}.\label{code:example-function}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture2-function.cpp}
 
 
 %----------------------------------------------------------------------------------------
@@ -852,7 +852,7 @@ The STL provides the class \lstinline[language=C++]{string}\endnote{\url{http://
 In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name: "} is written to the standard output stream using the operator \lstinline[language=c++]{<<}. In Line~9 a string object with the identifier \lstinline[language=c++]{name} is declared. All variables have a name \lstinline[language=c++]{name} and a type  \lstinline[language=c++]{std::string}. Since the variable is declared but not initialized yet, the variable is empty or a null string. The assignment operator \lstinline[language=c++]{=} is used to initialize the variable with a set of characters  \lstinline[language=c++]{std::string name = "Mike"}. In Line~10 the variable is initialized with the content provided by the standard input stream \lstinline[language=c++]{std::cin} and the \lstinline[language=c++]{>>} operator. In Line~12 the content of the variable is written to the standard output stream. Note that you can concatenate strings using the \lstinline[language=c++]{>>} operator multiple times. To generate a line break the statement \lstinline[language=c++]{std::endl} is used. Note that we only handled the basis features here, since these are necessary for the purpose of this course. For more details we refer to~\cite[Chapter~1]{andrew2000accelerated}.
 
 
-\lstinputlisting[language=C++,caption={Example reading and writing strings.\label{code:strings}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture1-string-io.cpp}
+\lstinputlisting[language=C++,caption={Example reading and writing strings.\label{code:strings}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture1-string-io.cpp}
 
 
 %----------------------------------------------------------------------------------------
@@ -863,11 +863,11 @@ In Line~7 the set of characters \lstinline[language=c++]{"Please enter your name
 %----------------------------------------------------------------------------------------
 For some applications, \emph{e.g.}\ Monte Carlo methods, see Chapter~\ref{sec:monte:carlo}, random numbers are essential. The trivial way to generate a integer random number in the range of zero and \cpp{RAND_MAX} is to use \cpp{std::rand}\link{http://www.cplusplus.com/reference/cstdlib/rand/} provided by the \cpp{#include <cstdlib>} header. Listing~\ref{code:srand} shows a small example to generate a random number. Note that one has to provide a seed to the random number generator to get a different random numbers each time the program is executed. One way to do so, is to use the current time \cpp{std::time(0)}\link{http://www.cplusplus.com/reference/ctime/time/?kw=time} provided by the \cpp{#include <ctime>} header. Line~10 shows how to use the current time passed as an argument \cpp{std::srand(std::time(0))} as a seed for the random number generator. Line~\mbox{12} shows how to get one random number. Note that the seed has to be set only once, but always before any random number is drawn.\\
 
-\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:srand}},float,floatplacement=tbp]{ParallelComputationMathExamples/chapter2/lecture2-random.cpp}
+\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:srand}},float,floatplacement=tbp]{ParallelComputationMathExamples/cpp/lecture2-random.cpp}
 
 For more advanced usage of random number generators the \cpp{#include<random>} header is provided. More advanced means that not only integer random number can be drawn and range can be provided. Listing~\ref{code:distrand} shows how to generate uniform distributed random numbers. Line~8 generates a random number device \cpp{std::random_device rd}\link{http://www.cplusplus.com/reference/random/random_device/}. Next, the engine for the random number generation is chosen. In this case the \cpp{mersenne_twister_engine}~\cite{matsumoto1998mersenne} is used by providing the random device as an argument \cpp{std::mt19937 gen(rd())}\link{http://www.cplusplus.com/reference/random/mersenne_twister_engine/}. Next the uniform distribution has to be specified by \cpp{std::uniform_int_distribution} for integer values and \cpp{std::uniform_real_distribution} for floating point numbers. In Line~12 the interval from 1 to 6 for integer numbers and in Line~14 for double numbers is specified. Line~15 shows how to get a random number by using the distribution by passing the engine as an argument \cpp{dis(gen)}.
 
-\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:distrand}},float,floatplacement=tbp]{ParallelComputationMathExamples/chapter2/lecture2-distrandom.cpp}
+\lstinputlisting[language=C++,caption={Example using the trivial random number generator.\label{code:distrand}},float,floatplacement=tbp]{ParallelComputationMathExamples/cpp/lecture2-distrandom.cpp}
 
 %----------------------------------------------------------------------------------------
 \section{Numerical limits}
@@ -879,7 +879,7 @@ For floating point numbers, two additional values are accessible, see Listing~\r
 the given floating-point type is shown. In Line~9 the value epsilon \cpp{std::numeric_limits<double>::epsilon()}\link{https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon} which is the difference between 1.0 and the next representable value of the given floating-point type is obtained. Fore more details about the IEEE 474 standard how floating point numbers are represented in the computer we refer to~\cite{4610935,goldberg1991every}. The next two lines of code show how to access the minimal and maximal value.
 
 
-\lstinputlisting[language=C++,caption={Example accessing the numerical limits of floating point types.\label{code:numerical:limits}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture3-limits2.cpp}
+\lstinputlisting[language=C++,caption={Example accessing the numerical limits of floating point types.\label{code:numerical:limits}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture3-limits2.cpp}
 
 
 %----------------------------------------------------------------------------------------
@@ -887,7 +887,7 @@ the given floating-point type is shown. In Line~9 the value epsilon \cpp{std::nu
 %----------------------------------------------------------------------------------------
 For numerical simulations, it is essential to read files, \emph{e.g.}\ configuration files, and store their values or write the simulation results to permanent storage. First, we look into how to read the content of a file line by line. To do so, the \cpp{ifstream}\link{https://en.cppreference.com/w/cpp/io/basic_ifstream} provided by the \cpp{#include <fstream>}\link{https://en.cppreference.com/w/cpp/header/fstream} header. Listing~\ref{code:io:reading} shows how to read the file's content \cpp{"example.txt"} line by line. In Line~7 a \cpp{ifstream} with the name \cpp{myfile} is declared. With the parentheses its constructor is called and the parameter is the file name of the file we want to open. Note that we assume that the file is located next to the cpp file. In Line~8 we check if the file could be opened successful. In that case the function \cpp{is_open()}\link{https://en.cppreference.com/w/cpp/io/basic_fstream/is_open} will return \cpp{true}. In line~10 the function \cpp{getline}\link{https://en.cppreference.com/w/cpp/string/basic_string/getline} is called to access the each line of the file. The first argument is the \cpp{ifstream} and the second argument is a \cpp{std::string} where the line of the file is stored. Each time the function is called there is new content in the argument \cpp{line}. If there is no next line. the function returns \cpp{false} and the \cpp{while} loop stops. In Line~16 the \cpp{ifstream} is closed by calling the \cpp{close()}\link{https://en.cppreference.com/w/cpp/io/basic_ifstream/close} function.\\
 
-\lstinputlisting[language=C++,caption={Example for reading the content of file "example.txt" line by line.\label{code:io:reading}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture3-reading.cpp}
+\lstinputlisting[language=C++,caption={Example for reading the content of file "example.txt" line by line.\label{code:io:reading}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture3-reading.cpp}
 
 \begin{exercise}
 Instead of printing the file content to the standard output device, store each line of the file in a \cpp{std::vector<string>}.
@@ -900,7 +900,7 @@ Second, we look into how to write the text \cpp{"Writing this to a file"} into t
 Instead writing one string to the file, write all string in a \cpp{std::vector<string>} to the file with each string in a new line.
 \end{exercise}
 
-\lstinputlisting[language=C++,caption={Example for writing to the file "example.txt".\label{code:io:writing}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture3-writing.cpp}. 
+\lstinputlisting[language=C++,caption={Example for writing to the file "example.txt".\label{code:io:writing}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture3-writing.cpp}. 
 
 
 \newpage
@@ -986,7 +986,7 @@ of the number from one to $n$. Listing~\ref{code:average} sketches how to comput
 
 In this example multiple values are read from the standard input using \cpp{while (std::cin >> x)} in Line~9. The \cpp{while} statement reads a new value from the standard input device, stores it in the variable \cpp{x}, until the users types \cpp{\\n}, which corresponds to a line break, since the loop condition is \cpp{false}. However, if we want to compute the median of a list of elements, we need to store the elements, process them, and print the average. To store these elements, we will look into the \cpp{std::vector} container and the \cpp{#include<algorithm>} header. In Section~\ref{sec:stl:algorithms} an example to compute the average is provided, since we have all the needed ingredients studied. For more details we refer to~\cite[Chapter~3]{andrew2000accelerated}.  
 
-\lstinputlisting[language=C++,caption={Computation of the average of the numbers from one to $n$.\label{code:average}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture2-average.cpp}
+\lstinputlisting[language=C++,caption={Computation of the average of the numbers from one to $n$.\label{code:average}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture2-average.cpp}
 
 %----------------------------------------------------------------------------------------
 \subsection{Vector}
@@ -1012,7 +1012,7 @@ Compared to other containers, \emph{e.g.}\ \cpp{std::list}, the \cpp{std::vector
 \end{enumerate}
 For example the complexity for inserting or removing an element in a vector is $\mathcal{O}(n^2)$ and for the container \cpp{std::list} the complexity is $\mathcal{O}(n)$~\cite{michalewicz2013genetic,knuth1997art}.
 
-\lstinputlisting[language=C++,caption={Computation of the average of the numbers from one to $n$ using containers.\label{code:averagecontainers}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture2-averagecontainers.cpp}
+\lstinputlisting[language=C++,caption={Computation of the average of the numbers from one to $n$ using containers.\label{code:averagecontainers}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture2-averagecontainers.cpp}
 
 
 %----------------------------------------------------------------------------------------
@@ -1096,7 +1096,7 @@ Using iterators, we can do advanced iterating over vectors, see Listing~\ref{cod
 
 With the iterators erasing elements gets easier, since we can use the expression \cpp{values.erase(iter)}\link{https://en.cppreference.com/w/cpp/string/basic_string/erase} instead of \cpp{vlaues.erase(values.begin()+i)}. Note that the \cpp{erase} function returns the iterator of the element the iterator is pointing to after the deletion \cpp{iter = vlaues.erase(iter)} which is useful for some algorithms.
 
-\lstinputlisting[language=C++,caption={Printing a vector using iterators.\label{code:for:iterator}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture3-for-iterator.cpp}
+\lstinputlisting[language=C++,caption={Printing a vector using iterators.\label{code:for:iterator}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture3-for-iterator.cpp}
 
 
 
@@ -1117,7 +1117,7 @@ To compute the median of a \cpp{std::vector}, we have to sort the vector first. 
 
 Line~13 shows how to use sort the values stored in the \cpp{std::vector} in Line~9--12. one has to provide the range of the vector to the sort function. Note that the current values in the vector will be replaced by the sorted ones. To keep the unsorted valued, a copy of the vector can be obtained by the \cpp{std::copy}\link{https://en.cppreference.com/w/cpp/algorithm/copy} algorithm.\\
 
-\lstinputlisting[language=C++,caption={Computation of the median using the sorting algorithm provided by the STL.\label{code:median}},float,floatplacement=tb]{ParallelComputationMathExamples/chapter2/lecture2-median.cpp}
+\lstinputlisting[language=C++,caption={Computation of the median using the sorting algorithm provided by the STL.\label{code:median}},float,floatplacement=tb]{ParallelComputationMathExamples/cpp/lecture2-median.cpp}
 
 Another example is to compute the sum of all elements of a \cpp{std::vector} using a \cpp{for} loop or using the \cpp{std::accumulate}\link{https://en.cppreference.com/w/cpp/algorithm/accumulate} provided by the \cpp{#include <numerics>}\link{https://en.cppreference.com/w/cpp/header/numeric} header. Listing~\ref{code:algorithms:showcase} shows how to compute the sum and some neat algorithms. To fill a vector with the values one to ten, the function \cpp{std::ito}\link{https://en.cppreference.com/w/cpp/algorithm/iota} in Line~8 is used instead of writing a for loop. In Line~12--13 the sum is computed using the loop and in Line~17 the sum computed using the STL. One can easily see that the code in Line~17 is shorter and easier to understand. Therefore, it is recommended to use the STL were possible. In line~25--29 the values of the vector are printed to the standard output stream using a \cpp{for} loop. In Line~32 instead of using the \cpp{for} loop, the expression \cpp{std::for_each}\link{https://en.cppreference.com/w/cpp/algorithm/for_each} provided by the \cpp{#include <algorithm>} header is used. This lien of code iterates over all elements in the vector and call the function \cpp{print} and passes each element to the function. Note that the function can have only one argument and its type has to match the type of the vector.\\
 
@@ -1186,7 +1186,7 @@ Fore more details, we refer to the talk ``The C++17 Parallel Algorithms Library 
 Beyond''\link{https://www.youtube.com/watch?v=Vck6kzWjY88} at CppCon 2016. Listing~\ref{code:parallel:compile} shows how to compile the code using the experimental feature and some time measurements.
 
 
-\lstinputlisting[language=C++,caption={Computation of the median using the sorting algorithm provided by the STL.\label{code:parallel:algorithms}},float,floatplacement=tbp]{ParallelComputationMathExamples/chapter2/lecture6-loops.cpp}
+\lstinputlisting[language=C++,caption={Computation of the median using the sorting algorithm provided by the STL.\label{code:parallel:algorithms}},float,floatplacement=tbp]{ParallelComputationMathExamples/cpp/lecture6-loops.cpp}
 
 
 \begin{lstlisting}[language=bash,caption={Compilation of the parallel algorithm example.\label{code:parallel:compile}},float,floatplacement=tb]
