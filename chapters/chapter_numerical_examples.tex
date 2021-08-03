@@ -995,9 +995,179 @@ class stepper
 }
 \end{lstlisting}
 
+%----------------------------------------------------------------------------------------
+\section{Futurized implementation}
+%----------------------------------------------------------------------------------------
+HPX provides additional features for asynchronous programming which are not yet in the C++ standard. In this section, we look into these. Therefore, we look into the \cpp{struct stepper} of the serial version, see Listing~\ref{code:heat:central:difference}, and add futures to have asynchronous execution of the solver for the one-dimensional heat equation. Listing~\ref{code:hpx:future:ready} shows the new \cpp{struct stepper} using futures. The first change is that the type \cpp{partition}, which was a simple \cpp{double} value before, is replaced by \cpp{hpx::shared_future}\index{future!shared}. Note that the \cpp{hpx::lcos::future} has the exclusive ownership model and if the future is out of scope, it will be not available anymore. To avoid the out of scope situation, the \cpp{hpx::shared_future} has the reference counting ownership model. Here, all references to the object are counted and the object solely goes out of scope if there are zero references. These concepts are equal to \cpp{std::unique_ptr}\link{https://en.cppreference.com/w/cpp/memory/unique_ptr} and \cpp{std::shared_ptr}\link{https://en.cppreference.com/w/cpp/memory/shared_ptr}.\\
+ 
+The first feature is the keyword \cpp{hpx::make_ready_future}\link{https://hpx-docs.stellar-group.org/latest/html/api.html?highlight=make_ready_future}\index{future!ready}, see Line~22 of Listing~\ref{code:hpx:future:ready}. Since the \cpp{partition} is now a \cpp{hpx::shared_future} the boundary conditions and initial conditions have to be a future too. However, since these are constant values and no computation is needed the future is immediately ready. Since HPX does not know that there is no execution, we can use a \cpp{hpx::make_ready_future} ready to propagate this information to the asynchronous execution tree.\\
+
+Second, since we use futures for the \cpp{partition}, but the function to evaluate the central difference \cpp{heat(double left, double middle, double right)} takes \cpp{double} values as arguments. We either have to change the function to take futures as its arguments and call the \cpp{.get()} function inside. To avoid these two things, HPX provides the so-called unwrapping of a function with the keyword \cpp{hpx::util::unwrapping}\index{HPX!unwrapping}. In Line~24 of Listing~\ref{code:hpx:future:ready} the function \cpp{heat} is unwrapped and the function \cpp{Op} takes futures as its arguments. So In Line~37 of the \cpp{hpx::launch::async} we can pass the \cpp{current} elements which are of the type \cpp{hpx::shared_future<double>} to a function which assumes \cpp{double values}.\\
+
+Third, HPX has the keyword \cpp{hpx::dataflow}\index{HPX!dataflow} to use unwrapping for the combination of \cpp{hpx::when_all} and \cpp{.then}. Imagine you have a vector \cpp{std::vector<hpx::lcos::future<int>> futures;} and pass it to \cpp{hpx::when_all(futures).then([](auto&& f)\{\});} the vector \cpp{futures} will be wrapped in the future \cpp{auto&& f}. SO if we want to access the elements of the vector we have to call \cpp{f.get()}. An easier approach is to use \cpp{hpx::dataflow} as it is done in Line~36 in Listing~\ref{code:hpx:future:ready}. The first argument is \cpp{hpx::launch::async} to launch asynchronous and a future is returned. Another possibility is to use \cpp{hpx::launch::sync} to launch synchronous. The second argument is the unwrapped function of the \cpp{heat} function, see Line~24. The last three remaining arguments are the futures with the values for the central difference scheme evaluation. Before we can return the current solution, we have to call \cpp{hpx::when_all} to synchronous all futures of the current solution.\\
+
+Figure~\ref{fig::stencil:benchmark:1} shows the execution time of the serial vs the asynchronous implementation for 1 CPU. We clearly see that the execution time even for one CPU is lower. Figure~\ref{fig::stencil:benchmark:2} shows the execution time for various amount of CPUs for the asynchronous implementation. Here, we can see that for enough grid points the we get some benefit for adding more CPUs which means we have to have enough work to keep the CPUs busy. To obtain better results, we have to extend the code to control its granularity.
+
+\begin{lstlisting}[language=c++,caption={Futurized version of the one-dimensional heat equation.\label{code:hpx:future:ready}},float,floatplacement=tbp]
+struct stepper
+{
+    // Our partition type
+    typedef hpx::shared_future<double> partition;
+
+    // Our data for one time step
+    typedef std::vector<partition> space;
+
+    // do all the work on 'nx' data points for 'nt' time steps
+    hpx::future<space> do_work(std::size_t nx, std::size_t nt)
+    {
+        using hpx::dataflow;
+        using hpx::util::unwrapping;
+
+        // U[t][i] is the state of position i at time t.
+        std::vector<space> U(2);
+        for (space& s : U)
+            s.resize(nx);
+
+        // Initial conditions: f(0, i) = i
+        for (std::size_t i = 0; i != nx; ++i)
+            U[0][i] = hpx::make_ready_future(double(i));
+
+        auto Op = unwrapping(&stepper::heat);
+
+        // Actual time step loop
+        for (std::size_t t = 0; t != nt; ++t)
+        {
+            space const& current = U[t % 2];
+            space& next = U[(t + 1) % 2];
+
+            // WHEN U[t][i-1], U[t][i], and U[t][i+1] have been computed, THEN we
+            // can compute U[t+1][i]
+            for (std::size_t i = 0; i != nx; ++i)
+            {
+                next[i] = dataflow(
+                        hpx::launch::async, Op,
+                        current[idx(i, -1, nx)], current[i], current[idx(i, +1, nx)]
+                    );
+            }
+        }
+
+        // Return the solution at time-step 'nt'.
+        return hpx::when_all(U[nt % 2]);
+    }
+};
+\end{lstlisting}
+
+
+\begin{figure}[btp]
+\centering
+\begin{subfigure}{.4\textwidth}
+\begin{tikzpicture}
+\selectcolormodel{gray}
+\begin{axis}[xlabel=Grid points,ylabel=Execution time, grid=both,title=1 CPU]
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_serial.dat};
+\addlegendentry{Serial}
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_1.dat};
+\addlegendentry{Futurization}
+\end{axis} 
+\end{tikzpicture}
+\caption{Serial vs asynchronous execution}
+\label{fig::stencil:benchmark:1}
+\end{subfigure}
+
+\begin{subfigure}{.4\textwidth}
+\begin{tikzpicture}
+\selectcolormodel{gray}
+\begin{axis}[xlabel=Grid points,ylabel=Execution time, grid=both,title= Stencil 2,legend pos=north west]
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_1.dat};
+\addlegendentry{1 CPU}
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_2.dat};
+\addlegendentry{2 CPU}
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_4.dat};
+\addlegendentry{4 CPU}
+\addplot table [x=Grid_Points, y=Execution_Time_sec, col sep=comma] {./data/stencil_2_6.dat};
+\addlegendentry{6 CPU}
+\end{axis}
+\end{tikzpicture}
+\caption{Execution time for various number of CPUs for the asynchronous implementation}
+\label{fig::stencil:benchmark:2}
+\end{subfigure}
+\caption{Comparison of the serial vs asynchronous execution~(\subref{fig::stencil:benchmark:1}) and speed-up for various amount of CPUs~(\subref{fig::stencil:benchmark:2}).}
+\label{fig:hpx:stencil:scaling1}
+\end{figure}
 
 %----------------------------------------------------------------------------------------
-\subsection{Distributed implementation}
+\subsection{Adding grain size control}
+%----------------------------------------------------------------------------------------
+In Section~\ref{heatequation:serial:grainsize} the control of the granularity was added to the serial implementation of the one-dimensional heat equation. here, we extend the code with the futurization with the grain size control. First, we extend the \cpp{struct partion_data}, see Listing~\ref{code:hpx:future:grain}. In Line~39 we change the class members to a \cpp{double []} array and we introduce \cpp{size_t size_} to the store the size of the partition. Note that we use a smart pointer \cpp{std::unique_ptr} to store the  \cpp{double []} array. The shared pointer is essential since we need to use the reference counter model to keep track that the array does not go out of scope. For more details about smart pointer we refer to Section~\ref{cpp:smart:pointer}. In the constructor, we use the expression \cpp{new double [size]} to allocate a double array od the size \cpp{size}. Fore more details about the \cpp{new} expression, we refer to Section~\ref{sec:memory:management}. \\
+
+By adding the grain size control to futurized implementation, we see some performance improvement compared to the previous implementation, see Figure~\ref{fig:hpx:stencil:scaling1}. In Figure~\ref{fig:scaling:future:grain:size} the number of discrete nodes is fixed to $1000000$ and the grain size varies which means the amount of point inside a partition change. For using one and two CPUs, we see the typical curve for the grain size control. Using a grain size of one results in the largest execution time. First, while increasing the grain size the execution times goes down until the so-called sweet spot. At the sweet spot the execution is as its minimum and decreases after. Here, it is important to find this sweet spot which depends on various factors, \emph{e.g.}\ the computation, the algorithm, and the architecture of the hardware. So for each amount of discrete nodes one has to find the sweet spot.
+
+
+\begin{lstlisting}[language=c++,caption={Adding the grain size control the futurized one-dimensional heat equation.\label{code:hpx:future:grain}},float,floatplacement=tbp]
+struct partition_data
+{
+public:
+    explicit partition_data(std::size_t size)
+      : data_(new double[size])
+      , size_(size)
+    {
+    }
+
+    partition_data(std::size_t size, double initial_value)
+      : data_(new double[size])
+      , size_(size)
+    {
+        double base_value = double(initial_value * size);
+        for (std::size_t i = 0; i != size; ++i)
+            data_[i] = base_value + double(i);
+    }
+
+    partition_data(partition_data&& other) noexcept
+      : data_(std::move(other.data_))
+      , size_(other.size_)
+    {
+    }
+
+    double& operator[](std::size_t idx)
+    {
+        return data_[idx];
+    }
+    double operator[](std::size_t idx) const
+    {
+        return data_[idx];
+    }
+
+    std::size_t size() const
+    {
+        return size_;
+    }
+
+private:
+    std::unique_ptr<double[]> data_;
+    std::size_t size_;
+};
+
+\end{lstlisting}
+
+\begin{figure}[tbp]
+\centering
+\begin{tikzpicture}
+\selectcolormodel{gray}
+\begin{axis}[xlabel=Partitions,ylabel=Execution time, grid=both,title=Stencil 4,legend pos=north west]
+\addplot table [x=Partitions, y=Execution_Time_sec, col sep=comma] {./data/stencil_4_1cpu_1000000.dat};
+\addlegendentry{1 CPU}
+\addplot table [x=Partitions, y=Execution_Time_sec, col sep=comma] {./data/stencil_4_2cpu_1000000.dat};
+\addlegendentry{2 CPU}
+\end{axis}
+\end{tikzpicture}
+\caption{Variation of grain size for fixed $1000000$ discrete nodes. For one CPU and the two CPUs, we see the typical curve where the execution time goes down, ther sweet spot is reached, and the execution increases after. }
+\label{fig:scaling:future:grain:size}
+\end{figure}
+
+
+
+%----------------------------------------------------------------------------------------
+\section{Distributed implementation}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
