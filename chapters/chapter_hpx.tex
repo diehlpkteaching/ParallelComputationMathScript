@@ -77,6 +77,7 @@ make
 
 %----------------------------------------------------------------------------------------
 \section{Parallel algorithms}
+\label{sec:hpx:parallel:algorithms}
 \index{algorithms!parallel}
 \index{parallel algorithms}
 \index{HPX!parallel algorithms}
@@ -222,6 +223,45 @@ hpx::when_all(futures).then([](auto&& f){
 \subsection{Advanced asynchronous programming}
 \label{sec:hpx:advanced:sync}
 %----------------------------------------------------------------------------------------
+HPX provides additional features for asynchronous programming which are not yet in the C++ standard. In this section, we look into these features on some small examples, In Section~\ref{heatequation:async} all of them are combined to have the asynchronous implementation of one-dimensional heat equation. First, we look into one feature which will not be used for the one-dimensional heat equation, however, it is still useful to combine the parallel algorithms in Section~\ref{sec:hpx:parallel:algorithms} with asynchronous programming. This feature is shown in Line~22 of Listing~\ref{code:hpx:parallel:reduce}. Second, we will look into the features which we will use for the asynchronous implementation of the heat equation. In some cases, for example if we initialize values at the beginning of simulation, we need a future to synchronize with the actual computation but this future is already ready since no computation is needed. Listing~\ref{code:hpx:future:ready} shows the usage of \lstinline|hpx::make_ready_future| to generate a future filled with the initial value of one. Since we used a so-called ready future the code in Line~6 will be immediately executed, since there will no barrier because the future is ready and the data is available when we call \lstinline|.get()|.
+
+
+\begin{lstlisting}[language=c++,caption={Use a ready future to initialize the computational data.\label{code:hpx:future:ready}},float,floatplacement=tb]
+auto f = hpx::make_ready_future(1);
+/* 
+ * Since the future is ready the output will happen
+ * and there will be no barrier.
+ */
+std::cout << f.get() << std::endl;
+\end{lstlisting}
+
+
+Another important feature is the unwrapping the futures to pass their content to some function directly without calling \lstinline|.get()| for all of the futures. Look at Listing~\ref{code:hpx:unwrapping} shows the function \lstinline|sum| taking two integers as its arguments and print their sum on the standard output stream in Line~\ref{code:hpx:unwrapping:sum}. In Line~\ref{code:hpx:unwrapping:async1} and Line~\ref{code:hpx:unwrapping:async2} we call the function \lstinline|square| asynchronously, which is not shown here and just computes the square of the argument. In Line~\ref{code:hpx:unwrapping:sum1} the function \lstinline|sum| is called and we need to call \lstinline|.get()| twice to access the content of the futures. Doing this for two futures is doable, but no really convenient. HPX provides the unwrapping of the function \lstinline|sum| so the \lstinline|.get()| will be called internally and we can pass the futures directly to the function. In Line~\ref{code:hpx:unwrapping:unwrap} we use \lstinline|hpx::util::unwrapping| to unwrap the function \lstinline|sum| and we get some function pointer \lstinline|fp| back which points to the unwrapped function. In Line~\ref{code:hpx:unwrapping:dataflow} we can now use \lstinline|hpx::dataflow| to launch the function pointer \lstinline|fp| synchronously and passing the futures directly without calling the \lstinline|.get()|. 
+
+
+\begin{lstlisting}[language=c++,caption={Unwrapping a function to pass futures without calling \lstinline|.get()|.\label{code:hpx:unwrapping}},float,floatplacement=tb,escapechar=|]
+void sum(int first, int second){ |\label{code:hpx:unwrapping:sum}|
+
+std:: cout << first + second << std::endl;
+
+}
+
+auto f1 = hpx::async(square,10); |\label{code:hpx:unwrapping:async1}|
+auto f2 = hpx::async(square,100); |\label{code:hpx:unwrapping:async2}|
+
+// We have to call .get() to pass 
+// the values of the future
+sum(f1.get(),f2.get()); |\label{code:hpx:unwrapping:sum1}|
+
+// We can unwrapp the function
+auto fp = hpx::util::unwrapping(sum); |\label{code:hpx:unwrapping:unwrap}|
+
+// After unwrapping, we can pass the future
+// directly to the function
+hpx::dataflow(hpx::launch::sync,fp,f1,f2); |\label{code:hpx:unwrapping:dataflow}|
+
+\end{lstlisting}
+
 
 %----------------------------------------------------------------------------------------
 \section{Semaphores}

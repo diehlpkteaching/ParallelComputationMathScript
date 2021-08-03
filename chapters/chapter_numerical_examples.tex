@@ -997,6 +997,7 @@ class stepper
 
 %----------------------------------------------------------------------------------------
 \section{Futurized implementation}
+\label{heatequation:async}
 %----------------------------------------------------------------------------------------
 HPX provides additional features for asynchronous programming which are not yet in the C++ standard. In this section, we look into these. Therefore, we look into the \cpp{struct stepper} of the serial version, see Listing~\ref{code:heat:central:difference}, and add futures to have asynchronous execution of the solver for the one-dimensional heat equation. Listing~\ref{code:hpx:future:ready} shows the new \cpp{struct stepper} using futures. The first change is that the type \cpp{partition}, which was a simple \cpp{double} value before, is replaced by \cpp{hpx::shared_future}\index{future!shared}. Note that the \cpp{hpx::lcos::future} has the exclusive ownership model and if the future is out of scope, it will be not available anymore. To avoid the out of scope situation, the \cpp{hpx::shared_future} has the reference counting ownership model. Here, all references to the object are counted and the object solely goes out of scope if there are zero references. These concepts are equal to \cpp{std::unique_ptr}\link{https://en.cppreference.com/w/cpp/memory/unique_ptr} and \cpp{std::shared_ptr}\link{https://en.cppreference.com/w/cpp/memory/shared_ptr}.\\
  
