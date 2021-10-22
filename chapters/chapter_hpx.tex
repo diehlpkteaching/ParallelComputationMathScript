@@ -414,6 +414,8 @@ Allows to wrap global (\cpp{static} functions in an action. So we can call this 
 \subsubsection{Action}
 \index{action!component}
 %----------------------------------------------------------------------------------------
+For the distributed implementation, we need to create and access data remotely located on one computational node from another computational node over the network. To do so, we use the concept of a \cpp{class}, see Section~\ref{sec:intro:cpp}, and extend it to a so--called HPX component. 
+
 
 
 %----------------------------------------------------------------------------------------
@@ -494,4 +496,4 @@ Provides \cpp{hpx::dataflow::dataflow}, see for example Listing~\ref{code:hpx:fu
 \end{itemize}
 
 \newpage
-\theendnotes
+\printendnotes
